@@ -1,0 +1,30 @@
+{
+  "name": "@agility/app-sdk",
+  "version": "0.0.1",
+  "description": "JavaScript library for building Agility CMS apps.",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "webpack --config webpack.config --mode=production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/agility/agility-cms-app-sdk.git"
+  },
+  "author": "James Vidler",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/agility/agility-cms-app-sdk/issues"
+  },
+  "homepage": "https://github.com/agility/agility-cms-app-sdk",
+  "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.3.4",
+    "@babel/node": "^7.2.2",
+    "@babel/preset-env": "^7.3.4",
+    "@babel/register": "^7.0.0",
+    "babel-loader": "^8.0.5",
+    "webpack": "^5.59.1",
+    "webpack-cli": "^4.9.1"
+  },
+  "dependencies": {}
+}
