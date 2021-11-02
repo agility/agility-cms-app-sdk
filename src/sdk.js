@@ -3,7 +3,6 @@ const APP_LOCATION_UNKNOWN = 'Unknown';
 const APP_LOCATION_APP_CONFIG = 'AppConfig';
 const APP_LOCATION_FLYOUT = 'Flyout';
 
-
 const setAppConfig = (appConfig) => {
     if (window.parent) {
         window.parent.postMessage({
@@ -13,10 +12,14 @@ const setAppConfig = (appConfig) => {
     }
 }
 
-const initializeField = ({ location, containerRef, onReady }) => {
+let fieldInfo = {};
+
+const initializeField = ({ containerRef, onReady }) => {
     
     const fieldID = getUrlParameter('fieldID');
     const fieldName = getUrlParameter('fieldName');
+    const location = getUrlParameter('location');
+
     var messageID = getMessageID({location, fieldName, fieldID});
 
     autoSyncFieldHeight({ containerRef, messageID });
@@ -30,7 +33,13 @@ const initializeField = ({ location, containerRef, onReady }) => {
         //only care about these messages
         if(e.data.type === `setInitialProps_for_${messageID}`) {
             console.log(`${messageID} => auth, fieldValue received from Agility CMS, setting up field...`)
-            onReady(e.data.message);
+
+            //set field info that we can re-use later
+            fieldInfo = e.data.message;
+            fieldInfo.location = location;
+
+            onReady(fieldInfo);
+
         } else {
             //show us the unhandled message...
             console.log(`${messageID} => IGNORING MESSAGE FROM PARENT: `, e.data)
@@ -47,14 +56,20 @@ const initializeField = ({ location, containerRef, onReady }) => {
     } else {
         console.log(`${messageID} => 😞 Parent window not found. You must load this within Agility CMS as an iFrame.`)
     }
+
 }
 
 const getMessageID = ({ location, fieldName, fieldID }) => {
     return location + '_' + fieldName + '_' + fieldID;
 }
 
-const updateFieldValue = ({ value, location, fieldName, fieldID }) => {
-    var messageID = getMessageID({location, fieldName, fieldID});
+const updateFieldValue = ({ value }) => {
+    var messageID = getMessageID({
+        location: fieldInfo.location,
+        fieldName: fieldInfo.fieldName,
+        fieldID: fieldInfo.fieldID
+    });
+
     if (window.parent) {
         window.parent.postMessage({
             message: value,
@@ -85,15 +100,19 @@ const autoSyncFieldHeight = ({ containerRef, messageID }) => {
     }, 500)
 }
 
-const openFlyout = ({title, size, appLocationName, fieldName, fieldID, onClose, params }) => {
-    const messageID = getMessageID({location:APP_LOCATION_CUSTOM_FIELD, fieldID, fieldName });
+const openFlyout = ({title, size, name, onClose, params }) => {
+    const messageID = getMessageID({
+        location:APP_LOCATION_CUSTOM_FIELD,
+        fieldID: fieldInfo.fieldID,
+        fieldName: fieldInfo.fieldName
+     });
+
     if (window.parent) {
         window.parent.postMessage({
             message: {
                 title,
                 size,
-                appLocation: APP_LOCATION_FLYOUT,
-                appLocationName,
+                name,
                 params
             },
             type: `openFlyout_for_${messageID}`
@@ -110,16 +129,16 @@ const openFlyout = ({title, size, appLocationName, fieldName, fieldID, onClose, 
     }
 }
 
-const closeFlyout = ({ fieldName, fieldID, params }) => {
+const closeFlyout = ({ params }) => {
 
     const location = APP_LOCATION_CUSTOM_FIELD;
-    const messageID = getMessageID({ location, fieldID, fieldName})
+    const messageID = getMessageID({ location, fieldID: fieldInfo.fieldID, fieldName: fieldInfo.fieldName})
     if (window.parent) {
         window.parent.postMessage({
             message: {
                 location,
-                fieldName,
-                fieldID,
+                fieldName: fieldInfo.fieldName,
+                fieldID: fieldInfo.fieldID,
                 params
             },
             type: `closeFlyout_for_${messageID}`
@@ -140,8 +159,10 @@ const getAppLocation = () => {
             location
         }
     } else if(location === APP_LOCATION_FLYOUT) {
+        const flyoutName = getUrlParameter('flyoutName');
         return {
-            location
+            location,
+            name: flyoutName
         }
     } else {
         return {
@@ -173,12 +194,34 @@ const getUrlParameter = (name) => {
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 };
 
+const subscribeToFieldValueChanges = ({ fieldName, onChange}) => {
+    const messageID = getMessageID({ fieldID: fieldInfo.fieldID, fieldName: fieldInfo.fieldName, location: fieldInfo.location })
+    //open a channel to listen to messages from the CMS when field values change
+    window.addEventListener("message", function (e) {
+        //only care about these messages
+        if(e.data.type === `otherValueChanged_${fieldName}_for_${messageID}`) {
+            onChange(e.data.message);
+        }
+    }, false);
+
+    //let the CMS know we are NOW ready to receive messages
+    if (window.parent) {
+        window.parent.postMessage({
+            message: fieldName,
+            type: `subscribeToOtherValueChanges_${messageID}`
+        }, "*")
+    } else {
+        console.log(`${messageID} => 😞 Parent window not found. You must load this within Agility CMS as an iFrame.`)
+    }
+}
+
 
 export  {
     setAppConfig,
     initializeField,
     updateFieldValue,
     updateFieldHeight,
+    subscribeToFieldValueChanges,
     getAppLocation,
     resolveAppComponent,
     openFlyout,
