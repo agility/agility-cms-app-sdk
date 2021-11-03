@@ -145,6 +145,7 @@ const appConfig =
     ]
 };
 ```
+### App Configuration Parameters
 **`*`** Represents a required configuration parameter.
 
 `name: <string> *`
@@ -180,13 +181,28 @@ The array of components that your App supports. It *must* include a component wi
 - `agilityAppSDK.locations.APP_LOCATION_CUSTOM_FIELD`
 - `agilityAppSDK.locations.APP_LOCATION_FLYOUT`
 
-`appComponents[].name <string> *` => The reference name of the component. For Custom Fields, this is used to store the name of the custom field type in your Models. For Flyouts, this represents a unique name for opening flyouts (if you have many).
+`appComponents[].name <string> *`
 
-`appComponents[].componentToRender <string> *` => The name of your component that will be used to determine which UI component to render. This is returned from `agilityAppSDK.resolveAppComponent(appConfig)`.
+The reference name of the component. For Custom Fields, this is used to store the name of the custom field type in your Models. For Flyouts, this represents a unique name for opening flyouts (if you have many).
 
-`appComponents[].label <string>` (* required for **Custom Fields**) - This is the friendly label of the custom field which is used in Models to display a list of all available custom fields.
+`appComponents[].componentToRender <string> *`
+
+The name of your component that will be used to determine which UI component to render. This is returned from `agilityAppSDK.resolveAppComponent(appConfig)`.
+
+`appComponents[].label <string> * (Required for **Custom Fields** only)` 
+
+This is the friendly label of the custom field which is used in Models to display a list of all available custom fields.
+
+***
+
+### Using the App Configuration
 
 Once you have established your App Configuration, you need to tell Agility CMS about it within your `AppConfig` component when requested.
+
+`agilityAppSDK.initializeAppConfig(<appConfig>): void`
+
+Sends a message to the CMS to inform it of our App.
+
 
 An example of this in React `AppConfig.js`
 ```javascript
@@ -208,9 +224,12 @@ function AppConfig({ appConfig }) {
 
 export default AppConfig;
 ```
+**Note**: If your App does not notify the CMS about its configuration within *3 seconds* of being requested, we'll treat the App as non-responsive and prevent it from being used in the CMS.
+
 
 ## Set Up your Custom Field
 Now that you have your **App Index** and **App Config** set up, the next step is to set up your custom field component(s).
+
 
 An example of this in React `BasicCustomField.js`:
 ```javascript
@@ -283,13 +302,79 @@ function BasicCustomField() {
 export default BasicCustomField;
 ```
 
-The above example shows how you initialize the field, can subscribe to other field changes, set the field value, as well as open a flyout.
+The above example shows how you *initialize the field*, can *subscribe to other field changes*, *set the field value*, as well as *open a flyout*.
 
-First, you need to call `agilityAppSDK.initializeField({ containerRef: <HtmlElem> })`, this will return a `Promise` which will be resolved with the `fieldSDK` client that can be used to interact with the field.
+### Using the Field SDK
+In order to interact with your content, you need to call:
 
-- `fieldSDK {}`  - This is the object returned from `agilityAppSDK.initializeField`.
-- `fieldSDK.updateFieldValue({ fieldValue: <string|number|decimal>, fieldName: <string> })` -  The method used to set a field value on the content item. If no `fieldName` is set, it will set the value for the current custom field being rendered.
-- `fieldsSDK.
+```
+agilityAppSDK.initializeField({
+    containerRef: <HtmlElem>
+}): Promise<fieldSDK>
+```
+
+This will return a `Promise` which will be resolved with the `fieldSDK` client that can be used to interact with the field.
+
+***
+```
+fieldSDK <object>
+```
+
+The object returned from `agilityAppSDK.initializeField` and the base SDK to use for interacting with custom fields and the content it is loaded on.
+***
+```
+fieldSDK.updateFieldValue({
+    fieldValue: <string|number|decimal>,
+    fieldName: <string>
+}): void
+```
+
+Sets a field value on the content item. If no `fieldName` is set, it will set the value for the current custom field being rendered.
+***
+```
+fieldSDK.subscribeToFieldValueChanges({
+    fieldName: <string>,
+    onChange: <function>
+}): void
+```
+
+Notifies when the value of a specific field **changes** on the content item. If a change occurs, the `onChange` function is called and passes the `fieldName <string>` and `fieldValue <string|number|decimal>` as parameters.
+***
+```
+fieldSDK.openFlyout({ 
+    title: <string>,
+    size: <string>,
+    name: <string>,
+    onClose: <function>,
+    params: <object> 
+}): void
+```
+Notifies the CMS to open a **Flyout** in the CMS and use a **Flyout** component from your App. 
+
+**Open Flyout Parameters**:
+
+`title <string>`
+
+The friendly title of the Flyout. It will be shown as the title of the Flyout in the CMS.
+
+`size <string>` 
+
+The size of the Flyout to open. Valid values are:
+- `agilityAppSDK.flyouts.APP_FLYOUT_SIZE_SMALL`
+- `agilityAppSDK.flyouts.APP_FLYOUT_SIZE_LARGE`
+
+`name <string>`
+
+The unique name of your Flyout. This *must* correspond to a known Flyout component with a matching `name` in your `AppConfig`.
+
+`onClose <function>`
+
+The function callback for when the Flyout is programatically closed from within the target Flyout component. This is useful for scenarios where you need to get some input from a user interaction that occurred in the flyout back to the custom field that called it. 
+
+When the Flyout calls `closeFlyout`, any user defined `params` that were passed as an argument will be sent through as `params` in this `onClose` callback.
+
+***
+
 
 
 

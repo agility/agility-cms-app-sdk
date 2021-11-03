@@ -1,5 +1,6 @@
 import * as fieldMethods from './fields'
 import locations from './locations'
+import flyouts from './flyouts'
 import 'regenerator-runtime/runtime.js'
 import { getUrlParameter, getMessageID, autoSyncFieldHeight } from './utils'
 
@@ -113,5 +114,6 @@ export  {
     initializeAppConfig,
     initializeField,
     resolveAppComponent,
-    locations
+    locations,
+    flyouts
 }
