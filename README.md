@@ -331,7 +331,7 @@ fieldSDK.updateFieldValue({
 
 Sets a field value on the content item. If no `fieldName` is set, it will set the value for the current custom field being rendered.
 
-**Note**: When setting a `fieldName`, it should match the exact casing of the `apiName` for the field as show in Agility CMS for the associated content model. 
+**Note**: When setting a `fieldName`, it should match the exact casing of the `apiName` for the field as shown in Agility CMS for the associated content model. 
 ***
 #### Subscribing to Field Value Changes
 ```
@@ -355,7 +355,7 @@ fieldSDK.openFlyout({
 ```
 Notifies the CMS to open a **Flyout** in the CMS and use a **Flyout** component from your App. 
 
-**Open Flyout Parameters**:
+Open Flyout Parameters:
 
 `title <string>`
 
@@ -376,9 +376,70 @@ The unique name of your Flyout. This *must* correspond to a known Flyout compone
 The function callback for when the Flyout is programatically closed from within the target Flyout component. This is useful for scenarios where you need to get some input from a user interaction that occurred in the flyout back to the custom field that called it. 
 
 When the Flyout calls `closeFlyout`, any user defined `params` that were passed as an argument will be sent through as `params` in this `onClose` callback.
-
 ***
 
+## Set up a Flyout
+Flyouts allow you to show a UI outside of the content input form and are very useful for integrations where a user may need to interact with an external UI and you don't want that to take up too much space in the input form itself.
 
+Flyouts work very similar to custom fields. In fact, you intialize a Flyout component in the same way you would a custom field. That's because your flyout is an extension of your custom field that opened it. Therefore, it has access to the same `fieldSDK` as your custom field.
+
+An example of this in React `Flyout.js`
+```javascript
+import { useEffect, useRef, useState } from 'react';
+import agilityAppSDK from '@agility/app-sdk';
+
+function Flyout({ appConfig }) {
+
+    const containerRef = useRef();
+
+    const [value, setValue] = useState("");
+    const [fieldName, setFieldName] = useState("");
+    const [fieldID, setFieldID] = useState("");
+    const [fieldLabel, setFieldLabel] = useState("");
+    const [configValues, setConfigValues] = useState({});
+    const [flyoutParams, setFlyoutParams] = useState({});
+    const [sdk, setSDK] = useState({})
+
+    useEffect(() => {
+        const init = async () => {
+            const fieldSDK = await agilityAppSDK.initializeField({
+                containerRef
+            })
+
+            setSDK(fieldSDK);
+
+            //set the actual value of the field
+            setValue(fieldSDK.fieldValue ? fieldSDK.fieldValue : "");
+            setFieldID(fieldSDK.fieldID);
+            setFieldName(fieldSDK.fieldName);
+            setFieldLabel(fieldSDK.fieldLabel);
+            setConfigValues(fieldSDK.configValues);
+            setFlyoutParams(fieldSDK.flyoutParams);
+        }
+        init();
+
+    }, []);
+
+    const closeThisFlyout = () => {
+        sdk.closeFlyout({
+            params: {
+                'somevalue': 'was set'
+            }
+        })
+    }
+
+
+    return (
+        <div className="Flyout" ref={containerRef}>
+            <div>
+                <div>This is a custom flyout for {fieldLabel}, {fieldName} who has a field value of {value}</div>
+                <button onClick={closeThisFlyout}>Close Flyout</button>
+            </div>
+        </div>
+    );
+}
+
+export default Flyout;
+```
 
 
