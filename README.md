@@ -315,13 +315,13 @@ agilityAppSDK.initializeField({
 
 This will return a `Promise` which will be resolved with the `fieldSDK` client that can be used to interact with the field.
 
-***
 ```
 fieldSDK <object>
 ```
 
 The object returned from `agilityAppSDK.initializeField` and the base SDK to use for interacting with custom fields and the content it is loaded on.
 ***
+#### Updating a Field Value
 ```
 fieldSDK.updateFieldValue({
     fieldValue: <string|number|decimal>,
@@ -330,7 +330,10 @@ fieldSDK.updateFieldValue({
 ```
 
 Sets a field value on the content item. If no `fieldName` is set, it will set the value for the current custom field being rendered.
+
+**Note**: When setting a `fieldName`, it should match the exact casing of the `apiName` for the field as show in Agility CMS for the associated content model. 
 ***
+#### Subscribing to Field Value Changes
 ```
 fieldSDK.subscribeToFieldValueChanges({
     fieldName: <string>,
@@ -340,6 +343,7 @@ fieldSDK.subscribeToFieldValueChanges({
 
 Notifies when the value of a specific field **changes** on the content item. If a change occurs, the `onChange` function is called and passes the `fieldName <string>` and `fieldValue <string|number|decimal>` as parameters.
 ***
+#### Open a Flyout
 ```
 fieldSDK.openFlyout({ 
     title: <string>,
