@@ -1,0 +1,11 @@
+const APP_LOCATION_CUSTOM_FIELD = 'CustomField';
+const APP_LOCATION_UNKNOWN = 'Unknown';
+const APP_LOCATION_APP_CONFIG = 'AppConfig';
+const APP_LOCATION_FLYOUT = 'Flyout';
+
+export default {
+    APP_LOCATION_CUSTOM_FIELD,
+    APP_LOCATION_FLYOUT,
+    APP_LOCATION_UNKNOWN,
+    APP_LOCATION_APP_CONFIG
+}
