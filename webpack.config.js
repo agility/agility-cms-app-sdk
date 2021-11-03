@@ -2,7 +2,7 @@ const path = require('path');
 
 const browserConfig = {
     target: 'web',
-    entry: './src/index.js',
+    entry: ['regenerator-runtime/runtime.js', './src/index.js'],
     output: {
         filename: 'agility-cms-app-sdk.browser.js',
         path: path.resolve(__dirname, 'dist'),

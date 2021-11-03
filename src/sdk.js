@@ -1,5 +1,6 @@
 import * as fieldMethods from './fields'
 import locations from './locations'
+import 'regenerator-runtime/runtime.js'
 import { getUrlParameter, getMessageID, autoSyncFieldHeight } from './utils'
 
 const initializeAppConfig = (appConfig) => {
