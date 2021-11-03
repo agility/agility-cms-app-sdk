@@ -1,5 +1,15 @@
 # Agility CMS App SDK
-This is a JavaScript SDk for building UI Apps for Agility CMS. 
+This is a JavaScript SDK for building UI Apps for Agility CMS. 
+
+- [Features](#features)
+- [How it Works](#how-it-works)
+- [What you can Do](#what-you-can-do)
+- [Getting Started](#getting-started)
+- [Examples](#examples)
+- [Set up your App Configuration](#set-up-your-app-configuration)
+- [Set up your Custom Field](#set-up-your-custom-field)
+- [Field SDK](#using-the-field-sdk)
+- [Set up a Flyout](#set-up-a-flyout)
 
 ## Features
 - Build custom UIs that can be shown in Agility CMS
@@ -9,7 +19,7 @@ This is a JavaScript SDk for building UI Apps for Agility CMS.
 - Support for additional UI components (aside from Custom Fields) is coming soon!
 
 ## How it Works
-The **App SDK ** facilitates a communication layer between Agility CMS and a single-page app that will be loaded in an iFrame. Using the SDK allows you to easily integrate with the CMS using JavaScript. 
+The **App SDK** facilitates a communication layer between Agility CMS and a single-page app that will be loaded in an iFrame. Using the SDK allows you to easily integrate with the CMS using JavaScript. 
 
 At this time, only Custom Fields are supported, however there are plans to introduce new UI locations such as Sidebar apps.
 
@@ -24,7 +34,7 @@ Just rendering your UI in a content input form isn't enough. The **App SDK  ** a
 ## Getting Started
 
 ### Prerequisites
-You need to have an Agility instance and be comfortable writing JavaScript. You'll also need to deploy your app to a publicly accessible endpoint and register it in Agiltiy CMS.
+You need to have an Agility instance and be comfortable writing JavaScript. You'll also need to deploy your app to a publicly accessible endpoint and register it in Agility CMS.
 
 ### What is in an App?
 An App will contain a page with an `AppConfig` and one or more custom UI's that will integrate with Agility CMS.
@@ -34,9 +44,17 @@ An App will contain a page with an `AppConfig` and one or more custom UI's that 
 - **CustomField(s)** - The UI components responsible for rendering a custom field for a Content Model or Page Module.
 - **Flyout(s)** - The UI components responsible for rendering the details of a flyout that was opened from a Custom Field.
 
+### Examples
+We've put together a couple example Apps to help you get started.
+
+[React App for Agility CMS](https://github.com/agility/agility-cms-apps/tree/main/example/react)
+[Vanilla JS App for Agility CMS](https://github.com/agility/agility-cms-apps/tree/main/example/html)
+
+
 
 ### Installation
 Install it using a package manager (recommended):
+
 `npm install @agility/app-sdk` or `yarn add @agility/app-sdk`.
 
 If you are building in Vanilla javascript, you can also reference a standalong package that can be used in a browser using a traditional `<script>` tag. In this case, the sdk can be accessed using a global variable by the name of `agilityAppSDK`.
