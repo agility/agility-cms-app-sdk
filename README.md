@@ -47,8 +47,8 @@ An App will contain a page with an `AppConfig` and one or more custom UI's that 
 ### Examples
 We've put together a couple example Apps to help you get started.
 
-[React App for Agility CMS](https://github.com/agility/agility-cms-apps/tree/main/example/react)
-[Vanilla JS App for Agility CMS](https://github.com/agility/agility-cms-apps/tree/main/example/html)
+- [React App for Agility CMS](https://github.com/agility/agility-cms-apps/tree/main/example/react)
+- [Vanilla JS App for Agility CMS](https://github.com/agility/agility-cms-apps/tree/main/example/html)
 
 
 
