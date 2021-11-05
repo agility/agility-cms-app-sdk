@@ -1,7 +1,27 @@
-const APP_FLYOUT_SIZE_SMALL = 'Small';
-const APP_FLYOUT_SIZE_LARGE = 'Large';
+import { getMessageID } from "./utils";
+import types from "./types";
+import { notifyCMS } from "./messages";
 
-export default {
-    APP_FLYOUT_SIZE_LARGE,
-    APP_FLYOUT_SIZE_SMALL
+const closeFlyout = function ({ params }) {
+    const location = types.APP_LOCATION_CUSTOM_FIELD;
+    const messageID = getMessageID({ 
+        location,
+        fieldID: this.fieldID,
+        fieldName: this.fieldName
+    })
+
+    notifyCMS({ 
+        message: {
+            location, 
+            fieldName: this.fieldName,
+            fieldID: this.fieldID,
+            params
+        },
+        messageChannel: `closeFlyout_for_${messageID}`
+    })
+    
+}
+
+export {
+    closeFlyout
 }

@@ -1,70 +1,57 @@
 import * as fieldMethods from './fields'
-import locations from './locations'
-import flyouts from './flyouts'
+import * as flyoutMethods from './flyouts'
+import types from './types'
 import 'regenerator-runtime/runtime.js'
 import { getUrlParameter, getMessageID, autoSyncFieldHeight } from './utils'
+import { notifyCMS, listenForCMS } from './messages'
 
 const initializeAppConfig = (appConfig) => {
-    if (window.parent) {
-        window.parent.postMessage({
-            message: appConfig,
-            type: `setAppConfig_for_${appConfig.name}`
-        }, "*")
-    }
+    notifyCMS({ message: appConfig, messageChannel: `setAppConfig_for_${appConfig.name}`})
 }
 
 
 const initializeField = async ({ containerRef }) => {
-    
+    const fieldSDK = await initializeAppComponent({ containerRef, location: types.APP_LOCATION_CUSTOM_FIELD })
+    return fieldSDK;
+}
+
+const initializeFlyout = async ({ containerRef }) => {
+    const flyoutSDK = await initializeAppComponent({ containerRef, location: types.APP_LOCATION_FLYOUT })
+    return flyoutSDK;
+}
+
+const initializeAppComponent = async ({ containerRef, location}) => {
+    // returns different available methods depending on whether this is a CustomField or a Flyout
     return new Promise(resolve => {
         const fieldID = getUrlParameter('fieldID');
         const fieldName = getUrlParameter('fieldName');
-        const location = getUrlParameter('location');
-
         var messageID = getMessageID({location, fieldName, fieldID});
 
         autoSyncFieldHeight({ containerRef, messageID });
 
         //get the field ready to wait for messages from the parent
-        console.log(`${messageID} => Waiting for message from Agility CMS`)
+        //console.log(`${messageID} => Waiting for message from Agility CMS`)
 
-        //open a channel to listen to messages from the CMS
-        window.addEventListener("message", function (e) {
-        
-            //only care about these messages
-            if(e.data.type === `setInitialProps_for_${messageID}`) {
-                console.log(`${messageID} => auth, fieldValue received from Agility CMS, setting up field...`)
+        listenForCMS({ messageChannel: `setInitialProps_for_${messageID}` }).then((fieldInfo) => {
+            fieldInfo.location = location;
+            let availableMethods = {};
 
-                //set field info that we can re-use later
-                const fieldInfo = e.data.message;
-                fieldInfo.location = location;
+            if(location === types.APP_LOCATION_CUSTOM_FIELD) {
+                availableMethods = fieldMethods;
+            } else if(location === types.APP_LOCATION_FLYOUT) {
+                availableMethods = flyoutMethods
+            } 
 
-                resolve(new function() {
-                    return {
-                        ...fieldInfo,
-                        ...fieldMethods
-                    }
-                }());
+            //return our SDK for the appropriate UI component
+            resolve({
+                ...fieldInfo,
+                ...availableMethods
+            })
+        })
 
-            
-            } else {
-                //show us the unhandled message...
-                console.log(`${messageID} => IGNORING MESSAGE FROM PARENT: `, e.data)
-            }
-        }, false);
+        notifyCMS({ message: "ready", messageChannel: `ready_for_${messageID}`})
 
-        //let the CMS know we are NOW ready to receive messages
-        if (window.parent) {
-            console.log(`${messageID} => 😀 Notifying Agility CMS this field is ready to receive messages...`)
-            window.parent.postMessage({
-                message: "ready",
-                type: `ready_for_${messageID}`
-            }, "*")
-        } else {
-            console.log(`${messageID} => 😞 Parent window not found. You must load this within Agility CMS as an iFrame.`)
-        }
     })
-
 }
 
 
@@ -85,17 +72,17 @@ const resolveAppComponent = (appConfig) => {
 
 const getAppLocation = () => {
     const location = getUrlParameter('location');
-    if(location === locations.APP_LOCATION_CUSTOM_FIELD) {
+    if(location === types.APP_LOCATION_CUSTOM_FIELD) {
         const fieldTypeName = getUrlParameter('fieldTypeName');
         return {
             location,
             name: fieldTypeName
         }
-    } else if(location === locations.APP_LOCATION_APP_CONFIG) {
+    } else if(location === types.APP_LOCATION_APP_CONFIG) {
         return {
             location
         }
-    } else if(location === locations.APP_LOCATION_FLYOUT) {
+    } else if(location === types.APP_LOCATION_FLYOUT) {
         const flyoutName = getUrlParameter('flyoutName');
         return {
             location,
@@ -103,7 +90,7 @@ const getAppLocation = () => {
         }
     } else {
         return {
-            location: locations.APP_LOCATION_UNKNOWN,
+            location: types.APP_LOCATION_UNKNOWN,
             name: null
         };
     }
@@ -113,7 +100,7 @@ const getAppLocation = () => {
 export  {
     initializeAppConfig,
     initializeField,
+    initializeFlyout,
     resolveAppComponent,
-    locations,
-    flyouts
+    types
 }

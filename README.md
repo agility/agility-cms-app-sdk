@@ -1,4 +1,7 @@
 # Agility CMS App SDK
+
+>TODO: DOCS NEED UPDATING (flyoutSDK, rejig examples)
+
 This is a JavaScript SDK for building UI Apps for Agility CMS. 
 
 - [Features](#features)
@@ -21,10 +24,11 @@ This is a JavaScript SDK for building UI Apps for Agility CMS.
 ## How it Works
 The **App SDK** facilitates a communication layer between Agility CMS and a single-page app that will be loaded in an iFrame. Using the SDK allows you to easily integrate with the CMS using JavaScript. 
 
-At this time, only Custom Fields are supported, however there are plans to introduce new UI locations such as Sidebar apps.
+At this time, only Custom Fields and Flyouts are supported, however there are plans to introduce new UI locations such as Sidebar components (that would appear on content).
 
 ### What you can Do
-Just rendering your UI in a content input form isn't enough. The **App SDK  ** allows you to:
+Just rendering your UI in a content input form isn't enough. The **App SDK** allows you to:
+-  Render a custom field
 - Set a custom field value
 - Set the value of another field
 - Run custom logic when another field changes
