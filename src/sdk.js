@@ -6,7 +6,8 @@ import { getUrlParameter, getMessageID, autoSyncFieldHeight } from './utils'
 import { notifyCMS, listenForCMS } from './messages'
 
 const initializeAppConfig = (appConfig) => {
-    notifyCMS({ message: appConfig, messageChannel: `setAppConfig_for_${appConfig.name}`})
+    const appDefinitionID = getUrlParameter('appDefinitionID');
+    notifyCMS({ message: appConfig, messageChannel: `setAppConfig_for_${appDefinitionID}`})
 }
 
 
