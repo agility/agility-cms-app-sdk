@@ -2,12 +2,12 @@
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
-		define("agility", [], factory);
+		define("agilityAppSDK", [], factory);
 	else if(typeof exports === 'object')
-		exports["agility"] = factory();
+		exports["agilityAppSDK"] = factory();
 	else
-		root["agility"] = factory();
-})(typeof self !== 'undefined' ? self : this, function() {
+		root["agilityAppSDK"] = factory();
+})(this, function() {
 return /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
@@ -832,6 +832,8 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
 "use strict";
+// ESM COMPAT FLAG
+__webpack_require__.r(__webpack_exports__);
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -1050,6 +1052,8 @@ function ownKeys(object, enumerableOnly) {var keys = Object.keys(object);if (Obj
 
 
 
+
+
 var initializeAppConfig = function initializeAppConfig(appConfig) {
   var appDefinitionID = getUrlParameter('appDefinitionID');
   notifyCMS({ message: appConfig, messageChannel: "setAppConfig_for_".concat(appDefinitionID) });
@@ -1150,7 +1154,6 @@ var getAppLocation = function getAppLocation() {
 /* harmony default export */ const src = (sdk_namespaceObject);
 })();
 
-__webpack_exports__ = __webpack_exports__["default"];
 /******/ 	return __webpack_exports__;
 /******/ })()
 ;
