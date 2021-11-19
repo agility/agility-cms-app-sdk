@@ -1,8 +1,8 @@
 {
   "name": "@agility/app-sdk",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "JavaScript library for building Agility CMS apps.",
-  "main": "src/index.js",
+  "main": "dist/agility-cms-app-sdk.node.js",
   "scripts": {
     "build": "webpack --config webpack.config --mode=production"
   },
