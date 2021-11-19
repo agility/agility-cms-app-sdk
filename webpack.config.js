@@ -33,7 +33,7 @@ const nodeConfig = {
     output: {
         filename: 'agility-cms-app-sdk.node.js',
         path: path.resolve(__dirname, 'dist'),
-        library: 'agility',
+        library: 'agilityAppSDK',
         libraryTarget: 'umd',
         libraryExport: 'default',
         umdNamedDefine: true,
