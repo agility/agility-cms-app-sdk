@@ -4,10 +4,11 @@ import types from './types'
 import 'regenerator-runtime/runtime.js'
 import { getUrlParameter, getMessageID, autoSyncFieldHeight } from './utils'
 import { notifyCMS, listenForCMS } from './messages'
-
-
+import { version as sdkVersion} from '../package.json'
 
 const initializeAppConfig = (appConfig) => {
+    //pass the sdk version to the CMS when setting the app config
+    appConfig.sdkVersion = sdkVersion;
     const appDefinitionID = getUrlParameter('appDefinitionID');
     notifyCMS({ message: appConfig, messageChannel: `setAppConfig_for_${appDefinitionID}`})
 }
@@ -105,5 +106,6 @@ export  {
     initializeField,
     initializeFlyout,
     resolveAppComponent,
-    types
+    types,
+    sdkVersion
 }

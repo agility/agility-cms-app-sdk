@@ -11,6 +11,337 @@
 return /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 187:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+// ESM COMPAT FLAG
+__webpack_require__.r(__webpack_exports__);
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  "default": () => (/* binding */ src)
+});
+
+// NAMESPACE OBJECT: ./src/fields.js
+var fields_namespaceObject = {};
+__webpack_require__.r(fields_namespaceObject);
+__webpack_require__.d(fields_namespaceObject, {
+  "openFlyout": () => (openFlyout),
+  "subscribeToFieldValueChanges": () => (subscribeToFieldValueChanges),
+  "updateFieldValue": () => (updateFieldValue)
+});
+
+// NAMESPACE OBJECT: ./src/flyouts.js
+var flyouts_namespaceObject = {};
+__webpack_require__.r(flyouts_namespaceObject);
+__webpack_require__.d(flyouts_namespaceObject, {
+  "closeFlyout": () => (closeFlyout)
+});
+
+// NAMESPACE OBJECT: ./src/sdk.js
+var sdk_namespaceObject = {};
+__webpack_require__.r(sdk_namespaceObject);
+__webpack_require__.d(sdk_namespaceObject, {
+  "initializeAppConfig": () => (initializeAppConfig),
+  "initializeField": () => (initializeField),
+  "initializeFlyout": () => (initializeFlyout),
+  "resolveAppComponent": () => (resolveAppComponent),
+  "sdkVersion": () => (package_namespaceObject.i8),
+  "types": () => (types)
+});
+
+;// CONCATENATED MODULE: ./src/types.js
+
+/* harmony default export */ const types = ({
+  APP_LOCATION_CUSTOM_FIELD: 'CustomField',
+  APP_LOCATION_FLYOUT: 'Flyout',
+  APP_LOCATION_UNKNOWN: 'Unknown',
+  APP_LOCATION_APP_CONFIG: 'AppConfig',
+  APP_FLYOUT_SIZE_SMALL: 'Small',
+  APP_FLYOUT_SIZE_LARGE: 'Small' });
+;// CONCATENATED MODULE: ./src/utils.js
+var getUrlParameter = function getUrlParameter(name) {
+  //eslint-disable-next-line
+  name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+  var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+  var results = regex.exec(window.location.search);
+  return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+};
+
+var getMessageID = function getMessageID(_ref) {var location = _ref.location,fieldName = _ref.fieldName,fieldID = _ref.fieldID;
+  return location + '_' + fieldName + '_' + fieldID;
+};
+
+var updateFieldHeight = function updateFieldHeight(_ref2) {var height = _ref2.height,messageID = _ref2.messageID;
+
+  if (window.parent) {
+    window.parent.postMessage({
+      message: height,
+      type: "setHeight_for_".concat(messageID) },
+    "*");
+  }
+};
+
+var autoSyncFieldHeight = function autoSyncFieldHeight(_ref3) {var containerRef = _ref3.containerRef,messageID = _ref3.messageID;
+  setInterval(function () {
+
+    updateFieldHeight({
+      height: containerRef.current ? containerRef.current.offsetHeight : containerRef.offsetHeight,
+      messageID: messageID });
+
+  }, 500);
+};
+
+
+
+;// CONCATENATED MODULE: ./src/messages.js
+
+var notifyCMS = function notifyCMS(_ref) {var message = _ref.message,messageChannel = _ref.messageChannel;
+  if (window.parent) {
+    window.parent.postMessage({
+      message: message,
+      type: messageChannel },
+    "*");
+  }
+};
+
+var listenForCMS = function listenForCMS(_ref2) {var messageChannel = _ref2.messageChannel,_ref2$persist = _ref2.persist,persist = _ref2$persist === void 0 ? false : _ref2$persist;
+  return new Promise(function (resolve) {
+    var listener = function listener(e) {
+
+      //only care about these messages
+      if (e.data.type === messageChannel) {
+        if (!persist) {
+          removeEventListener("message", listener, false);
+        }
+        resolve(e.data.message);
+        return;
+
+      }
+    };
+
+    window.addEventListener("message", listener, false);
+  });
+
+};
+
+
+;// CONCATENATED MODULE: ./src/fields.js
+
+
+
+
+var updateFieldValue = function updateFieldValue(_ref) {var fieldName = _ref.fieldName,fieldValue = _ref.fieldValue;
+  var messageID = getMessageID({
+    location: this.location,
+    fieldName: this.fieldName,
+    fieldID: this.fieldID });
+
+
+  if (!fieldName) {
+    fieldName = this.fieldName;
+  }
+
+  notifyCMS({
+    message: {
+      fieldName: fieldName,
+      fieldValue: fieldValue },
+
+    messageChannel: "setNewValue_for_".concat(messageID) });
+
+
+};
+
+var openFlyout = function openFlyout(_ref2) {var title = _ref2.title,size = _ref2.size,name = _ref2.name,onClose = _ref2.onClose,params = _ref2.params;
+  var messageID = getMessageID({
+    location: types.APP_LOCATION_CUSTOM_FIELD,
+    fieldID: this.fieldID,
+    fieldName: this.fieldName });
+
+
+  notifyCMS({
+    message: {
+      title: title,
+      size: size,
+      name: name,
+      params: params },
+
+    messageChannel: "openFlyout_for_".concat(messageID) });
+
+
+  listenForCMS({ messageChannel: "closeFlyoutCallback_for_".concat(messageID) }).then(function (message) {
+    onClose(message);
+  });
+};
+
+
+
+var subscribeToFieldValueChanges = function subscribeToFieldValueChanges(_ref3) {var fieldName = _ref3.fieldName,onChange = _ref3.onChange;
+
+  var messageID = getMessageID({
+    fieldID: this.fieldID,
+    fieldName: this.fieldName,
+    location: this.location });
+
+
+  listenForCMS({
+    messageChannel: "otherValueChanged_".concat(fieldName, "_for_").concat(messageID),
+    persist: true }).
+  then(function (message) {
+    onChange(message);
+  });
+
+  notifyCMS({
+    message: fieldName,
+    messageChannel: "subscribeToOtherValueChanges_".concat(messageID) });
+
+};
+
+
+
+;// CONCATENATED MODULE: ./src/flyouts.js
+
+
+
+
+var closeFlyout = function closeFlyout(_ref) {var params = _ref.params;
+  var location = types.APP_LOCATION_CUSTOM_FIELD;
+  var messageID = getMessageID({
+    location: location,
+    fieldID: this.fieldID,
+    fieldName: this.fieldName });
+
+
+  notifyCMS({
+    message: {
+      location: location,
+      fieldName: this.fieldName,
+      fieldID: this.fieldID,
+      params: params },
+
+    messageChannel: "closeFlyout_for_".concat(messageID) });
+
+
+};
+
+
+// EXTERNAL MODULE: ./node_modules/regenerator-runtime/runtime.js
+var runtime = __webpack_require__(666);
+;// CONCATENATED MODULE: ./package.json
+const package_namespaceObject = {"i8":"0.1.2"};
+;// CONCATENATED MODULE: ./src/sdk.js
+function ownKeys(object, enumerableOnly) {var keys = Object.keys(object);if (Object.getOwnPropertySymbols) {var symbols = Object.getOwnPropertySymbols(object);if (enumerableOnly) {symbols = symbols.filter(function (sym) {return Object.getOwnPropertyDescriptor(object, sym).enumerable;});}keys.push.apply(keys, symbols);}return keys;}function _objectSpread(target) {for (var i = 1; i < arguments.length; i++) {var source = arguments[i] != null ? arguments[i] : {};if (i % 2) {ownKeys(Object(source), true).forEach(function (key) {_defineProperty(target, key, source[key]);});} else if (Object.getOwnPropertyDescriptors) {Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));} else {ownKeys(Object(source)).forEach(function (key) {Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));});}}return target;}function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;}function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {try {var info = gen[key](arg);var value = info.value;} catch (error) {reject(error);return;}if (info.done) {resolve(value);} else {Promise.resolve(value).then(_next, _throw);}}function _asyncToGenerator(fn) {return function () {var self = this,args = arguments;return new Promise(function (resolve, reject) {var gen = fn.apply(self, args);function _next(value) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);}function _throw(err) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);}_next(undefined);});};}
+
+
+
+
+
+
+
+var initializeAppConfig = function initializeAppConfig(appConfig) {
+  //pass the sdk version to the CMS when setting the app config
+  appConfig.sdkVersion = package_namespaceObject.i8;
+  var appDefinitionID = getUrlParameter('appDefinitionID');
+  notifyCMS({ message: appConfig, messageChannel: "setAppConfig_for_".concat(appDefinitionID) });
+};
+
+
+var initializeField = /*#__PURE__*/function () {var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(_ref) {var containerRef, fieldSDK;return regeneratorRuntime.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:containerRef = _ref.containerRef;_context.next = 3;return (
+              initializeAppComponent({ containerRef: containerRef, location: types.APP_LOCATION_CUSTOM_FIELD }));case 3:fieldSDK = _context.sent;return _context.abrupt("return",
+            fieldSDK);case 5:case "end":return _context.stop();}}}, _callee);}));return function initializeField(_x) {return _ref2.apply(this, arguments);};}();
+
+
+var initializeFlyout = /*#__PURE__*/function () {var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(_ref3) {var containerRef, flyoutSDK;return regeneratorRuntime.wrap(function _callee2$(_context2) {while (1) {switch (_context2.prev = _context2.next) {case 0:containerRef = _ref3.containerRef;_context2.next = 3;return (
+              initializeAppComponent({ containerRef: containerRef, location: types.APP_LOCATION_FLYOUT }));case 3:flyoutSDK = _context2.sent;return _context2.abrupt("return",
+            flyoutSDK);case 5:case "end":return _context2.stop();}}}, _callee2);}));return function initializeFlyout(_x2) {return _ref4.apply(this, arguments);};}();
+
+
+var initializeAppComponent = /*#__PURE__*/function () {var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(_ref5) {var containerRef, location;return regeneratorRuntime.wrap(function _callee3$(_context3) {while (1) {switch (_context3.prev = _context3.next) {case 0:containerRef = _ref5.containerRef, location = _ref5.location;return _context3.abrupt("return",
+
+            new Promise(function (resolve) {
+              var fieldID = getUrlParameter('fieldID');
+              var fieldName = getUrlParameter('fieldName');
+              var messageID = getMessageID({ location: location, fieldName: fieldName, fieldID: fieldID });
+
+              autoSyncFieldHeight({ containerRef: containerRef, messageID: messageID });
+
+              //get the field ready to wait for messages from the parent
+              //console.log(`${messageID} => Waiting for message from Agility CMS`)
+              //get the field ready to wait for messages from the parent
+              //console.log(`${messageID} => Waiting for message from Agility CMS`)
+              listenForCMS({ messageChannel: "setInitialProps_for_".concat(messageID) }).then(function (fieldInfo) {fieldInfo.location = location;
+                var availableMethods = {};
+
+                if (location === types.APP_LOCATION_CUSTOM_FIELD) {
+                  availableMethods = fields_namespaceObject;
+                } else if (location === types.APP_LOCATION_FLYOUT) {
+                  availableMethods = flyouts_namespaceObject;
+                }
+
+                //return our SDK for the appropriate UI component
+                //return our SDK for the appropriate UI component
+                resolve(_objectSpread(_objectSpread({}, fieldInfo),
+                availableMethods));
+
+              });
+
+              notifyCMS({ message: "ready", messageChannel: "ready_for_".concat(messageID) });
+
+            }));case 2:case "end":return _context3.stop();}}}, _callee3);}));return function initializeAppComponent(_x3) {return _ref6.apply(this, arguments);};}();
+
+
+
+
+var resolveAppComponent = function resolveAppComponent(appConfig) {
+
+  var appLocation = getAppLocation();
+  var currentAppComponent = appConfig.appComponents.find(function (appComponent) {
+    return appComponent.location === appLocation.location && (!appLocation.name || appComponent.name === appLocation.name);
+  });
+
+  if (currentAppComponent) {
+    return currentAppComponent.componentToRender;
+  } else {
+    console.error("Could not render the '" + appConfig.name + "' component for '" + appLocation.location + "' with the name of '" + appLocation.name + "'");
+  }
+};
+
+var getAppLocation = function getAppLocation() {
+  var location = getUrlParameter('location');
+  if (location === types.APP_LOCATION_CUSTOM_FIELD) {
+    var fieldTypeName = getUrlParameter('fieldTypeName');
+    return {
+      location: location,
+      name: fieldTypeName };
+
+  } else if (location === types.APP_LOCATION_APP_CONFIG) {
+    return {
+      location: location };
+
+  } else if (location === types.APP_LOCATION_FLYOUT) {
+    var flyoutName = getUrlParameter('flyoutName');
+    return {
+      location: location,
+      name: flyoutName };
+
+  } else {
+    return {
+      location: types.APP_LOCATION_UNKNOWN,
+      name: null };
+
+  }
+};
+
+
+
+;// CONCATENATED MODULE: ./src/index.js
+
+
+/* harmony default export */ const src = (sdk_namespaceObject);
+
+/***/ }),
+
 /***/ 666:
 /***/ ((module) => {
 
@@ -828,332 +1159,12 @@ try {
 /******/ 	})();
 /******/ 	
 /************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be in strict mode.
-(() => {
-"use strict";
-// ESM COMPAT FLAG
-__webpack_require__.r(__webpack_exports__);
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  "default": () => (/* binding */ src)
-});
-
-// NAMESPACE OBJECT: ./src/fields.js
-var fields_namespaceObject = {};
-__webpack_require__.r(fields_namespaceObject);
-__webpack_require__.d(fields_namespaceObject, {
-  "openFlyout": () => (openFlyout),
-  "subscribeToFieldValueChanges": () => (subscribeToFieldValueChanges),
-  "updateFieldValue": () => (updateFieldValue)
-});
-
-// NAMESPACE OBJECT: ./src/flyouts.js
-var flyouts_namespaceObject = {};
-__webpack_require__.r(flyouts_namespaceObject);
-__webpack_require__.d(flyouts_namespaceObject, {
-  "closeFlyout": () => (closeFlyout)
-});
-
-// NAMESPACE OBJECT: ./src/sdk.js
-var sdk_namespaceObject = {};
-__webpack_require__.r(sdk_namespaceObject);
-__webpack_require__.d(sdk_namespaceObject, {
-  "initializeAppConfig": () => (initializeAppConfig),
-  "initializeField": () => (initializeField),
-  "initializeFlyout": () => (initializeFlyout),
-  "resolveAppComponent": () => (resolveAppComponent),
-  "types": () => (types)
-});
-
-;// CONCATENATED MODULE: ./src/types.js
-
-/* harmony default export */ const types = ({
-  APP_LOCATION_CUSTOM_FIELD: 'CustomField',
-  APP_LOCATION_FLYOUT: 'Flyout',
-  APP_LOCATION_UNKNOWN: 'Unknown',
-  APP_LOCATION_APP_CONFIG: 'AppConfig',
-  APP_FLYOUT_SIZE_SMALL: 'Small',
-  APP_FLYOUT_SIZE_LARGE: 'Small' });
-;// CONCATENATED MODULE: ./src/utils.js
-var getUrlParameter = function getUrlParameter(name) {
-  //eslint-disable-next-line
-  name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-  var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-  var results = regex.exec(window.location.search);
-  return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-};
-
-var getMessageID = function getMessageID(_ref) {var location = _ref.location,fieldName = _ref.fieldName,fieldID = _ref.fieldID;
-  return location + '_' + fieldName + '_' + fieldID;
-};
-
-var updateFieldHeight = function updateFieldHeight(_ref2) {var height = _ref2.height,messageID = _ref2.messageID;
-
-  if (window.parent) {
-    window.parent.postMessage({
-      message: height,
-      type: "setHeight_for_".concat(messageID) },
-    "*");
-  }
-};
-
-var autoSyncFieldHeight = function autoSyncFieldHeight(_ref3) {var containerRef = _ref3.containerRef,messageID = _ref3.messageID;
-  setInterval(function () {
-
-    updateFieldHeight({
-      height: containerRef.current ? containerRef.current.offsetHeight : containerRef.offsetHeight,
-      messageID: messageID });
-
-  }, 500);
-};
-
-
-
-;// CONCATENATED MODULE: ./src/messages.js
-
-var notifyCMS = function notifyCMS(_ref) {var message = _ref.message,messageChannel = _ref.messageChannel;
-  if (window.parent) {
-    window.parent.postMessage({
-      message: message,
-      type: messageChannel },
-    "*");
-  }
-};
-
-var listenForCMS = function listenForCMS(_ref2) {var messageChannel = _ref2.messageChannel,_ref2$persist = _ref2.persist,persist = _ref2$persist === void 0 ? false : _ref2$persist;
-  return new Promise(function (resolve) {
-    var listener = function listener(e) {
-
-      //only care about these messages
-      if (e.data.type === messageChannel) {
-        if (!persist) {
-          removeEventListener("message", listener, false);
-        }
-        resolve(e.data.message);
-        return;
-
-      }
-    };
-
-    window.addEventListener("message", listener, false);
-  });
-
-};
-
-
-;// CONCATENATED MODULE: ./src/fields.js
-
-
-
-
-var updateFieldValue = function updateFieldValue(_ref) {var fieldName = _ref.fieldName,fieldValue = _ref.fieldValue;
-  var messageID = getMessageID({
-    location: this.location,
-    fieldName: this.fieldName,
-    fieldID: this.fieldID });
-
-
-  if (!fieldName) {
-    fieldName = this.fieldName;
-  }
-
-  notifyCMS({
-    message: {
-      fieldName: fieldName,
-      fieldValue: fieldValue },
-
-    messageChannel: "setNewValue_for_".concat(messageID) });
-
-
-};
-
-var openFlyout = function openFlyout(_ref2) {var title = _ref2.title,size = _ref2.size,name = _ref2.name,onClose = _ref2.onClose,params = _ref2.params;
-  var messageID = getMessageID({
-    location: types.APP_LOCATION_CUSTOM_FIELD,
-    fieldID: this.fieldID,
-    fieldName: this.fieldName });
-
-
-  notifyCMS({
-    message: {
-      title: title,
-      size: size,
-      name: name,
-      params: params },
-
-    messageChannel: "openFlyout_for_".concat(messageID) });
-
-
-  listenForCMS({ messageChannel: "closeFlyoutCallback_for_".concat(messageID) }).then(function (message) {
-    onClose(message);
-  });
-};
-
-
-
-var subscribeToFieldValueChanges = function subscribeToFieldValueChanges(_ref3) {var fieldName = _ref3.fieldName,onChange = _ref3.onChange;
-
-  var messageID = getMessageID({
-    fieldID: this.fieldID,
-    fieldName: this.fieldName,
-    location: this.location });
-
-
-  listenForCMS({
-    messageChannel: "otherValueChanged_".concat(fieldName, "_for_").concat(messageID),
-    persist: true }).
-  then(function (message) {
-    onChange(message);
-  });
-
-  notifyCMS({
-    message: fieldName,
-    messageChannel: "subscribeToOtherValueChanges_".concat(messageID) });
-
-};
-
-
-
-;// CONCATENATED MODULE: ./src/flyouts.js
-
-
-
-
-var closeFlyout = function closeFlyout(_ref) {var params = _ref.params;
-  var location = types.APP_LOCATION_CUSTOM_FIELD;
-  var messageID = getMessageID({
-    location: location,
-    fieldID: this.fieldID,
-    fieldName: this.fieldName });
-
-
-  notifyCMS({
-    message: {
-      location: location,
-      fieldName: this.fieldName,
-      fieldID: this.fieldID,
-      params: params },
-
-    messageChannel: "closeFlyout_for_".concat(messageID) });
-
-
-};
-
-
-// EXTERNAL MODULE: ./node_modules/regenerator-runtime/runtime.js
-var runtime = __webpack_require__(666);
-;// CONCATENATED MODULE: ./src/sdk.js
-function ownKeys(object, enumerableOnly) {var keys = Object.keys(object);if (Object.getOwnPropertySymbols) {var symbols = Object.getOwnPropertySymbols(object);if (enumerableOnly) {symbols = symbols.filter(function (sym) {return Object.getOwnPropertyDescriptor(object, sym).enumerable;});}keys.push.apply(keys, symbols);}return keys;}function _objectSpread(target) {for (var i = 1; i < arguments.length; i++) {var source = arguments[i] != null ? arguments[i] : {};if (i % 2) {ownKeys(Object(source), true).forEach(function (key) {_defineProperty(target, key, source[key]);});} else if (Object.getOwnPropertyDescriptors) {Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));} else {ownKeys(Object(source)).forEach(function (key) {Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));});}}return target;}function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;}function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {try {var info = gen[key](arg);var value = info.value;} catch (error) {reject(error);return;}if (info.done) {resolve(value);} else {Promise.resolve(value).then(_next, _throw);}}function _asyncToGenerator(fn) {return function () {var self = this,args = arguments;return new Promise(function (resolve, reject) {var gen = fn.apply(self, args);function _next(value) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);}function _throw(err) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);}_next(undefined);});};}
-
-
-
-
-
-
-
-
-var initializeAppConfig = function initializeAppConfig(appConfig) {
-  var appDefinitionID = getUrlParameter('appDefinitionID');
-  notifyCMS({ message: appConfig, messageChannel: "setAppConfig_for_".concat(appDefinitionID) });
-};
-
-
-var initializeField = /*#__PURE__*/function () {var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(_ref) {var containerRef, fieldSDK;return regeneratorRuntime.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:containerRef = _ref.containerRef;_context.next = 3;return (
-              initializeAppComponent({ containerRef: containerRef, location: types.APP_LOCATION_CUSTOM_FIELD }));case 3:fieldSDK = _context.sent;return _context.abrupt("return",
-            fieldSDK);case 5:case "end":return _context.stop();}}}, _callee);}));return function initializeField(_x) {return _ref2.apply(this, arguments);};}();
-
-
-var initializeFlyout = /*#__PURE__*/function () {var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(_ref3) {var containerRef, flyoutSDK;return regeneratorRuntime.wrap(function _callee2$(_context2) {while (1) {switch (_context2.prev = _context2.next) {case 0:containerRef = _ref3.containerRef;_context2.next = 3;return (
-              initializeAppComponent({ containerRef: containerRef, location: types.APP_LOCATION_FLYOUT }));case 3:flyoutSDK = _context2.sent;return _context2.abrupt("return",
-            flyoutSDK);case 5:case "end":return _context2.stop();}}}, _callee2);}));return function initializeFlyout(_x2) {return _ref4.apply(this, arguments);};}();
-
-
-var initializeAppComponent = /*#__PURE__*/function () {var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(_ref5) {var containerRef, location;return regeneratorRuntime.wrap(function _callee3$(_context3) {while (1) {switch (_context3.prev = _context3.next) {case 0:containerRef = _ref5.containerRef, location = _ref5.location;return _context3.abrupt("return",
-
-            new Promise(function (resolve) {
-              var fieldID = getUrlParameter('fieldID');
-              var fieldName = getUrlParameter('fieldName');
-              var messageID = getMessageID({ location: location, fieldName: fieldName, fieldID: fieldID });
-
-              autoSyncFieldHeight({ containerRef: containerRef, messageID: messageID });
-
-              //get the field ready to wait for messages from the parent
-              //console.log(`${messageID} => Waiting for message from Agility CMS`)
-              //get the field ready to wait for messages from the parent
-              //console.log(`${messageID} => Waiting for message from Agility CMS`)
-              listenForCMS({ messageChannel: "setInitialProps_for_".concat(messageID) }).then(function (fieldInfo) {fieldInfo.location = location;
-                var availableMethods = {};
-
-                if (location === types.APP_LOCATION_CUSTOM_FIELD) {
-                  availableMethods = fields_namespaceObject;
-                } else if (location === types.APP_LOCATION_FLYOUT) {
-                  availableMethods = flyouts_namespaceObject;
-                }
-
-                //return our SDK for the appropriate UI component
-                //return our SDK for the appropriate UI component
-                resolve(_objectSpread(_objectSpread({}, fieldInfo),
-                availableMethods));
-
-              });
-
-              notifyCMS({ message: "ready", messageChannel: "ready_for_".concat(messageID) });
-
-            }));case 2:case "end":return _context3.stop();}}}, _callee3);}));return function initializeAppComponent(_x3) {return _ref6.apply(this, arguments);};}();
-
-
-
-
-var resolveAppComponent = function resolveAppComponent(appConfig) {
-
-  var appLocation = getAppLocation();
-  var currentAppComponent = appConfig.appComponents.find(function (appComponent) {
-    return appComponent.location === appLocation.location && (!appLocation.name || appComponent.name === appLocation.name);
-  });
-
-  if (currentAppComponent) {
-    return currentAppComponent.componentToRender;
-  } else {
-    console.error("Could not render the '" + appConfig.name + "' component for '" + appLocation.location + "' with the name of '" + appLocation.name + "'");
-  }
-};
-
-var getAppLocation = function getAppLocation() {
-  var location = getUrlParameter('location');
-  if (location === types.APP_LOCATION_CUSTOM_FIELD) {
-    var fieldTypeName = getUrlParameter('fieldTypeName');
-    return {
-      location: location,
-      name: fieldTypeName };
-
-  } else if (location === types.APP_LOCATION_APP_CONFIG) {
-    return {
-      location: location };
-
-  } else if (location === types.APP_LOCATION_FLYOUT) {
-    var flyoutName = getUrlParameter('flyoutName');
-    return {
-      location: location,
-      name: flyoutName };
-
-  } else {
-    return {
-      location: types.APP_LOCATION_UNKNOWN,
-      name: null };
-
-  }
-};
-
-
-
-;// CONCATENATED MODULE: ./src/index.js
-
-
-/* harmony default export */ const src = (sdk_namespaceObject);
-})();
-
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module doesn't tell about it's top-level declarations so it can't be inlined
+/******/ 	var __webpack_exports__ = __webpack_require__(187);
+/******/ 	
 /******/ 	return __webpack_exports__;
 /******/ })()
 ;
