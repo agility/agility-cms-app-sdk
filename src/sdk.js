@@ -8,7 +8,7 @@ import { version as sdkVersion} from '../package.json'
 
 const initializeAppConfig = (appConfig) => {
     //pass the sdk version to the CMS when setting the app config
-    appConfig.sdkVersion = sdkVersion;
+    appConfig.__sdkVersion = sdkVersion;
     const appDefinitionID = getUrlParameter('appDefinitionID');
     notifyCMS({ message: appConfig, messageChannel: `setAppConfig_for_${appDefinitionID}`})
 }
