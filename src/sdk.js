@@ -69,7 +69,7 @@ const resolveAppComponent = (appConfig) => {
 
     if(currentAppComponent) {
         return currentAppComponent.componentToRender;
-    } else if(appLocation === types.APP_LOCATION_APP_CONFIG) {
+    } else if(appLocation.location === types.APP_LOCATION_APP_CONFIG) {
         return types.APP_LOCATION_APP_CONFIG;
     } else {
         console.error("Could not render the '" + appConfig.name + "' component for '" + appLocation.location + "' with the name of '" + appLocation.name + "'");
