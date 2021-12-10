@@ -73,68 +73,77 @@ Your root page for your App must contain logic to determine what UI component is
 
 An example of this in React `App.js`:
 ```javascript
+import './App.css';
+
 import agilityAppSDK from '@agility/app-sdk'
 
-//the UI components that make up your App
+
 import BasicCustomField from './BasicCustomField';
-import AppConfig from './AppConfig'
 import Flyout from './Flyout';
 
-const Components = {
+function App() {
+  
+  const Components = {
     BasicCustomField,
-    AppConfig,
     Flyout
   }
-
-function App() {
-
-  //your app configuration
+  
   const appConfig = {
     name: 'Basic App',
-    version: '1.0.0',
+    version: '1',
     configValues: [
-        { name: 'apiKey', label: 'API Key', type: 'string'}
+        { name: 'apiKey', label: 'API Key', type: 'string'}        
     ],
     appComponents: [
-      {
-        location: agilityAppSDK.types.APP_LOCATION_APP_CONFIG,
-        name: 'AppConfig',
-        componentToRender: 'AppConfig'
-      },
       {
         location: agilityAppSDK.types.APP_LOCATION_CUSTOM_FIELD,
         label: 'Basic Custom Field',
         name: 'BasicCustomField',
         componentToRender: 'BasicCustomField'
       },
-
       {
-        location: agilityAppSDK.v.APP_LOCATION_FLYOUT,
+        location: agilityAppSDK.types.APP_LOCATION_CUSTOM_FIELD,
+        label: 'Other Custom Field',
+        name: 'OtherCustomField',
+        componentToRender: 'BasicCustomField'
+      },
+      {
+        location: agilityAppSDK.types.APP_LOCATION_FLYOUT,
         componentToRender: 'Flyout',
         name: 'Flyout1'
       }
     ]
   };
 
-  //using the `resolveAppComponent` method to return the `componentToRender` property of the component that is requested by the CMS
-  const ComponentToRender = Components[agilityAppSDK.resolveAppComponent(appConfig)];
-  
-  if(ComponentToRender) {
-      //render the desired component (i.e. AppConfig, BasicCustomField, or Flyout)
-    return <ComponentToRender appConfig={appConfig} />;
+  const componentRequested = agilityAppSDK.resolveAppComponent(appConfig);
+
+  if(componentRequested === 'AppConfig') {
+
+    //provide the CMS information about your app configuration
+    agilityAppSDK.setAppConfig(appConfig);
+
   } else {
-    return <h2>Warning: App must be loaded within Agility CMS.</h2>
+    //determine the React component we want to render based on what the CMS has requested...
+    const ComponentToRender = Components[componentRequested];
+    
+    if(ComponentToRender) {
+      return <ComponentToRender appConfig={appConfig} />;
+    } else {
+      return <h2>Warning: App must be loaded within Agility CMS.</h2>
+    }
   }
 
+  return null;
 }
 
 export default App;
+
 ```
 
 ## Set up your App Configuration
 When the App is initially installed or whenever Agility CMS loads, it needs to be able to access your `AppConfig`.
 
-Your `AppConfig` must be in a specific format, and you must initialize it appropriately using the `initializeAppConfig` method from the SDK.
+Your `AppConfig` must be in a specific format, and you must initialize it appropriately using the `setAppConfig` method from the SDK.
 
 ```javascript
 const appConfig = 
@@ -146,17 +155,11 @@ const appConfig =
     ],
     appComponents: [
         {
-            location: agilityAppSDK.types.APP_LOCATION_APP_CONFIG,
-            name: 'AppConfig',
-            componentToRender: 'AppConfig'
-        },
-        {
             location: agilityAppSDK.types.APP_LOCATION_CUSTOM_FIELD,
             name: 'BasicCustomField',
             componentToRender: 'BasicCustomField',
             label: 'Basic Custom Field',
         },
-
         {
             location: agilityAppSDK.types.APP_LOCATION_FLYOUT,
             name: 'Flyout1',
@@ -219,27 +222,20 @@ This is the friendly label of the **custom field** which is used in Models to di
 
 Once you have established your App Configuration, you need to tell Agility CMS about it within your `AppConfig` component when requested.
 
-`agilityAppSDK.initializeAppConfig(<appConfig>): void`
+`agilityAppSDK.setAppConfig(<appConfig>): void`
 
 Sends a message to the CMS to inform it of our App.
 
-An example of this in React `AppConfig.js`
+An example of this:
 ```javascript
-import { useEffect, useRef } from 'react';
-import agilityAppSDK from '@agility/app-sdk'
+const componentRequested = agilityAppSDK.resolveAppComponent(appConfig);
 
-function AppConfig({ appConfig }) {
+if(componentRequested === 'AppConfig') {
 
-    const containerRef = useRef();
-    useEffect(() => {
-        agilityAppSDK.initializeAppConfig(appConfig);
-    }, [appConfig]);
+  //provide the CMS information about your app configuration
+  agilityAppSDK.setAppConfig(appConfig);
 
-    //no need to render anything when initializing the AppConfig - this is passed automatically to the CMS
-    return null;
 }
-
-export default AppConfig;
 ```
 >**Note**: If your App does not notify the CMS about its configuration within *3 seconds* of being requested, we'll treat the App as non-responsive and prevent it from being used in the CMS.
 
@@ -342,7 +338,18 @@ The `fieldSDK` represents the object returned from `agilityAppSDK.initializeFiel
 ***
 ### Field SDK Properties
 The following are the properties returned in the `fieldSDK` object:
+`guid`
 
+The guid of representing the Agility CMS instance calling this app. 
+***
+`websiteName` 
+
+The website/instance name representing the Agility CMS instance calling this app.
+***
+`locale`
+
+The current locale that the Agility CMS is in.
+***
 `fieldValue <string>`
 
 The current value of the custom field.
@@ -492,7 +499,18 @@ The `fieldSDK` represents the object returned from `agilityAppSDK.initializeFlyo
 ***
 ### Flyout SDK Properties
 The `flyoutSDK` contains many of the same properties as the `fieldSDK`. 
+`guid`
 
+The guid of representing the Agility CMS instance calling this app. 
+***
+`websiteName` 
+
+The website/instance name representing the Agility CMS instance calling this app.
+***
+`locale`
+
+The current locale that the Agility CMS is in.
+***
 `fieldValue <string>`
 
 The current value of the custom field that initiated the flyout.

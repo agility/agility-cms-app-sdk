@@ -6,7 +6,7 @@ import { getUrlParameter, getMessageID, autoSyncFieldHeight } from './utils'
 import { notifyCMS, listenForCMS } from './messages'
 import { version as sdkVersion} from '../package.json'
 
-const initializeAppConfig = (appConfig) => {
+const setAppConfig = (appConfig) => {
     //pass the sdk version to the CMS when setting the app config
     appConfig.__sdkVersion = sdkVersion;
     const appDefinitionID = getUrlParameter('appDefinitionID');
@@ -69,6 +69,8 @@ const resolveAppComponent = (appConfig) => {
 
     if(currentAppComponent) {
         return currentAppComponent.componentToRender;
+    } else if(appLocation === types.APP_LOCATION_APP_CONFIG) {
+        return types.APP_LOCATION_APP_CONFIG;
     } else {
         console.error("Could not render the '" + appConfig.name + "' component for '" + appLocation.location + "' with the name of '" + appLocation.name + "'");
     }
@@ -102,7 +104,7 @@ const getAppLocation = () => {
 
 
 export  {
-    initializeAppConfig,
+    setAppConfig,
     initializeField,
     initializeFlyout,
     resolveAppComponent,
