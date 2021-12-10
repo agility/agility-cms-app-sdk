@@ -21,12 +21,21 @@ const updateFieldHeight = ({ height, messageID }) => {
 }
 
 const autoSyncFieldHeight = ({ containerRef, messageID }) => {
+    let previousHeight = 0;
+
     setInterval(function() {
-        
-        updateFieldHeight({
-            height: containerRef.current ? containerRef.current.offsetHeight : containerRef.offsetHeight,
-            messageID
-         });
+        const currentHeight = containerRef.current ? containerRef.current.offsetHeight : containerRef.offsetHeight;
+
+        if(currentHeight != previousHeight) {
+            console.log('height changed!');
+            updateFieldHeight({
+                height: currentHeight,
+                messageID
+            });
+        }
+
+        previousHeight = currentHeight;
+
     }, 500)
 }
 
