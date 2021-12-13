@@ -15,7 +15,6 @@ const setAppConfig = (appConfig) => {
 
 
 const initializeField = async ({ containerRef }) => {
-    debugger;
     const fieldSDK = await initializeAppComponent({ containerRef, location: types.APP_LOCATION_CUSTOM_FIELD })
     return fieldSDK;
 }
@@ -26,7 +25,6 @@ const initializeFlyout = async ({ containerRef }) => {
 }
 
 const initializeAppComponent = async ({ containerRef, location}) => {
-    debugger;
     // returns different available methods depending on whether this is a CustomField or a Flyout
     return new Promise(resolve => {
         
