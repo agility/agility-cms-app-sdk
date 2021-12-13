@@ -15,6 +15,7 @@ const setAppConfig = (appConfig) => {
 
 
 const initializeField = async ({ containerRef }) => {
+    debugger;
     const fieldSDK = await initializeAppComponent({ containerRef, location: types.APP_LOCATION_CUSTOM_FIELD })
     return fieldSDK;
 }
@@ -25,19 +26,31 @@ const initializeFlyout = async ({ containerRef }) => {
 }
 
 const initializeAppComponent = async ({ containerRef, location}) => {
+    debugger;
     // returns different available methods depending on whether this is a CustomField or a Flyout
     return new Promise(resolve => {
-        const fieldID = getUrlParameter('fieldID');
-        const fieldName = getUrlParameter('fieldName');
-        var messageID = getMessageID({location, fieldName, fieldID});
+        
+        const initiator = {
+            name: getUrlParameter('initiatorName'),
+            id: getUrlParameter('initiatorID').length > 0 ? getUrlParameter('initiatorID') : null
+        };
+
+        let id = null;
+        if(location === types.APP_LOCATION_CUSTOM_FIELD) {
+            id = getUrlParameter('fieldID');
+        } else if(location === types.APP_LOCATION_FLYOUT) {
+            id = getUrlParameter('flyoutName'); 
+        }
+
+        var messageID = getMessageID({location, id, initiator});
 
         autoSyncFieldHeight({ containerRef, messageID });
 
         //get the field ready to wait for messages from the parent
         //console.log(`${messageID} => Waiting for message from Agility CMS`)
 
-        listenForCMS({ messageChannel: `setInitialProps_for_${messageID}` }).then((fieldInfo) => {
-            fieldInfo.location = location;
+        listenForCMS({ messageChannel: `setInitialProps_for_${messageID}` }).then((props) => {
+            props.location = location;
             let availableMethods = {};
 
             if(location === types.APP_LOCATION_CUSTOM_FIELD) {
@@ -48,7 +61,7 @@ const initializeAppComponent = async ({ containerRef, location}) => {
 
             //return our SDK for the appropriate UI component
             resolve({
-                ...fieldInfo,
+                ...props,
                 ...availableMethods
             })
         })

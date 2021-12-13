@@ -6,8 +6,8 @@ const getUrlParameter = (name) => {
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 };
 
-const getMessageID = ({ location, fieldName, fieldID }) => {
-    return location + '_' + fieldName + '_' + fieldID;
+const getMessageID = ({ location, id, initiator }) => {
+    return `${location}_${id}_${initiator.id}`;
 }
 
 const updateFieldHeight = ({ height, messageID }) => {

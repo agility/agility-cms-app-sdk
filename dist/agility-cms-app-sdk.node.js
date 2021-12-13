@@ -69,8 +69,8 @@ var getUrlParameter = function getUrlParameter(name) {
   return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 };
 
-var getMessageID = function getMessageID(_ref) {var location = _ref.location,fieldName = _ref.fieldName,fieldID = _ref.fieldID;
-  return location + '_' + fieldName + '_' + fieldID;
+var getMessageID = function getMessageID(_ref) {var location = _ref.location,id = _ref.id,initiator = _ref.initiator;
+  return "".concat(location, "_").concat(id, "_").concat(initiator.id);
 };
 
 var updateFieldHeight = function updateFieldHeight(_ref2) {var height = _ref2.height,messageID = _ref2.messageID;
@@ -142,14 +142,15 @@ var listenForCMS = function listenForCMS(_ref2) {var messageChannel = _ref2.mess
 
 
 var updateFieldValue = function updateFieldValue(_ref) {var fieldName = _ref.fieldName,fieldValue = _ref.fieldValue;
+
   var messageID = getMessageID({
     location: this.location,
-    fieldName: this.fieldName,
-    fieldID: this.fieldID });
+    initiator: this.initiator,
+    id: this.id });
 
 
   if (!fieldName) {
-    fieldName = this.fieldName;
+    fieldName = this.field.name;
   }
 
   notifyCMS({
@@ -165,8 +166,8 @@ var updateFieldValue = function updateFieldValue(_ref) {var fieldName = _ref.fie
 var openFlyout = function openFlyout(_ref2) {var title = _ref2.title,size = _ref2.size,name = _ref2.name,onClose = _ref2.onClose,params = _ref2.params;
   var messageID = getMessageID({
     location: types.APP_LOCATION_CUSTOM_FIELD,
-    fieldID: this.fieldID,
-    fieldName: this.fieldName });
+    initiator: this.initiator,
+    id: this.id });
 
 
   notifyCMS({
@@ -189,9 +190,9 @@ var openFlyout = function openFlyout(_ref2) {var title = _ref2.title,size = _ref
 var subscribeToFieldValueChanges = function subscribeToFieldValueChanges(_ref3) {var fieldName = _ref3.fieldName,onChange = _ref3.onChange;
 
   var messageID = getMessageID({
-    fieldID: this.fieldID,
-    fieldName: this.fieldName,
-    location: this.location });
+    location: types.APP_LOCATION_CUSTOM_FIELD,
+    initiator: this.initiator,
+    id: this.ids });
 
 
   listenForCMS({
@@ -216,17 +217,22 @@ var subscribeToFieldValueChanges = function subscribeToFieldValueChanges(_ref3) 
 
 var closeFlyout = function closeFlyout(_ref) {var params = _ref.params;
   var location = types.APP_LOCATION_CUSTOM_FIELD;
+
+  //Special Case: message ID must match the custom field's ID that called it
   var messageID = getMessageID({
-    location: location,
-    fieldID: this.fieldID,
-    fieldName: this.fieldName });
+    location: types.APP_LOCATION_CUSTOM_FIELD,
+    initiator: {
+      name: 'system',
+      id: null },
+
+    id: this.initiator.id });
 
 
   notifyCMS({
     message: {
       location: location,
-      fieldName: this.fieldName,
-      fieldID: this.fieldID,
+      fieldName: this.initiator.name,
+      fieldID: this.initiator.id,
       params: params },
 
     messageChannel: "closeFlyout_for_".concat(messageID) });
@@ -238,7 +244,7 @@ var closeFlyout = function closeFlyout(_ref) {var params = _ref.params;
 // EXTERNAL MODULE: ./node_modules/regenerator-runtime/runtime.js
 var runtime = __webpack_require__(666);
 ;// CONCATENATED MODULE: ./package.json
-const package_namespaceObject = {"i8":"0.2.2"};
+const package_namespaceObject = {"i8":"0.9.0"};
 ;// CONCATENATED MODULE: ./src/sdk.js
 function ownKeys(object, enumerableOnly) {var keys = Object.keys(object);if (Object.getOwnPropertySymbols) {var symbols = Object.getOwnPropertySymbols(object);if (enumerableOnly) {symbols = symbols.filter(function (sym) {return Object.getOwnPropertyDescriptor(object, sym).enumerable;});}keys.push.apply(keys, symbols);}return keys;}function _objectSpread(target) {for (var i = 1; i < arguments.length; i++) {var source = arguments[i] != null ? arguments[i] : {};if (i % 2) {ownKeys(Object(source), true).forEach(function (key) {_defineProperty(target, key, source[key]);});} else if (Object.getOwnPropertyDescriptors) {Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));} else {ownKeys(Object(source)).forEach(function (key) {Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));});}}return target;}function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;}function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {try {var info = gen[key](arg);var value = info.value;} catch (error) {reject(error);return;}if (info.done) {resolve(value);} else {Promise.resolve(value).then(_next, _throw);}}function _asyncToGenerator(fn) {return function () {var self = this,args = arguments;return new Promise(function (resolve, reject) {var gen = fn.apply(self, args);function _next(value) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);}function _throw(err) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);}_next(undefined);});};}
 
@@ -256,9 +262,10 @@ var setAppConfig = function setAppConfig(appConfig) {
 };
 
 
-var initializeField = /*#__PURE__*/function () {var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(_ref) {var containerRef, fieldSDK;return regeneratorRuntime.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:containerRef = _ref.containerRef;_context.next = 3;return (
-              initializeAppComponent({ containerRef: containerRef, location: types.APP_LOCATION_CUSTOM_FIELD }));case 3:fieldSDK = _context.sent;return _context.abrupt("return",
-            fieldSDK);case 5:case "end":return _context.stop();}}}, _callee);}));return function initializeField(_x) {return _ref2.apply(this, arguments);};}();
+var initializeField = /*#__PURE__*/function () {var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(_ref) {var containerRef, fieldSDK;return regeneratorRuntime.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:containerRef = _ref.containerRef;
+            debugger;_context.next = 4;return (
+              initializeAppComponent({ containerRef: containerRef, location: types.APP_LOCATION_CUSTOM_FIELD }));case 4:fieldSDK = _context.sent;return _context.abrupt("return",
+            fieldSDK);case 6:case "end":return _context.stop();}}}, _callee);}));return function initializeField(_x) {return _ref2.apply(this, arguments);};}();
 
 
 var initializeFlyout = /*#__PURE__*/function () {var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(_ref3) {var containerRef, flyoutSDK;return regeneratorRuntime.wrap(function _callee2$(_context2) {while (1) {switch (_context2.prev = _context2.next) {case 0:containerRef = _ref3.containerRef;_context2.next = 3;return (
@@ -266,12 +273,24 @@ var initializeFlyout = /*#__PURE__*/function () {var _ref4 = _asyncToGenerator( 
             flyoutSDK);case 5:case "end":return _context2.stop();}}}, _callee2);}));return function initializeFlyout(_x2) {return _ref4.apply(this, arguments);};}();
 
 
-var initializeAppComponent = /*#__PURE__*/function () {var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(_ref5) {var containerRef, location;return regeneratorRuntime.wrap(function _callee3$(_context3) {while (1) {switch (_context3.prev = _context3.next) {case 0:containerRef = _ref5.containerRef, location = _ref5.location;return _context3.abrupt("return",
+var initializeAppComponent = /*#__PURE__*/function () {var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(_ref5) {var containerRef, location;return regeneratorRuntime.wrap(function _callee3$(_context3) {while (1) {switch (_context3.prev = _context3.next) {case 0:containerRef = _ref5.containerRef, location = _ref5.location;
+            debugger;
+            // returns different available methods depending on whether this is a CustomField or a Flyout
+            return _context3.abrupt("return", new Promise(function (resolve) {
 
-            new Promise(function (resolve) {
-              var fieldID = getUrlParameter('fieldID');
-              var fieldName = getUrlParameter('fieldName');
-              var messageID = getMessageID({ location: location, fieldName: fieldName, fieldID: fieldID });
+              var initiator = {
+                name: getUrlParameter('initiatorName'),
+                id: getUrlParameter('initiatorID').length > 0 ? getUrlParameter('initiatorID') : null };
+
+
+              var id = null;
+              if (location === types.APP_LOCATION_CUSTOM_FIELD) {
+                id = getUrlParameter('fieldID');
+              } else if (location === types.APP_LOCATION_FLYOUT) {
+                id = getUrlParameter('flyoutName');
+              }
+
+              var messageID = getMessageID({ location: location, id: id, initiator: initiator });
 
               autoSyncFieldHeight({ containerRef: containerRef, messageID: messageID });
 
@@ -279,7 +298,7 @@ var initializeAppComponent = /*#__PURE__*/function () {var _ref6 = _asyncToGener
               //console.log(`${messageID} => Waiting for message from Agility CMS`)
               //get the field ready to wait for messages from the parent
               //console.log(`${messageID} => Waiting for message from Agility CMS`)
-              listenForCMS({ messageChannel: "setInitialProps_for_".concat(messageID) }).then(function (fieldInfo) {fieldInfo.location = location;
+              listenForCMS({ messageChannel: "setInitialProps_for_".concat(messageID) }).then(function (props) {props.location = location;
                 var availableMethods = {};
 
                 if (location === types.APP_LOCATION_CUSTOM_FIELD) {
@@ -290,14 +309,14 @@ var initializeAppComponent = /*#__PURE__*/function () {var _ref6 = _asyncToGener
 
                 //return our SDK for the appropriate UI component
                 //return our SDK for the appropriate UI component
-                resolve(_objectSpread(_objectSpread({}, fieldInfo),
+                resolve(_objectSpread(_objectSpread({}, props),
                 availableMethods));
 
               });
 
               notifyCMS({ message: "ready", messageChannel: "ready_for_".concat(messageID) });
 
-            }));case 2:case "end":return _context3.stop();}}}, _callee3);}));return function initializeAppComponent(_x3) {return _ref6.apply(this, arguments);};}();
+            }));case 3:case "end":return _context3.stop();}}}, _callee3);}));return function initializeAppComponent(_x3) {return _ref6.apply(this, arguments);};}();
 
 
 
