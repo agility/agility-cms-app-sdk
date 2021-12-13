@@ -243,7 +243,6 @@ if(componentRequested === 'AppConfig') {
 ## Set Up your Custom Field
 Now that you have your **App Index** and **App Config** set up, the next step is to set up your custom field component(s).
 
-
 An example of this in React `BasicCustomField.js`:
 ```javascript
 import { useEffect, useState, useRef } from 'react';
@@ -262,10 +261,10 @@ function BasicCustomField() {
         
         //set the SDK that we can use later...
         setSDK(fieldSDK);
-      
+        
         //set the actual value of the field
-        setValue(fieldSDK.fieldValue);
-        setFieldLabel(fieldSDK.fieldLabel);
+        setValue(fieldSDK.field.value);
+        setFieldLabel(fieldSDK.field.label);
         setConfigValues(fieldSDK.configValues);
 
         fieldSDK.subscribeToFieldValueChanges({
@@ -306,7 +305,7 @@ function BasicCustomField() {
     <div className="BasicCustomField" ref={containerRef}>
       <label>
         {fieldLabel}
-        <input style={{display: 'block', width: '100%'}} type="text" value={value} onChange={e => updateValue(e.target.value)} />
+        <input style={{display: 'block', width: '100%'}} type="text" defaultValue={value} onChange={e => updateValue(e.target.value)} />
       </label>
       <p>API Key: {configValues.apiKey}</p>
       <button onClick={openCustomFlyout}>Open Flyout</button>
@@ -350,18 +349,39 @@ The website/instance name representing the Agility CMS instance calling this app
 
 The current locale that the Agility CMS is in.
 ***
-`fieldValue <string>`
+`field.value <string>`
 
 The current value of the custom field.
 ***
-`fieldLabel <string>`
+`field.label <string>`
 
 The label of the field as it appears in the Content Model/Page Module.
+***
+`field.name <string>`
+
+The reference name for this field. This is defined when adding the field to your Content Model/Page Module.
+***
+`field.typeName <string>`
+
+The field reference name of this specific custom field (as defined in `appConfig.appComponents`).
+***
+`field.description <string>`
+
+The description of the field. This is defined when adding the field to your Content Model/Page Module.
+***
+`field.required <boolean>`
+
+Determines if a field value is required in order to save the content item.
+***
+`field.readonly <boolean>`
+
+Determines if a field is allowed to be edited. This could return as `false` if a user does not have permission to edit the field or this field is being rendered as part of a `Version History` view.
 ***
 `configValues <object>`
 
 The configuration values that have been set by the user who installed the App. This is based off the `configValues` that were set in your `AppConfig`.
 ***
+
 ### Field SDK Methods
 The following represents the methods available to call from the `fieldsSDK`:
 #### Updating a Field Value
@@ -434,29 +454,18 @@ import agilityAppSDK from '@agility/app-sdk';
 function Flyout({ appConfig }) {
 
     const containerRef = useRef();
-
-    const [value, setValue] = useState("");
-    const [fieldName, setFieldName] = useState("");
-    const [fieldLabel, setFieldLabel] = useState("");
     const [sdk, setSDK] = useState({})
-
-    //const [fieldID, setFieldID] = useState("");
+    const [flyout, setFlyout] = useState({});
     //const [configValues, setConfigValues] = useState({});
-    //const [flyoutParams, setFlyoutParams] = useState({});
-
+    
     useEffect(() => {
         agilityAppSDK.initializeFlyout({containerRef}).then((flyoutSDK) => {
             setSDK(flyoutSDK);
-
-            //set the actual value of the field
-            setValue(flyoutSDK.fieldValue ? flyoutSDK.fieldValue : "");
-            setFieldName(flyoutSDK.fieldName);
-            setFieldLabel(flyoutSDK.fieldLabel);
+            setFlyout(flyoutSDK.flyout);
 
             //You can also get access to this properties:
-            //setFieldID(flyoutSDK.fieldID);
-            //setConfigValues(flyoutSDK.configValues);
-            //setFlyoutParams(flyoutSDK.flyoutParams);
+            //setConfigValues(flyoutSDK.configValues);    
+
         })
     }, [appConfig]);
 
@@ -470,15 +479,18 @@ function Flyout({ appConfig }) {
 
     return (
         <div className="Flyout" ref={containerRef}>
+            { sdk && sdk.initiator &&
             <div>
-                <div>This is a custom flyout for {fieldLabel}, {fieldName} who has a field value of {value}</div>
+                <div>This is a custom flyout {flyout.title} that was initialized by the {sdk.initiator.name} field.</div>
                 <button onClick={closeThisFlyout}>Close Flyout</button>
             </div>
+            }            
         </div>
     );
 }
 
 export default Flyout;
+
 ```
 ### Using the Flyout SDK
 In order to interact with the CMS, you need to call:
@@ -495,7 +507,7 @@ This will return a `Promise` which will be resolved with the `flyoutSDK` client 
 flyoutSDK <object>
 ```
 
-The `fieldSDK` represents the object returned from `agilityAppSDK.initializeFlyout` and the base SDK to use for interacting with flyouts.
+The `flyoutSDK` represents the object returned from `agilityAppSDK.initializeFlyout` and the base SDK to use for interacting with flyouts.
 ***
 ### Flyout SDK Properties
 The `flyoutSDK` contains many of the same properties as the `fieldSDK`. 
@@ -510,14 +522,6 @@ The website/instance name representing the Agility CMS instance calling this app
 `locale`
 
 The current locale that the Agility CMS is in.
-***
-`fieldValue <string>`
-
-The current value of the custom field that initiated the flyout.
-***
-`fieldLabel <string>`
-
-The label of the custom field that initiated the flyout.
 ***
 `configValues <object>`
 
