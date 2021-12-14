@@ -179,6 +179,10 @@ The name of your App (will be displayed in Agiliity CMS).
 
 The version of your App (can be any string, will be displayed in Agility CMS).
 ***
+`documentationLink: <string> *`
+
+The URL to a hosted webpage that provides detailed information about this app. This will be accessible to users when they are installing your app within in instance.
+***
 `configValues: <objectArray>`
 
 The (*optional*) configuration values you want to capture when a user installs the App.
@@ -541,3 +545,9 @@ Closes the flyout and passes the `params` object as parameter to the `onClose` c
 The `params` object can be anything you want.
 
 
+## Releasing New Versions
+For contributors who are building new versions of this SDK, you will need to do the following to deploy your changes to `npm`.
+
+1. Increase the `version` number in `package.json`
+2. `npm run build` to bundle the JS.
+3. `npm publish --access public` (requires authentication) to publish the new `@agility/app-sdk` package.

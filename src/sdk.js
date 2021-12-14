@@ -42,7 +42,9 @@ const initializeAppComponent = async ({ containerRef, location}) => {
 
         var messageID = getMessageID({location, id, initiator});
 
-        autoSyncFieldHeight({ containerRef, messageID });
+        if(location === types.APP_LOCATION_CUSTOM_FIELD) {
+            autoSyncFieldHeight({ containerRef, messageID });
+        }
 
         //get the field ready to wait for messages from the parent
         //console.log(`${messageID} => Waiting for message from Agility CMS`)
