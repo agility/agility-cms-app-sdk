@@ -11,6 +11,7 @@ This is a JavaScript SDK for building UI Apps for Agility CMS.
 - [Field SDK](#using-the-field-sdk) | [Properties](#field-sdk-properties) | [Methods](#field-sdk-methods)
 - [Set up a Flyout](#set-up-a-flyout)
 - [Flyout SDK](#using-the-flyout-sdk) | [Properties](#flyout-sdk-properties) | [Methods](#flyout-sdk-methods)
+- [Styling your App](#styling-your-app)
 
 ## Features
 - Build custom UIs that can be shown in Agility CMS
@@ -544,6 +545,10 @@ Closes the flyout and passes the `params` object as parameter to the `onClose` c
 
 The `params` object can be anything you want.
 
+## Styling your App
+Since apps are loaded as iframes, they will not inherit any styles from Agility CMS. You have full control over how your app should be styled - using CSS.
+
+>**Note**: We recommend styling your App to match the look and feel of the CMS. In the future, a design system will be provided by Agility that you can import into your app to assist with appropriate styling.
 
 ## Releasing New Versions
 For contributors who are building new versions of this SDK, you will need to do the following to deploy your changes to `npm`.

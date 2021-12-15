@@ -1,6 +1,6 @@
 {
   "name": "@agility/app-sdk",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "description": "JavaScript library for building Agility CMS apps.",
   "main": "dist/agility-cms-app-sdk.node.js",
   "scripts": {
