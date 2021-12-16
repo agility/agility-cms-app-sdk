@@ -8,24 +8,21 @@ const notifyCMS = ({ message, messageChannel}) => {
     }
 }
 
-const listenForCMS = ({ messageChannel, persist = false }) => {
-    return new Promise(resolve => {
-        var listener = function (e) {
+const listenForCMS = ({ messageChannel, onMsgReceived, persist = false }) => {
+    var listener = function (e) {
         
-            //only care about these messages
-            if(e.data.type === messageChannel) {
-                if(!persist) {
-                    removeEventListener("message", listener, false);
-                }
-                resolve(e.data.message);
-                return;
-            
+        //only care about these messages
+        if(e.data.type === messageChannel) {
+            if(!persist) {
+                removeEventListener("message", listener, false);
             }
+            onMsgReceived(e.data.message);
+            return;
+        
         }
-    
-        window.addEventListener("message", listener, false);
-    })
-    
+    }
+
+    window.addEventListener("message", listener, false);
 }
 
 export {

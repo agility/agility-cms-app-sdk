@@ -31,19 +31,21 @@ const openFlyout = function ({title, size, name, onClose, params }) {
         id: this.id
      });
 
-     notifyCMS({
-         message: {
-            title,
-            size,
-            name,
-            params
-         },
-         messageChannel: `openFlyout_for_${messageID}`
-     })
+    notifyCMS({
+        message: {
+        title,
+        size,
+        name,
+        params
+        },
+        messageChannel: `openFlyout_for_${messageID}`
+    })
 
-     listenForCMS({ messageChannel: `closeFlyoutCallback_for_${messageID}`}).then((message) => {
-         onClose(message);
-     });
+    listenForCMS({ 
+        messageChannel: `closeFlyoutCallback_for_${messageID}`,
+        onMsgReceived: (message) => onClose(message)
+    });
+
 }
 
 
@@ -53,15 +55,14 @@ const subscribeToFieldValueChanges = function ({ fieldName, onChange}) {
     const messageID = getMessageID({
         location: types.APP_LOCATION_CUSTOM_FIELD,
         initiator: this.initiator,
-        id: this.ids
+        id: this.id
     });
     
     listenForCMS({ 
         messageChannel: `otherValueChanged_${fieldName}_for_${messageID}`,
-        persist: true
-     }).then((message) => {
-         onChange(message);
-     })
+        persist: true,
+        onMsgReceived: (message) => onChange(message)
+    })
 
     notifyCMS({ 
         message: fieldName,

@@ -49,22 +49,25 @@ const initializeAppComponent = async ({ containerRef, location}) => {
         //get the field ready to wait for messages from the parent
         //console.log(`${messageID} => Waiting for message from Agility CMS`)
 
-        listenForCMS({ messageChannel: `setInitialProps_for_${messageID}` }).then((props) => {
-            props.location = location;
-            let availableMethods = {};
-
-            if(location === types.APP_LOCATION_CUSTOM_FIELD) {
-                availableMethods = fieldMethods;
-            } else if(location === types.APP_LOCATION_FLYOUT) {
-                availableMethods = flyoutMethods
-            } 
-
-            //return our SDK for the appropriate UI component
-            resolve({
-                ...props,
-                ...availableMethods
-            })
-        })
+        listenForCMS({ 
+            messageChannel: `setInitialProps_for_${messageID}`,
+            onMsgReceived: (props) => {
+                props.location = location;
+                let availableMethods = {};
+    
+                if(location === types.APP_LOCATION_CUSTOM_FIELD) {
+                    availableMethods = fieldMethods;
+                } else if(location === types.APP_LOCATION_FLYOUT) {
+                    availableMethods = flyoutMethods
+                } 
+    
+                //return our SDK for the appropriate UI component
+                resolve({
+                    ...props,
+                    ...availableMethods
+                })
+            }
+         })
 
         notifyCMS({ message: "ready", messageChannel: `ready_for_${messageID}`})
 
