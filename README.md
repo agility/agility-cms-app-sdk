@@ -382,6 +382,14 @@ Determines if a field value is required in order to save the content item.
 
 Determines if a field is allowed to be edited. This could return as `false` if a user does not have permission to edit the field or this field is being rendered as part of a `Version History` view.
 ***
+`contentItem <object>`
+
+The initial values  of the content item that the field is currently rendering in. To retrieve the latest content item values, use the `await fieldSDK.getContentItem()` method.
+***
+`user <object>`
+
+The details of the user currently logged into Agility CMS.
+***
 `configValues <object>`
 
 The configuration values that have been set by the user who installed the App. This is based off the `configValues` that were set in your `AppConfig`.
@@ -400,6 +408,13 @@ fieldSDK.updateFieldValue({
 Sets a field value on the content item. If no `fieldName` is set, it will set the value for the current custom field being rendered.
 
 >**Note**: When setting a `fieldName`, it should match the exact casing of the `apiName` for the field as shown in Agility CMS for the associated content model. 
+***
+#### Get Content Item
+```javascript
+await fieldSDK.getContentItem(): Promise<contentItem>
+```
+
+Retrieves the latest values of the content item that this field is rendering in. This may differ from the initial values that are passed-down from the CMS when the field is first initialized. Returns a `contentItem` object.
 ***
 #### Subscribing to Field Value Changes
 ```javascript

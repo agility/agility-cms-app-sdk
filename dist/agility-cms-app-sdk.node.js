@@ -27,6 +27,7 @@ __webpack_require__.d(__webpack_exports__, {
 var fields_namespaceObject = {};
 __webpack_require__.r(fields_namespaceObject);
 __webpack_require__.d(fields_namespaceObject, {
+  "getContentItem": () => (getContentItem),
   "openFlyout": () => (openFlyout),
   "subscribeToFieldValueChanges": () => (subscribeToFieldValueChanges),
   "updateFieldValue": () => (updateFieldValue)
@@ -134,7 +135,7 @@ var listenForCMS = function listenForCMS(_ref2) {var messageChannel = _ref2.mess
 
 
 ;// CONCATENATED MODULE: ./src/fields.js
-
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {try {var info = gen[key](arg);var value = info.value;} catch (error) {reject(error);return;}if (info.done) {resolve(value);} else {Promise.resolve(value).then(_next, _throw);}}function _asyncToGenerator(fn) {return function () {var self = this,args = arguments;return new Promise(function (resolve, reject) {var gen = fn.apply(self, args);function _next(value) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);}function _throw(err) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);}_next(undefined);});};}
 
 
 
@@ -160,7 +161,38 @@ var updateFieldValue = function updateFieldValue(_ref) {var fieldName = _ref.fie
 
 };
 
-var openFlyout = function openFlyout(_ref2) {var title = _ref2.title,size = _ref2.size,name = _ref2.name,onClose = _ref2.onClose,params = _ref2.params;
+var getContentItem = /*#__PURE__*/function () {var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {var _this = this;return regeneratorRuntime.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:return _context.abrupt("return",
+            new Promise(function (resolve, reject) {
+              var contentItemReceived = false;
+
+              var messageID = getMessageID({
+                location: types.APP_LOCATION_CUSTOM_FIELD,
+                initiator: _this.initiator,
+                id: _this.id });
+
+
+              notifyCMS({
+                message: null, //no specific values required
+                messageChannel: "getContentItem_for_".concat(messageID) });
+
+
+              listenForCMS({
+                messageChannel: "getContentItemCallback_for_".concat(messageID),
+                onMsgReceived: function onMsgReceived(contentItem) {
+                  contentItemReceived = true;
+                  resolve(contentItem);
+                } });
+
+
+              setTimeout(function () {
+                if (!contentItemReceived) {
+                  reject("CMS did not reply with a contentItem.");
+                }
+              }, 3000); //wait 3 seconds before cancelling
+            }));case 1:case "end":return _context.stop();}}}, _callee);}));return function getContentItem() {return _ref2.apply(this, arguments);};}();
+
+
+var openFlyout = function openFlyout(_ref3) {var title = _ref3.title,size = _ref3.size,name = _ref3.name,onClose = _ref3.onClose,params = _ref3.params;
   var messageID = getMessageID({
     location: types.APP_LOCATION_CUSTOM_FIELD,
     initiator: this.initiator,
@@ -186,7 +218,7 @@ var openFlyout = function openFlyout(_ref2) {var title = _ref2.title,size = _ref
 
 
 
-var subscribeToFieldValueChanges = function subscribeToFieldValueChanges(_ref3) {var fieldName = _ref3.fieldName,onChange = _ref3.onChange;
+var subscribeToFieldValueChanges = function subscribeToFieldValueChanges(_ref4) {var fieldName = _ref4.fieldName,onChange = _ref4.onChange;
 
   var messageID = getMessageID({
     location: types.APP_LOCATION_CUSTOM_FIELD,
@@ -244,7 +276,7 @@ var runtime = __webpack_require__(666);
 ;// CONCATENATED MODULE: ./package.json
 const package_namespaceObject = {"i8":"1.0.0"};
 ;// CONCATENATED MODULE: ./src/sdk.js
-function ownKeys(object, enumerableOnly) {var keys = Object.keys(object);if (Object.getOwnPropertySymbols) {var symbols = Object.getOwnPropertySymbols(object);if (enumerableOnly) {symbols = symbols.filter(function (sym) {return Object.getOwnPropertyDescriptor(object, sym).enumerable;});}keys.push.apply(keys, symbols);}return keys;}function _objectSpread(target) {for (var i = 1; i < arguments.length; i++) {var source = arguments[i] != null ? arguments[i] : {};if (i % 2) {ownKeys(Object(source), true).forEach(function (key) {_defineProperty(target, key, source[key]);});} else if (Object.getOwnPropertyDescriptors) {Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));} else {ownKeys(Object(source)).forEach(function (key) {Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));});}}return target;}function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;}function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {try {var info = gen[key](arg);var value = info.value;} catch (error) {reject(error);return;}if (info.done) {resolve(value);} else {Promise.resolve(value).then(_next, _throw);}}function _asyncToGenerator(fn) {return function () {var self = this,args = arguments;return new Promise(function (resolve, reject) {var gen = fn.apply(self, args);function _next(value) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);}function _throw(err) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);}_next(undefined);});};}
+function ownKeys(object, enumerableOnly) {var keys = Object.keys(object);if (Object.getOwnPropertySymbols) {var symbols = Object.getOwnPropertySymbols(object);if (enumerableOnly) {symbols = symbols.filter(function (sym) {return Object.getOwnPropertyDescriptor(object, sym).enumerable;});}keys.push.apply(keys, symbols);}return keys;}function _objectSpread(target) {for (var i = 1; i < arguments.length; i++) {var source = arguments[i] != null ? arguments[i] : {};if (i % 2) {ownKeys(Object(source), true).forEach(function (key) {_defineProperty(target, key, source[key]);});} else if (Object.getOwnPropertyDescriptors) {Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));} else {ownKeys(Object(source)).forEach(function (key) {Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));});}}return target;}function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;}function sdk_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {try {var info = gen[key](arg);var value = info.value;} catch (error) {reject(error);return;}if (info.done) {resolve(value);} else {Promise.resolve(value).then(_next, _throw);}}function sdk_asyncToGenerator(fn) {return function () {var self = this,args = arguments;return new Promise(function (resolve, reject) {var gen = fn.apply(self, args);function _next(value) {sdk_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);}function _throw(err) {sdk_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);}_next(undefined);});};}
 
 
 
@@ -260,17 +292,17 @@ var setAppConfig = function setAppConfig(appConfig) {
 };
 
 
-var initializeField = /*#__PURE__*/function () {var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(_ref) {var containerRef, fieldSDK;return regeneratorRuntime.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:containerRef = _ref.containerRef;_context.next = 3;return (
+var initializeField = /*#__PURE__*/function () {var _ref2 = sdk_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(_ref) {var containerRef, fieldSDK;return regeneratorRuntime.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:containerRef = _ref.containerRef;_context.next = 3;return (
               initializeAppComponent({ containerRef: containerRef, location: types.APP_LOCATION_CUSTOM_FIELD }));case 3:fieldSDK = _context.sent;return _context.abrupt("return",
             fieldSDK);case 5:case "end":return _context.stop();}}}, _callee);}));return function initializeField(_x) {return _ref2.apply(this, arguments);};}();
 
 
-var initializeFlyout = /*#__PURE__*/function () {var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(_ref3) {var containerRef, flyoutSDK;return regeneratorRuntime.wrap(function _callee2$(_context2) {while (1) {switch (_context2.prev = _context2.next) {case 0:containerRef = _ref3.containerRef;_context2.next = 3;return (
+var initializeFlyout = /*#__PURE__*/function () {var _ref4 = sdk_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(_ref3) {var containerRef, flyoutSDK;return regeneratorRuntime.wrap(function _callee2$(_context2) {while (1) {switch (_context2.prev = _context2.next) {case 0:containerRef = _ref3.containerRef;_context2.next = 3;return (
               initializeAppComponent({ containerRef: containerRef, location: types.APP_LOCATION_FLYOUT }));case 3:flyoutSDK = _context2.sent;return _context2.abrupt("return",
             flyoutSDK);case 5:case "end":return _context2.stop();}}}, _callee2);}));return function initializeFlyout(_x2) {return _ref4.apply(this, arguments);};}();
 
 
-var initializeAppComponent = /*#__PURE__*/function () {var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(_ref5) {var containerRef, location;return regeneratorRuntime.wrap(function _callee3$(_context3) {while (1) {switch (_context3.prev = _context3.next) {case 0:containerRef = _ref5.containerRef, location = _ref5.location;return _context3.abrupt("return",
+var initializeAppComponent = /*#__PURE__*/function () {var _ref6 = sdk_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(_ref5) {var containerRef, location;return regeneratorRuntime.wrap(function _callee3$(_context3) {while (1) {switch (_context3.prev = _context3.next) {case 0:containerRef = _ref5.containerRef, location = _ref5.location;return _context3.abrupt("return",
 
             new Promise(function (resolve) {
 
