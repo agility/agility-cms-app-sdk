@@ -24,6 +24,37 @@ const updateFieldValue = function ({ fieldName, fieldValue }) {
 
 }
 
+const getContentItem = async function() {
+    return new Promise((resolve, reject) => {
+        let contentItemReceived = false;
+
+        const messageID = getMessageID({
+            location: types.APP_LOCATION_CUSTOM_FIELD,
+            initiator: this.initiator,
+            id: this.id
+         });
+    
+         notifyCMS({
+            message: null, //no specific values required
+            messageChannel: `getContentItem_for_${messageID}`
+         })
+    
+         listenForCMS({
+             messageChannel: `getContentItemCallback_for_${messageID}`,
+             onMsgReceived: (contentItem) => {
+                 contentItemReceived = true;
+                resolve(contentItem)
+             }
+         })
+
+         setTimeout(() => {
+            if(!contentItemReceived) {
+                reject("CMS did not reply with a contentItem.")
+            }
+         }, 3000); //wait 3 seconds before cancelling
+    })
+}
+
 const openFlyout = function ({title, size, name, onClose, params }) {
     const messageID = getMessageID({
         location: types.APP_LOCATION_CUSTOM_FIELD,
@@ -74,5 +105,6 @@ const subscribeToFieldValueChanges = function ({ fieldName, onChange}) {
 export  {
     updateFieldValue,
     subscribeToFieldValueChanges,
-    openFlyout
+    openFlyout,
+    getContentItem
 }
