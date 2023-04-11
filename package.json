@@ -1,32 +1,32 @@
 {
   "name": "@agility/app-sdk",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "JavaScript library for building Agility CMS apps.",
-  "main": "dist/agility-cms-app-sdk.node.js",
+  "main": "dist/index.js",
   "scripts": {
-    "build": "webpack --config webpack.config --mode=production"
+    "clean": "rm -rf ./dist",
+    "build": "yarn clean && tsc",
+    "prepare": "yarn build",
+    "watch": "tsc -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/agility/agility-cms-app-sdk.git"
   },
-  "author": "James Vidler",
+  "author": "Joel Varty",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/agility/agility-cms-app-sdk/issues"
   },
   "homepage": "https://github.com/agility/agility-cms-app-sdk",
   "devDependencies": {
-    "@babel/cli": "^7.2.3",
-    "@babel/core": "^7.3.4",
-    "@babel/node": "^7.2.2",
-    "@babel/preset-env": "^7.3.4",
-    "@babel/register": "^7.0.0",
-    "babel-loader": "^8.0.5",
-    "webpack": "^5.59.1",
-    "webpack-cli": "^4.9.1"
+    "@types/node": "^18.15.11",
+    "@types/react": "^18.0.34",
+    "@types/react-dom": "^18.0.11",
+    "react": "^18.2.0",
+    "ts-loader": "^9.4.2",
+    "typescript": "^5.0.4"
   },
-  "dependencies": {
-    "regenerator-runtime": "^0.13.9"
-  }
+  "dependencies": {}
 }
