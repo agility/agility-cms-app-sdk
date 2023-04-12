@@ -1,9 +1,11 @@
-import { useEffect, useId, useState } from 'react';
-
-import { IAppEventParam } from './types/IAppEventParam'
-import { IAppInstallContext } from "./types/IAppInstallContext"
-import { IInstance } from "./types/IInstance"
-import { IContextParam } from './types';
+import { useEffect, useMemo, useState } from 'react';
+import { Subject } from 'rxjs';
+import { IAppEventParam , IAppInstallContext, IInstance, IContextParam } from './types';
+import { getOperationID } from './lib/getOperationID';
+import { addOperation } from './lib/operationAccess';
+import { operationDispatcher } from './lib/operationDispatcher';
+import { invokeAppMethod } from './lib/invokeAppMethod';
+import { getAppID } from './lib/getAppID';
 
 export const useAgilityAppSDK = () => {
 	const [initializing, setInitializing] = useState(true)
@@ -11,47 +13,62 @@ export const useAgilityAppSDK = () => {
 	const [instance, setInstance] = useState<IInstance | null>(null)
 	const [locale, setLocale] = useState<string | null>(null)
 
-	const operationID = useId()
+	const appID = useMemo(() => {
+		return getAppID()
+	}, [])
+
+	// const updateConfigurationValue = (key: string, value: string) => {
+	// 	if (appInstallContext) {
+	// 		const arg: IAppEventParam<{ key: string, value: string }> = {
+	// 			appID,
+	// 			operationID: getOperationID(),
+	// 			operationType: "updateConfigurationValue",
+	// 			arg: {
+	// 				key,
+	// 				value
+	// 			}
+	// 		}
+
+	// 		window.parent.postMessage(arg, "*")
+	// 	}
+	// }
 
 	useEffect(() => {
 
-		const params = window.location.search
-		const urlParams = new URLSearchParams(params)
-		const appID = Number(urlParams.get('appID'))
+		if (appID < 0) return
 
+		//setup an operation observer to listen for the context event after the initialize method
+		const operation = new Subject<IContextParam>();
+
+		operation.subscribe((context) => {
+			setAppInstallContext(context.app)
+			setInstance(context.instance)
+			setLocale(context.locale)
+			setInitializing(false)
+			operation.unsubscribe()
+		})
+
+		const operationID = getOperationID()
+		addOperation({ operationID, operation })
 
 		//set up the listener for the app events
-		const listener = (event: any) => {
-			const { data } = event as { data: IAppEventParam<any> }
-
-			switch (data.operationType) {
-				case "context":
-					const context = data.arg as IContextParam
-					setAppInstallContext(context.app)
-					setInstance(context.instance)
-					setLocale(context.locale)
-					setInitializing(false)
-					break;
-
-			}
-		}
-
-		window.addEventListener("message", listener, false);
+		window.addEventListener("message", operationDispatcher, false);
 
 		//send the init method call to the parent window
-		const initArg: IAppEventParam<never> = {
+		invokeAppMethod<never>({
 			appID,
 			operationID,
 			operationType: "initialize"
-		}
-
-		window.parent.postMessage(initArg)
+		})
 
 		return () => {
-			removeEventListener("message", listener, false);
+			//clean up the listener...
+			removeEventListener("message", operationDispatcher, false);
 		}
 
-	}, [])
+
+
+	}, [appID])
 
 	return {
 		initializing,
