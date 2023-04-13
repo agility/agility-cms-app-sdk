@@ -25,6 +25,7 @@ export const addOperation = <T>({ operationID, operation }: IOperation<T>) => {
 export const getOperation = (operationID:string): Subject<any> | null => {
 
 	const op = operations[operationID]
+	delete operations[operationID]
 	return op || null
 
 }

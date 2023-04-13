@@ -41,11 +41,13 @@ export const useAgilityAppSDK = () => {
 		const operation = new Subject<IContextParam>();
 
 		operation.subscribe((context) => {
-			setAppInstallContext(context.app)
-			setInstance(context.instance)
-			setLocale(context.locale)
-			setInitializing(false)
-			operation.unsubscribe()
+			if (context) {
+				setAppInstallContext(context.app)
+				setInstance(context.instance)
+				setLocale(context.locale)
+				setInitializing(false)
+				operation.unsubscribe()
+			}
 		})
 
 		const operationID = getOperationID()
