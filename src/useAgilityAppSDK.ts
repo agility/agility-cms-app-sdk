@@ -7,7 +7,21 @@ import { operationDispatcher } from './lib/operationDispatcher';
 import { invokeAppMethod } from './lib/invokeAppMethod';
 import { getAppID } from './lib/getAppID';
 
-export const useAgilityAppSDK = () => {
+
+interface AgilityAddSKReturn {
+	initializing: boolean,
+	appInstallContext: IAppInstallContext | null,
+	instance: IInstance | null,
+	locale: string | null
+}
+
+/**
+ * The main hook for using the Agility App SDK.
+ *
+ * @returns {AgilityAddSKReturn}
+ */
+export const useAgilityAppSDK = (): AgilityAddSKReturn => {
+
 	const [initializing, setInitializing] = useState(true)
 	const [appInstallContext, setAppInstallContext] = useState<IAppInstallContext | null>(null)
 	const [instance, setInstance] = useState<IInstance | null>(null)
@@ -23,17 +37,15 @@ export const useAgilityAppSDK = () => {
 	useEffect(() => {
 
 		if (mounted.current === true) return
-
 		if (appID < 0) return
 		mounted.current = true
 
-console.log("INITIALIZE APP SDK")
 		//setup an operation observer to listen for the context event after the initialize method
 		const operation = new Subject<IContextParam>();
 
 		operation.subscribe((context) => {
-			console.log("FIRST SUBSCRIBE", context)
 			if (context) {
+				//TODO: add other context variables here too - such as config / connections
 				setAppInstallContext(context.app)
 				setInstance(context.instance)
 				setLocale(context.locale)

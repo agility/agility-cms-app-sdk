@@ -1,16 +1,22 @@
-import { IAppEventParam } from '../types';
-import { getOperationID } from '../lib/getOperationID';
+import { IAppEventParam } from '../../types';
+import { getOperationID } from '../../lib/getOperationID';
 import { Subject } from 'rxjs';
-import { addOperation } from '../lib/operationAccess';
-import { getAppID } from '../lib/getAppID';
-import { invokeAppMethod } from '../lib/invokeAppMethod';
+import { addOperation } from '../../lib/operationAccess';
+import { getAppID } from '../../lib/getAppID';
+import { invokeAppMethod } from '../../lib/invokeAppMethod';
 
 interface Props {
 	key: string
 	value: string
 }
 
-export const updateConfigurationValue = ({key, value}:Props):Promise<any> => {
+/**
+ * Updates a configuration value for the current app.  This will be persisted by Agility.
+ *
+ * @param {Props} {key, value}
+ * @returns {Promise<void>}
+ */
+export const updateConfigurationValue = ({key, value}:Props):Promise<void> => {
 
 	const appID = getAppID()
 	const operationID = getOperationID()
