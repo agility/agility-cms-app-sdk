@@ -3,6 +3,7 @@ import { getOperationID } from '../lib/getOperationID';
 import { Subject } from 'rxjs';
 import { addOperation } from '../lib/operationAccess';
 import { getAppID } from '../lib/getAppID';
+import { invokeAppMethod } from '../lib/invokeAppMethod';
 
 interface Props {
 	key: string
@@ -36,7 +37,8 @@ export const updateConfigurationValue = ({key, value}:Props):Promise<any> => {
 	addOperation<void>({ operationID, operation })
 
 	//call the method in the parent windpow
-	window.parent.postMessage(arg)
+	invokeAppMethod(arg)
+
 
 	return p
 

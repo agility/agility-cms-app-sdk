@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Subject } from 'rxjs';
 import { IAppEventParam , IAppInstallContext, IInstance, IContextParam } from './types';
 import { getOperationID } from './lib/getOperationID';
@@ -13,34 +13,26 @@ export const useAgilityAppSDK = () => {
 	const [instance, setInstance] = useState<IInstance | null>(null)
 	const [locale, setLocale] = useState<string | null>(null)
 
+	const mounted = useRef<boolean>(false)
+
 	const appID = useMemo(() => {
 		return getAppID()
 	}, [])
 
-	// const updateConfigurationValue = (key: string, value: string) => {
-	// 	if (appInstallContext) {
-	// 		const arg: IAppEventParam<{ key: string, value: string }> = {
-	// 			appID,
-	// 			operationID: getOperationID(),
-	// 			operationType: "updateConfigurationValue",
-	// 			arg: {
-	// 				key,
-	// 				value
-	// 			}
-	// 		}
-
-	// 		window.parent.postMessage(arg, "*")
-	// 	}
-	// }
 
 	useEffect(() => {
 
-		if (appID < 0) return
+		if (mounted.current === true) return
 
+		if (appID < 0) return
+		mounted.current = true
+
+console.log("INITIALIZE APP SDK")
 		//setup an operation observer to listen for the context event after the initialize method
 		const operation = new Subject<IContextParam>();
 
 		operation.subscribe((context) => {
+			console.log("FIRST SUBSCRIBE", context)
 			if (context) {
 				setAppInstallContext(context.app)
 				setInstance(context.instance)
