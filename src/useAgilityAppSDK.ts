@@ -27,20 +27,12 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 	const [instance, setInstance] = useState<IInstance | null>(null)
 	const [locale, setLocale] = useState<string | null>(null)
 
-	const mounted = useRef<boolean>(false)
-
-	const appID = useMemo(() => {
-		return getAppID()
-	}, [])
-
-
+	
 	useEffect(() => {
-
-		if (mounted.current === true) return
+		const appID = getAppID()
 		if (appID < 0) return
-		mounted.current = true
 
-		//setup an operation observer to listen for the context event after the initialize method
+		//setup an operation observer to lcd isten for the context event after the initialize method
 		const operation = new Subject<IContextParam>();
 
 		operation.subscribe((context) => {
@@ -71,10 +63,7 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 			//clean up the listener...
 			removeEventListener("message", operationDispatcher, false);
 		}
-
-
-
-	}, [appID])
+	}, [])
 
 	return {
 		initializing,
