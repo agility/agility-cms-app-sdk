@@ -26,8 +26,8 @@ export const getContentItem = ():Promise<any> => {
 
 	//setup the return promise so we can call it when the parent window returns the result
 	const p = new Promise<void>((resolve, reject) => {
-		operation.subscribe(() => {
-			resolve()
+		operation.subscribe((contentItem) => {
+			resolve(contentItem)
 			operation.unsubscribe()
 		})
 	})
