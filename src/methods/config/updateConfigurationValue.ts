@@ -1,14 +1,9 @@
-import { IAppEventParam } from '../../types';
+import { IAppConfigValue, IAppEventParam } from '../../types';
 import { getOperationID } from '../../lib/getOperationID';
 import { Subject } from 'rxjs';
 import { addOperation } from '../../lib/operationAccess';
 import { getAppID } from '../../lib/getAppID';
 import { invokeAppMethod } from '../../lib/invokeAppMethod';
-
-interface Props {
-	key: string
-	value: string
-}
 
 /**
  * Updates a configuration value for the current app.  This will be persisted by Agility.
@@ -16,31 +11,32 @@ interface Props {
  * @param {Props} {key, value}
  * @returns {Promise<void>}
  */
-export const updateConfigurationValue = ({key, value}:Props):Promise<void> => {
+export const updateConfigurationValue = ({name, value}:IAppConfigValue):Promise<IAppConfigValue> => {
 
 	const appID = getAppID()
 	const operationID = getOperationID()
-	const arg: IAppEventParam<{ key: string, value: string }> = {
+	const arg: IAppEventParam<IAppConfigValue> = {
 		appID,
 		operationID,
 		operationType: "updateConfigurationValue",
 		arg: {
-			key,
+			name,
 			value
 		}
 	}
 
-	const operation = new Subject<void>();
+	const operation = new Subject<IAppConfigValue>();
 
 	//setup the return promise so we can call it when the parent window returns the result
-	const p = new Promise<void>((resolve, reject) => {
-		operation.subscribe(() => {
-			resolve()
+	const p = new Promise<IAppConfigValue>((resolve, reject) => {
+		operation.subscribe((appConfigValue) => {
+			debugger;
+			resolve(appConfigValue)
 			operation.unsubscribe()
 		})
 	})
 
-	addOperation<void>({ operationID, operation })
+	addOperation<IAppConfigValue>({ operationID, operation })
 
 	//call the method in the parent windpow
 	invokeAppMethod(arg)

@@ -1,7 +1,7 @@
 import { IAppEventParam } from "../types"
 import { getOperation } from "./operationAccess"
 
-export const operationDispatcher = (event: any) => {
+export const operationDispatcher = (event: MessageEvent) => {
 
 	const { data } = event as { data: IAppEventParam<any> }
 
