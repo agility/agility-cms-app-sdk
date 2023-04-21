@@ -42,29 +42,43 @@ export const openModal = <T>({ name, props, callback }: Props<T>) => {
 
 	const appID = getAppID()
 	const operationID = getOperationID()
+	const returnID = getOperationID()
+
 	const arg: IAppEventParam<{ name: string, props: any }> = {
 		appID,
 		operationID,
 		operationType: "openModal",
 		arg: {
 			name,
-			props
+			props: {
+				returnID,
+				...props
+			}
 		}
 	}
 
 	const operation = new Subject<T>();
-
-	//setup the return promise so we can call it when the parent window returns the result
-	operation.subscribe((ret: T) => {
-		callback(ret)
+	operation.subscribe(() => {
 		operation.unsubscribe()
 	})
 
-
 	addOperation<T>({ operationID, operation })
+
+	const closeOperation = new Subject<T>();
+	//setup the return promise so we can call it when the parent window returns the result
+	const p = new Promise<void>((resolve, reject) => {
+		closeOperation.subscribe((ret: any) => {
+			callback(ret)
+			resolve()
+			closeOperation.unsubscribe()
+		})
+	})
+
+	addOperation<T>({ operationID: returnID, operation: closeOperation })
 
 	//call the method in the parent windpow
 	invokeAppMethod(arg)
 
+	return p
 
 }
