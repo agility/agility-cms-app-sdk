@@ -1,5 +1,5 @@
 export interface IAppEventParam<T> {
-	appID: number
+	appID: string;
 	operationID: string
 	operationType: "initialize" | "context"
 	| "updateConfigurationValue"
@@ -8,6 +8,7 @@ export interface IAppEventParam<T> {
 	| "selectAssets"
 	| "persistData"
 	| "setHeight"
+	| "setFieldValue"
 	| "subscribeToOtherValueChanges"
 	
 	error?: string

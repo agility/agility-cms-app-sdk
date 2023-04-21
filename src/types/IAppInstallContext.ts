@@ -1,4 +1,4 @@
 export interface IAppInstallContext {
-	appID: number
+	appID: string
 	configuration: { [name: string]: string; }
 }

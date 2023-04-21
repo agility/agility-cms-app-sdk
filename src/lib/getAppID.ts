@@ -1,8 +1,7 @@
 export const getAppID = () => {
-	if (typeof window === 'undefined') return -1
+	if (typeof window === 'undefined') return ""
 	const params = window.location.search
 	const urlParams = new URLSearchParams(params)
-	const id = Number(urlParams.get('appID'))
-	if (isNaN(id)) return -1
+	const id = urlParams.get('appID')
 	return id
 }

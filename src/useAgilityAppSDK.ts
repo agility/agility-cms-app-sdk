@@ -30,7 +30,7 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 	
 	useEffect(() => {
 		const appID = getAppID()
-		if (appID < 0) return
+		if (!appID) return
 
 		//setup an operation observer to lcd isten for the context event after the initialize method
 		const operation = new Subject<IContextParam>();
