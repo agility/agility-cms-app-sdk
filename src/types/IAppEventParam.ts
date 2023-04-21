@@ -5,7 +5,11 @@ export interface IAppEventParam<T> {
 	| "updateConfigurationValue"
 	| "getContentItem"
 	| "openModal"
-
+	| "selectAssets"
+	| "persistData"
+	| "setHeight"
+	| "subscribeToOtherValueChanges"
+	
 	error?: string
 	arg?: T
 }

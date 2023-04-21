@@ -1,4 +1,4 @@
-import { IAppEventParam, IContentItem } from '../../types';
+import { IAppEventParam } from '../../types';
 import { getOperationID } from '../../lib/getOperationID';
 import { Subject } from 'rxjs';
 import { addOperation } from '../../lib/operationAccess';
@@ -7,32 +7,32 @@ import { invokeAppMethod } from '../../lib/invokeAppMethod';
 
 
 /**
- * Gets the contentItem from the current context.
- * This is meant to be used on Custom Field or Content Item Sidebar Panel app.
+ * Selects assets for the current context
+ * This is meant to be used on the pages dashboard or content dashboard.
  *
- * @returns {Promise<IContentItem>}
+ * @returns {Promise<any>}
  */
-export const getContentItem = ():Promise<IContentItem> => {
+export const selectAssets = ():Promise<any> => {
 
 	const appID = getAppID()
 	const operationID = getOperationID()
 	const arg: IAppEventParam<{ key: string, value: string }> = {
 		appID,
 		operationID,
-		operationType: "getContentItem"
+		operationType: "selectAssets"
 	}
 
-	const operation = new Subject<IContentItem>();
+	const operation = new Subject<void>();
 
 	//setup the return promise so we can call it when the parent window returns the result
-	const p = new Promise<IContentItem>((resolve, reject) => {
-		operation.subscribe((contentItem) => {
-			resolve(contentItem)
+	const p = new Promise<void>((resolve, reject) => {
+		operation.subscribe(() => {
+			resolve()
 			operation.unsubscribe()
 		})
 	})
 
-	addOperation<IContentItem>({ operationID, operation })
+	addOperation<void>({ operationID, operation })
 
 	//call the method in the parent windpow
 	invokeAppMethod(arg)
