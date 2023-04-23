@@ -4,6 +4,7 @@ import { Subject } from 'rxjs';
 import { addOperation } from '../lib/operationAccess';
 import { getAppID } from '../lib/getAppID';
 import { invokeAppMethod } from '../lib/invokeAppMethod';
+import { IAppDataPersistValue } from '../types';
 
 interface Props {
 	key: string
@@ -11,16 +12,16 @@ interface Props {
 }
 
 /**
- * Persists  value for the current app.  This will be persisted by Agility.
+ * Persists  value for the current app. This will be persisted per user by Agility.
  *
  * @param {Props} {key, value}
  * @returns {Promise<void>}
  */
-export const persistData = ({key, value}:Props):Promise<void> => {
+export const persistData = ({key, value}:Props):Promise<IAppDataPersistValue> => {
 
 	const appID = getAppID()
 	const operationID = getOperationID()
-	const arg: IAppEventParam<{ key: string, value: string }> = {
+	const arg: IAppEventParam<IAppDataPersistValue> = {
 		appID,
 		operationID,
 		operationType: "persistData",
@@ -30,17 +31,17 @@ export const persistData = ({key, value}:Props):Promise<void> => {
 		}
 	}
 
-	const operation = new Subject<void>();
+	const operation = new Subject<IAppDataPersistValue>();
 
 	//setup the return promise so we can call it when the parent window returns the result
-	const p = new Promise<void>((resolve, reject) => {
-		operation.subscribe(() => {
-			resolve()
+	const p = new Promise<IAppDataPersistValue>((resolve, reject) => {
+		operation.subscribe((persistedData) => {
+			resolve(persistedData)
 			operation.unsubscribe()
 		})
 	})
 
-	addOperation<void>({ operationID, operation })
+	addOperation<IAppDataPersistValue>({ operationID, operation })
 
 	//call the method in the parent windpow
 	invokeAppMethod(arg)

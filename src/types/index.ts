@@ -4,6 +4,6 @@ export * from "./IAppInstallContext"
 export * from "./IContextParam"
 export * from "./IInstance"
 export * from "./IContentItem"
-
-
+export * from "./IAppHeightValue"
+export * from "./IAppDataPersist"
 
