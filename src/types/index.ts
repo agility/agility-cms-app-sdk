@@ -10,3 +10,5 @@ export * from "./IAppFieldValue"
 export * from "./IModalParam"
 export * from "./IFieldParam"
 export * from "./IContentModel"
+export * from "./IAppInstall"
+
