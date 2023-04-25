@@ -1,16 +1,6 @@
 import { IAppInstallContext } from "./IAppInstallContext"
+import { IField } from "./IFieldParam"
 import { IInstance } from "./IInstance"
-
-export interface IField {
-	id: string
-	label: string
-	typeName: string
-	name: string
-	value: any
-	description?: string
-	required: boolean
-	readOnly: boolean
-}
 
 export interface IContextParam {
 	app: IAppInstallContext

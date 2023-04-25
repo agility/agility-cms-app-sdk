@@ -6,4 +6,7 @@ export * from "./IInstance"
 export * from "./IContentItem"
 export * from "./IAppHeightValue"
 export * from "./IAppDataPersist"
-
+export * from "./IAppFieldValue"
+export * from "./IModalParam"
+export * from "./IFieldParam"
+export * from "./IContentModel"

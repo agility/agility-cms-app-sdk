@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Subject } from 'rxjs';
-import { IAppEventParam , IAppInstallContext, IInstance, IContextParam, IField } from './types';
+import { IAppEventParam , IAppInstallContext, IInstance, IContextParam, IField, IContentItem, IContentModel } from './types';
 import { getOperationID } from './lib/getOperationID';
 import { addOperation, removeOperations } from './lib/operationAccess';
 import { operationDispatcher } from './lib/operationDispatcher';
@@ -13,9 +13,9 @@ interface AgilityAddSKReturn {
 	appInstallContext: IAppInstallContext | null,
 	instance: IInstance | null,
 	locale: string | null,
-	field: IField | null
-	contentItem: any,
-	contentModel: any
+	field: IField | null,
+	contentItem: IContentItem | null,
+	contentModel: IContentModel | null
 }
 
 /**
@@ -30,8 +30,8 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 	const [instance, setInstance] = useState<IInstance | null>(null)
 	const [locale, setLocale] = useState<string | null>(null)
 	const [field, setField] = useState<IField | null>(null)
-	const [contentModel, setContentModel] = useState(null)
-	const [contentItem, setContentItem] = useState(null)
+	const [contentModel, setContentModel] = useState<IContentModel | null>(null)
+	const [contentItem, setContentItem] = useState<IContentItem | null>(null)
 
 
 	useEffect(() => {

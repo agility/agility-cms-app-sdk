@@ -3,9 +3,15 @@ import { getAppID } from "../lib/getAppID"
 import { getOperationID } from "../lib/getOperationID"
 import { invokeAppMethod } from "../lib/invokeAppMethod"
 import { addOperation } from "../lib/operationAccess"
-import { IAppEventParam } from "../types"
+import { IAppEventParam, IAppHeightValue } from "../types"
 
-export const setHeight = (height: number) => {
+/**
+ * setHeight
+ * 	sends a message out to the iframe channel with a numeric height
+ * @param height 
+ * @returns 
+ */
+export const setHeight = ({ height }: IAppHeightValue) => {
 
   const appID = getAppID()
   if (!appID) return 
