@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Subject } from 'rxjs';
-import { IAppEventParam , IAppInstallContext, IInstance, IContextParam } from './types';
+import { IAppEventParam , IAppInstallContext, IInstance, IContextParam, IField } from './types';
 import { getOperationID } from './lib/getOperationID';
-import { addOperation } from './lib/operationAccess';
+import { addOperation, removeOperations } from './lib/operationAccess';
 import { operationDispatcher } from './lib/operationDispatcher';
 import { invokeAppMethod } from './lib/invokeAppMethod';
 import { getAppID } from './lib/getAppID';
@@ -12,7 +12,10 @@ interface AgilityAddSKReturn {
 	initializing: boolean,
 	appInstallContext: IAppInstallContext | null,
 	instance: IInstance | null,
-	locale: string | null
+	locale: string | null,
+	field: IField | null
+	contentItem: any,
+	contentModel: any
 }
 
 /**
@@ -26,8 +29,11 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 	const [appInstallContext, setAppInstallContext] = useState<IAppInstallContext | null>(null)
 	const [instance, setInstance] = useState<IInstance | null>(null)
 	const [locale, setLocale] = useState<string | null>(null)
+	const [field, setField] = useState<IField | null>(null)
+	const [contentModel, setContentModel] = useState(null)
+	const [contentItem, setContentItem] = useState(null)
 
-	
+
 	useEffect(() => {
 		const appID = getAppID()
 		if (!appID) return
@@ -41,6 +47,11 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 				setAppInstallContext(context.app)
 				setInstance(context.instance)
 				setLocale(context.locale)
+
+				setField(context?.field)
+				setContentItem(context?.contentItem)
+				setContentModel(context?.contentModel)
+
 				setInitializing(false)
 				operation.unsubscribe()
 			}
@@ -62,6 +73,7 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 		return () => {
 			//clean up the listener...
 			removeEventListener("message", operationDispatcher, false);
+			removeOperations()
 		}
 	}, [])
 
@@ -69,6 +81,9 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 		initializing,
 		appInstallContext,
 		instance,
-		locale
+		locale,
+		field,
+		contentItem,
+		contentModel
 	}
 }

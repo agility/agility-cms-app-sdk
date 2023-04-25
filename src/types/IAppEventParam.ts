@@ -9,7 +9,7 @@ export interface IAppEventParam<T> {
 	| "persistData"
 	| "setHeight"
 	| "setFieldValue"
-	| "subscribeToOtherValueChanges"
+	| "onFieldValueChanges"
 	
 	error?: string
 	arg?: T
