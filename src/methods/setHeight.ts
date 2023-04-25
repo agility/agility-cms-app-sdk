@@ -25,5 +25,4 @@ export const setHeight = (height: number) => {
   addOperation<void>({ operationID, operation })
 
   invokeAppMethod(arg)
-
 }
