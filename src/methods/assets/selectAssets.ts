@@ -1,4 +1,4 @@
-import { IAppEventParam } from '../../types';
+import { IAppConfigValue, IAppEventParam } from '../../types';
 import { getOperationID } from '../../lib/getOperationID';
 import { Subject } from 'rxjs';
 import { addOperation } from '../../lib/operationAccess';
@@ -12,9 +12,10 @@ import { invokeAppMethod } from '../../lib/invokeAppMethod';
  *
  * @returns {Promise<any>}
  */
-export const selectAssets = ():Promise<any> => {
+export const selectAssets = ():(Promise<void> | undefined) => {
 
 	const appID = getAppID()
+	if (!appID) return
 	const operationID = getOperationID()
 	const arg: IAppEventParam<{ key: string, value: string }> = {
 		appID,

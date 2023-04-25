@@ -38,9 +38,10 @@ interface Props<T> {
  * @param {Props<T>} { name, props, callback }
  * @returns
  */
-export const openModal = <T>({ name, props, callback }: Props<T>) => {
+export const openModal = <T>({ name, props, callback }: (Props<T> | undefined)) => {
 
 	const appID = getAppID()
+	if (!appID) return
 	const operationID = getOperationID()
 	const returnID = getOperationID()
 

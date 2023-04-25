@@ -11,9 +11,10 @@ import { invokeAppMethod } from '../../lib/invokeAppMethod';
  * @param {Props} {key, value}
  * @returns {Promise<void>}
  */
-export const updateConfigurationValue = ({name, value}:IAppConfigValue):Promise<IAppConfigValue> => {
+export const updateConfigurationValue = ({name, value}:IAppConfigValue):(Promise<IAppConfigValue> | undefined) => {
 
 	const appID = getAppID()
+	if (!appID) return
 	const operationID = getOperationID()
 	const arg: IAppEventParam<IAppConfigValue> = {
 		appID,

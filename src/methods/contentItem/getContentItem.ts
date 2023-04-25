@@ -12,9 +12,10 @@ import { invokeAppMethod } from '../../lib/invokeAppMethod';
  *
  * @returns {Promise<IContentItem>}
  */
-export const getContentItem = ():Promise<IContentItem> => {
+export const getContentItem = ():(Promise<IContentItem> | undefined) => {
 
 	const appID = getAppID()
+	if (!appID) return
 	const operationID = getOperationID()
 	const arg: IAppEventParam<{ key: string, value: string }> = {
 		appID,

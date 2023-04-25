@@ -16,9 +16,10 @@ interface Props {
  * @param {Props} {key, value}
  * @returns {Promise<void>}
  */
-export const persistData = ({key, value}:Props):Promise<void> => {
+export const persistData = ({key, value}:Props):(Promise<void> | undefined) => {
 
 	const appID = getAppID()
+	if (!appID) return
 	const operationID = getOperationID()
 	const arg: IAppEventParam<{ key: string, value: string }> = {
 		appID,

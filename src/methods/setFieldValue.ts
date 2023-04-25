@@ -5,7 +5,7 @@ import { invokeAppMethod } from "../lib/invokeAppMethod"
 import { addOperation } from "../lib/operationAccess"
 import { IAppEventParam } from "../types"
 
-export const setHeight = (height: number) => {
+export const setFieldValue = ({ name, value }: { name?: string, value: any }) => {
 
   const appID = getAppID()
   if (!appID) return 
@@ -14,9 +14,10 @@ export const setHeight = (height: number) => {
   const arg: IAppEventParam<{}> = {
     appID,
     operationID,
-    operationType: 'setHeight',
+    operationType: 'setFieldValue',
     arg: {
-      height
+      name,
+      value
     }
   }
 
