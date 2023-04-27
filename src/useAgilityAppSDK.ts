@@ -73,7 +73,6 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 		return () => {
 			//clean up the listener...
 			removeEventListener("message", operationDispatcher, false);
-			removeOperations()
 		}
 	}, [])
 
