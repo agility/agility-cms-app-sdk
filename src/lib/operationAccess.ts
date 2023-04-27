@@ -34,3 +34,7 @@ export const getOperation = (operationID:string): Subject<any> | null => {
 
 	return operation || null
 }
+
+export const deleteOperation = (operationID: string) => {
+	delete operations[operationID]
+}

@@ -16,7 +16,7 @@ export interface IAppEventParam<T> {
 	| "installApp"
 	| "preInstall"
 	| "setExtraConfigValues"
-	
+	| "removeFieldListener"
 	error?: string
 	arg?: T
 }

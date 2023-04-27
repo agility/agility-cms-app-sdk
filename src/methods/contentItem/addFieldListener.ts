@@ -21,7 +21,7 @@ export const addFieldListener = ({ fieldName, onChange }: Props) => {
 	const appID = getAppID()
 	if (!appID) return
 	const operationID = getOperationID()
-  const returnID = getOperationID()
+	const returnID = `fieldName-${appID}`
 
 	const arg: IAppEventParam<{ fieldName: string, operationID: string, operationType: string }> = {
 		appID,
