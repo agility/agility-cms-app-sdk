@@ -6,4 +6,4 @@ export * as contentItemMethods from "./contentItem"
 export * from "./setHeight"
 export * from "./persistData"
 export * from "./getAppInstall"
-
+export * from "./setExtraConfigValues"

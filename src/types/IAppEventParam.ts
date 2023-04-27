@@ -12,6 +12,10 @@ export interface IAppEventParam<T> {
 	| "onFieldValueChanges"
 	| "subscribeToOtherValueChanges"
 	| "getAppInstall"
+	| "preInstall"
+	| "installApp"
+	| "preInstall"
+	| "setExtraConfigValues"
 	
 	error?: string
 	arg?: T
