@@ -9,8 +9,8 @@ export interface IAppEventParam<T> {
 	| "persistData"
 	| "setHeight"
 	| "setFieldValue"
-	| "onFieldValueChanges"
-	| "subscribeToOtherValueChanges"
+	| "addFieldListener"
+	| "onFieldChanged"
 	| "getAppInstall"
 	
 	error?: string

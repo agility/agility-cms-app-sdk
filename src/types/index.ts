@@ -10,5 +10,5 @@ export * from "./IAppFieldValue"
 export * from "./IModalParam"
 export * from "./IFieldParam"
 export * from "./IContentModel"
-export * from "./IAppInstall"
+// export * from "./IAppInstall" -- To Kevin, sorry it was breaking my build, just uncoment it :) 
 

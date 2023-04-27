@@ -7,6 +7,7 @@ import { invokeAppMethod } from '../../lib/invokeAppMethod';
 
 
 /**
+ * selectAssets
  * Selects assets for the current context
  * This is meant to be used on the pages dashboard or content dashboard.
  *
