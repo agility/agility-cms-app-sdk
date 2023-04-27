@@ -10,6 +10,8 @@ export interface IAppEventParam<T> {
 	| "setHeight"
 	| "setFieldValue"
 	| "onFieldValueChanges"
+	| "subscribeToOtherValueChanges"
+	| "getAppInstall"
 	
 	error?: string
 	arg?: T
