@@ -34,12 +34,3 @@ export const getOperation = (operationID:string): Subject<any> | null => {
 
 	return operation || null
 }
-
-
-export const removeOperations = () => {
-	for (const id of Object.getOwnPropertyNames(operations)) {
-		const { operation } = operations[id]
-		operation.unsubscribe()
-		delete operations[id]
-	}
-}

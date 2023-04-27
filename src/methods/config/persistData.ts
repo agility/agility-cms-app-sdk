@@ -1,10 +1,10 @@
-import { IAppEventParam } from '../types';
-import { getOperationID } from '../lib/getOperationID';
+import { IAppEventParam } from '../../types';
+import { getOperationID } from '../../lib/getOperationID';
 import { Subject } from 'rxjs';
-import { addOperation } from '../lib/operationAccess';
-import { getAppID } from '../lib/getAppID';
-import { invokeAppMethod } from '../lib/invokeAppMethod';
-import { IAppDataPersistValue } from '../types';
+import { addOperation } from '../../lib/operationAccess';
+import { getAppID } from '../../lib/getAppID';
+import { invokeAppMethod } from '../../lib/invokeAppMethod';
+import { IAppDataPersistValue } from '../../types';
 
 interface Props {
 	key: string

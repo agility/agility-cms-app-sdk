@@ -1,15 +1,14 @@
 import { Subject } from "rxjs"
-import { getAppID } from "../lib/getAppID"
-import { getOperationID } from "../lib/getOperationID"
-import { invokeAppMethod } from "../lib/invokeAppMethod"
-import { addOperation } from "../lib/operationAccess"
-import { IAppEventParam, IAppHeightValue } from "../types"
+import { getAppID } from "../../lib/getAppID"
+import { getOperationID } from "../../lib/getOperationID"
+import { invokeAppMethod } from "../../lib/invokeAppMethod"
+import { addOperation } from "../../lib/operationAccess"
+import { IAppEventParam, IAppHeightValue } from "../../types"
 
 /**
  * setHeight
- * 	sends a message out to the iframe channel with a numeric height
+ * sends a message out to the iframe channel with a numeric height
  * @param height 
- * @returns 
  */
 export const setHeight = ({ height }: IAppHeightValue) => {
 

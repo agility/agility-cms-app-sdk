@@ -1,9 +1,9 @@
-import { IAppEventParam, IModalParam } from '../types';
-import { getOperationID } from '../lib/getOperationID';
+import { IAppEventParam, IModalParam } from '../../types';
+import { getOperationID } from '../../lib/getOperationID';
 import { Subject } from 'rxjs';
-import { addOperation } from '../lib/operationAccess';
-import { getAppID } from '../lib/getAppID';
-import { invokeAppMethod } from '../lib/invokeAppMethod';
+import { addOperation } from '../../lib/operationAccess';
+import { getAppID } from '../../lib/getAppID';
+import { invokeAppMethod } from '../../lib/invokeAppMethod';
 
 /**
  * openModal
@@ -13,7 +13,6 @@ import { invokeAppMethod } from '../lib/invokeAppMethod';
  *
  * @template T
  * @param {Props<T>} { name, props, callback }
- * @returns
  */
 export const openModal = <T>({ name, props, callback }: (IModalParam<T> | undefined)) => {
 
@@ -29,7 +28,7 @@ export const openModal = <T>({ name, props, callback }: (IModalParam<T> | undefi
 		arg: {
 			name,
 			props: {
-				returnID,
+				operationID,
 				...props
 			}
 		}

@@ -3,5 +3,5 @@
  *
  */
 export interface IAppHeightValue {
-	height: number
+	height: number | string
 }
