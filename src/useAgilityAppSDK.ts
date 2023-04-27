@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Subject } from 'rxjs';
 import { IAppEventParam , IAppInstallContext, IInstance, IContextParam, IField, IContentItem, IContentModel } from './types';
 import { getOperationID } from './lib/getOperationID';
-import { addOperation, removeOperations } from './lib/operationAccess';
+import { addOperation } from './lib/operationAccess';
 import { operationDispatcher } from './lib/operationDispatcher';
 import { invokeAppMethod } from './lib/invokeAppMethod';
 import { getAppID } from './lib/getAppID';
