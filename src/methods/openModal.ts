@@ -1,9 +1,9 @@
-import { IAppEventParam, IModalParam } from '../../types';
-import { getOperationID } from '../../lib/getOperationID';
+import { IAppEventParam, IModalParam } from '../types';
+import { getOperationID } from '../lib/getOperationID';
 import { Subject } from 'rxjs';
-import { addOperation } from '../../lib/operationAccess';
-import { getAppID } from '../../lib/getAppID';
-import { invokeAppMethod } from '../../lib/invokeAppMethod';
+import { addOperation } from '../lib/operationAccess';
+import { getAppID } from '../lib/getAppID';
+import { invokeAppMethod } from '../lib/invokeAppMethod';
 
 /**
  * openModal
@@ -42,20 +42,14 @@ export const openModal = <T>({ name, props, callback }: (IModalParam<T> | undefi
 	addOperation<T>({ operationID, operation })
 
 	const closeOperation = new Subject<T>();
-	//setup the return promise so we can call it when the parent window returns the result
-	const p = new Promise<void>((resolve, reject) => {
-		closeOperation.subscribe((ret: any) => {
-			callback(ret)
-			resolve()
-			closeOperation.unsubscribe()
-		})
+	closeOperation.subscribe((ret: any) => {
+		callback(ret)
+		closeOperation.unsubscribe()
 	})
 
 	addOperation<T>({ operationID: returnID, operation: closeOperation })
 
 	//call the method in the parent windpow
 	invokeAppMethod(arg)
-
-	return p
 
 }
