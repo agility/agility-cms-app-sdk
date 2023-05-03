@@ -48,9 +48,11 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 				setInstance(context.instance)
 				setLocale(context.locale)
 
-				setField(context?.field)
-				setContentItem(context?.contentItem)
-				setContentModel(context?.contentModel)
+
+				setField(context.field || null)
+
+				setContentItem(context.contentItem || null)
+				setContentModel(context.contentModel || null)
 
 				setInitializing(false)
 				operation.unsubscribe()
