@@ -32,14 +32,18 @@ export const removeFieldListener = ({ fieldName }: Props) => {
 		}
 	}
 
-	const operation = new Subject<{ removeOperationID }>();
+	interface IOperation {
+		removeOperationID: string
+	}
+
+	const operation = new Subject<IOperation>();
 
   operation.subscribe(({ removeOperationID }) => {
     deleteOperation(removeOperationID)
     operation.unsubscribe()
   })
 
-	addOperation<{ removeOperationID }>({ operationID, operation })
+	addOperation<IOperation>({ operationID, operation })
 
 	//call the method in the parent windpow
 	invokeAppMethod(arg)

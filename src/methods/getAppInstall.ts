@@ -13,9 +13,12 @@ import { IAppInstallInfo } from '../types/IAppInstall';
 
  * @returns {Promise<IAppInstallInfo>}
  */
-export const getAppInstall = ():Promise<IAppInstallInfo> => {
+export const getAppInstall = ():Promise<IAppInstallInfo> | null => {
 
 	const appID = getAppID()
+	if (! appID) return null
+
+
 	const operationID = getOperationID()
 	const arg: IAppEventParam<never> = {
 		appID,

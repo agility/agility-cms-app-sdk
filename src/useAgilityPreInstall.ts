@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Subject } from 'rxjs';
 import { IInstallContext, IConfig  } from './types';
 import { getOperationID } from './lib/getOperationID';
@@ -17,14 +17,14 @@ interface AgilityPreInstallReturn {
  */
 export const useAgilityPreInstall = (): AgilityPreInstallReturn => {
 
-	const [configuration, setConfiguration] = useState<IConfig[]>(null)
+	 const [configuration, setConfiguration] = useState<IConfig[]>([])
 
 	const appID = getAppID()
-	if (!appID) return
+	if (!appID) return { configuration }
 
 	useEffect(() => {
 		//setup an operation observer to lcd isten for the context event after the initialize method
-		
+
 		const operation = new Subject<IInstallContext>();
 		operation.subscribe((context) => {
 			if (context) {
@@ -46,7 +46,7 @@ export const useAgilityPreInstall = (): AgilityPreInstallReturn => {
 			operationID,
 			operationType: "preInstall"
 		})
-		
+
 
 		return () => {
 			//clean up the listener...
