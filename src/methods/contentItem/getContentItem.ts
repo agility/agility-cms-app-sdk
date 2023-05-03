@@ -26,7 +26,7 @@ export const getContentItem = ():(Promise<INormalizedContentItem> | undefined) =
 	const operation = new Subject<INormalizedContentItem>();
 
 	//setup the return promise so we can call it when the parent window returns the result
-	const p = new Promise<INormalizedContentItem>((resolve, reject) => {
+	const p = new Promise<INormalizedContentItem>((resolve) => {
 		operation.subscribe((contentItem) => {
 			resolve(contentItem)
 			operation.unsubscribe()

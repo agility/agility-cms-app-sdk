@@ -6,4 +6,4 @@ export * as assetsMethods from "./assets"
 export * from './setHeight'
 export * from './openModal'
 export * from "./getAppInstall"
-
+export * from "./refresh"
