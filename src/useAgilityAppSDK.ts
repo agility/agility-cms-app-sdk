@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Subject } from 'rxjs';
-import { IAppEventParam , IAppInstallContext, IInstance, IContextParam, IField, IContentItem, IContentModel } from './types';
+import { IAppEventParam , IAppInstallContext, IInstance, IContextParam, IField, IContentItem, IContentModel, IPageItem } from './types';
 import { getOperationID } from './lib/getOperationID';
 import { addOperation } from './lib/operationAccess';
 import { operationDispatcher } from './lib/operationDispatcher';
@@ -16,6 +16,7 @@ interface AgilityAddSKReturn {
 	field: IField | null,
 	contentItem: IContentItem | null,
 	contentModel: IContentModel | null
+	pageItem: IPageItem | null,
 }
 
 /**
@@ -32,7 +33,7 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 	const [field, setField] = useState<IField | null>(null)
 	const [contentModel, setContentModel] = useState<IContentModel | null>(null)
 	const [contentItem, setContentItem] = useState<IContentItem | null>(null)
-
+	const [pageItem, setPageItem] = useState<IPageItem | null>(null)
 
 	useEffect(() => {
 		const appID = getAppID()
@@ -43,7 +44,6 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 
 		operation.subscribe((context) => {
 			if (context) {
-				//TODO: add other context variables here too - such as config / connections
 				setAppInstallContext(context.app)
 				setInstance(context.instance)
 				setLocale(context.locale)
@@ -51,6 +51,7 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 				setField(context?.field)
 				setContentItem(context?.contentItem)
 				setContentModel(context?.contentModel)
+				setPageItem(context?.pageItem)
 
 				setInitializing(false)
 				operation.unsubscribe()
@@ -83,6 +84,7 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 		locale,
 		field,
 		contentItem,
-		contentModel
+		contentModel,
+		pageItem
 	}
 }

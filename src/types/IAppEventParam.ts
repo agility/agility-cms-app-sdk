@@ -7,6 +7,7 @@ export interface IAppEventParam<T> {
 	| "openModal"
 	| "selectAssets"
 	| "persistData"
+	| "refresh"
 	| "setHeight"
 	| "setFieldValue"
 	| "addFieldListener"
@@ -17,6 +18,11 @@ export interface IAppEventParam<T> {
 	| "preInstall"
 	| "setExtraConfigValues"
 	| "removeFieldListener"
+	| "getSelectedItems"
+	| "addSelectedItemListener"
+	| "onSelectedItemChange"
+	| "removeSelectedItemListener"
+	| "getPageItem"
 	error?: string
 	arg?: T
 }
