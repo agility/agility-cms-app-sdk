@@ -29,7 +29,7 @@ export const updateConfigurationValue = ({name, value}:IAppConfigValue):(Promise
 	const operation = new Subject<IAppConfigValue>();
 
 	//setup the return promise so we can call it when the parent window returns the result
-	const p = new Promise<IAppConfigValue>((resolve, reject) => {
+	const p = new Promise<IAppConfigValue>((resolve) => {
 		operation.subscribe((appConfigValue) => {
 			resolve(appConfigValue)
 			operation.unsubscribe()

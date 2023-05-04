@@ -1,4 +1,4 @@
-import { IAppEventParam, IContentItem, INormalizedContentItem } from '../../types';
+import { IAppEventParam, IContentItem } from '../../types';
 import { getOperationID } from '../../lib/getOperationID';
 import { Subject } from 'rxjs';
 import { addOperation } from '../../lib/operationAccess';
@@ -12,7 +12,7 @@ import { invokeAppMethod } from '../../lib/invokeAppMethod';
  *
  * @returns {Promise<IContentItem>}
  */
-export const getContentItem = ():(Promise<INormalizedContentItem> | undefined) => {
+export const getContentItem = ():(Promise<IContentItem> | undefined) => {
 
 	const appID = getAppID()
 	if (!appID) return
@@ -23,17 +23,17 @@ export const getContentItem = ():(Promise<INormalizedContentItem> | undefined) =
 		operationType: "getContentItem"
 	}
 
-	const operation = new Subject<INormalizedContentItem>();
+	const operation = new Subject<IContentItem>();
 
 	//setup the return promise so we can call it when the parent window returns the result
-	const p = new Promise<INormalizedContentItem>((resolve) => {
+	const p = new Promise<IContentItem>((resolve) => {
 		operation.subscribe((contentItem) => {
 			resolve(contentItem)
 			operation.unsubscribe()
 		})
 	})
 
-	addOperation<INormalizedContentItem>({ operationID, operation })
+	addOperation<IContentItem>({ operationID, operation })
 
 	//call the method in the parent windpow
 	invokeAppMethod(arg)

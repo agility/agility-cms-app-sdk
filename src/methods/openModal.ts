@@ -14,32 +14,25 @@ import { invokeAppMethod } from '../lib/invokeAppMethod';
  * @template T
  * @param {Props<T>} { name, props, callback }
  */
-export const openModal = <T>({ name, props, callback }: (IModalParam<T> | undefined)) => {
+export const openModal = <T>({ title, callback }: (IModalParam<T> | undefined)) => {
 
 	const appID = getAppID()
 	if (!appID) return
 	const operationID = getOperationID()
-	const returnID = getOperationID()
+	const closeModalID = getOperationID()
 
-	const arg: IAppEventParam<{ name: string, props: any }> = {
+	const arg: IAppEventParam<{ closeModalID: string, title: string }> = {
 		appID,
 		operationID,
 		operationType: "openModal",
 		arg: {
-			name,
-			props: {
-				operationID,
-				...props
-			}
+			closeModalID,
+			title
 		}
 	}
 
-	const operation = new Subject<T>();
-	operation.subscribe(() => {
-		operation.unsubscribe()
-	})
-
-	addOperation<T>({ operationID, operation })
+	const operation = new Subject<void>();
+	addOperation<void>({ operationID, operation })
 
 	const closeOperation = new Subject<T>();
 	closeOperation.subscribe((ret: any) => {
@@ -47,7 +40,7 @@ export const openModal = <T>({ name, props, callback }: (IModalParam<T> | undefi
 		closeOperation.unsubscribe()
 	})
 
-	addOperation<T>({ operationID: returnID, operation: closeOperation })
+	addOperation<T>({ operationID: closeModalID, operation: closeOperation })
 
 	//call the method in the parent windpow
 	invokeAppMethod(arg)

@@ -54,18 +54,18 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 				setPageItem(context?.pageItem)
 
 				setInitializing(false)
-				operation.unsubscribe()
+				// operation.unsubscribe()
 			}
 		})
 
 		const operationID = getOperationID()
-		addOperation({ operationID, operation })
+		addOperation({ operationID, operation, autoDelete: false })
 
 		//set up the listener for the app events
 		window.addEventListener("message", operationDispatcher, false);
 
 		//send the init method call to the parent window
-		invokeAppMethod<never>({
+		invokeAppMethod<{ updateContextID: string }>({
 			appID,
 			operationID,
 			operationType: "initialize"

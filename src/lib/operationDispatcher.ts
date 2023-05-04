@@ -12,7 +12,7 @@ export const operationDispatcher = (event: MessageEvent) => {
 	const operation = getOperation(operationID)
 
 	if (operation) {
-		operation.next(data.arg)
+		operation.next(data.arg || data?.error)
 	}
 
 }

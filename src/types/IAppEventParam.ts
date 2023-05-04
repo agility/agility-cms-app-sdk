@@ -22,6 +22,7 @@ export interface IAppEventParam<T> {
 	| "addSelectedItemListener"
 	| "onSelectedItemChange"
 	| "removeSelectedItemListener"
+	| "setVisibility"
 	| "getPageItem"
 	error?: string
 	arg?: T

@@ -1,4 +1,4 @@
-import { IAppConfigValue, IAppEventParam } from '../../types';
+import { IAppConfigValue, IAppEventParam, IAssetItem } from '../../types';
 import { getOperationID } from '../../lib/getOperationID';
 import { Subject } from 'rxjs';
 import { addOperation } from '../../lib/operationAccess';
@@ -13,33 +13,36 @@ import { invokeAppMethod } from '../../lib/invokeAppMethod';
  *
  * @returns {Promise<any>}
  */
-export const selectAssets = ():(Promise<void> | undefined) => {
+export const selectAssets = ({ title, singleSelectOnly, callback }) => {
 
 	const appID = getAppID()
 	if (!appID) return
 	const operationID = getOperationID()
-	const arg: IAppEventParam<{ key: string, value: string }> = {
+	const closeModalID = getOperationID()
+
+	const arg: IAppEventParam<{ closeModalID: string, title: string, singleSelectOnly: boolean }> = {
 		appID,
 		operationID,
-		operationType: "selectAssets"
+		operationType: "selectAssets",
+		arg: {
+			closeModalID,
+			title,
+			singleSelectOnly,
+		}
 	}
 
 	const operation = new Subject<void>();
+	addOperation<void>({ operationID, operation })
 
-	//setup the return promise so we can call it when the parent window returns the result
-	const p = new Promise<void>((resolve, reject) => {
-		operation.subscribe(() => {
-			resolve()
-			operation.unsubscribe()
-		})
+	const closeOperation = new Subject<{assets: IAssetItem[]}>();
+	closeOperation.subscribe(({ assets }) => {
+		callback(assets)
+		closeOperation.unsubscribe()
 	})
 
-	addOperation<void>({ operationID, operation })
+	addOperation<{assets: IAssetItem[]}>({ operationID: closeModalID, operation: closeOperation })
 
 	//call the method in the parent windpow
 	invokeAppMethod(arg)
-
-
-	return p
 
 }

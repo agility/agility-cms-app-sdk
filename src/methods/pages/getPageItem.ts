@@ -7,13 +7,11 @@ import { invokeAppMethod } from '../../lib/invokeAppMethod';
 
 
 /**
- * Gets the contentItem from the current context.
- * This is meant to be used on Custom Field or Content Item Sidebar Panel app.
+ * Gets the pageItem from the current context
  *
  * @returns {Promise<IPageItem>}
  */
 export const getPageItem = ():(Promise<IPageItem> | undefined) => {
-
 	const appID = getAppID()
 	if (!appID) return
 	const operationID = getOperationID()
