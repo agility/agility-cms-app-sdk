@@ -14,7 +14,7 @@ import { invokeAppMethod } from '../lib/invokeAppMethod';
  * @template T
  * @param {Props<T>} { name, props, callback }
  */
-export const openModal = <T>({ title, callback }: (IModalParam<T> | undefined)) => {
+export const openModal = <T>({ title, callback }: IModalParam<T> ) => {
 
 	const appID = getAppID()
 	if (!appID) return

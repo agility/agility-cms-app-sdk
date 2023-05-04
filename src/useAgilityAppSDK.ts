@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Subject } from 'rxjs';
-import { IAppEventParam , IAppInstallContext, IInstance, IContextParam, IField, IContentItem, IContentModel, IPageItem } from './types';
+import { IAppInstallContext, IInstance, IContextParam, IField, IContentItem, IContentModel, IPageItem } from './types';
 import { getOperationID } from './lib/getOperationID';
 import { addOperation } from './lib/operationAccess';
 import { operationDispatcher } from './lib/operationDispatcher';
@@ -48,18 +48,18 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 				setInstance(context.instance)
 				setLocale(context.locale)
 
-				setField(context?.field)
-				setContentItem(context?.contentItem)
-				setContentModel(context?.contentModel)
-				setPageItem(context?.pageItem)
+				setField(context.field || null)
+
+				setContentItem(context.contentItem || null)
+				setContentModel(context.contentModel || null)
 
 				setInitializing(false)
-				// operation.unsubscribe()
+				operation.unsubscribe()
 			}
 		})
 
 		const operationID = getOperationID()
-		addOperation({ operationID, operation, autoDelete: false })
+		addOperation({ operationID, operation })
 
 		//set up the listener for the app events
 		window.addEventListener("message", operationDispatcher, false);
