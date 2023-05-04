@@ -24,14 +24,14 @@ export const removeSelectedItemListener = () => {
 		}
 	}
 
-	const operation = new Subject<{ removeOperationID }>();
+	const operation = new Subject<{ removeOperationID: string }>();
 
   operation.subscribe(({ removeOperationID }) => {
     deleteOperation(removeOperationID)
     operation.unsubscribe()
   })
 
-	addOperation<{ removeOperationID }>({ operationID, operation })
+	addOperation<{ removeOperationID: string }>({ operationID, operation })
 
 	//call the method in the parent windpow
 	invokeAppMethod(arg)
