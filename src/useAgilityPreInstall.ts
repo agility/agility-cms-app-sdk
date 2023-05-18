@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Subject } from 'rxjs';
-import { IInstallContext, IConfig  } from './types';
+import { IInstallContext, IConfig, IContextParam, IAppInstallContext, IInstance  } from './types';
 import { getOperationID } from './lib/getOperationID';
 import { addOperation } from './lib/operationAccess';
 import { operationDispatcher } from './lib/operationDispatcher';
 import { invokeAppMethod } from './lib/invokeAppMethod';
 import { getAppID } from './lib/getAppID';
 interface AgilityPreInstallReturn {
-	configuration: IConfig[]
+	initializing: boolean,
+	appInstallContext: IAppInstallContext | null,
+	instance: IInstance | null,
+	locale: string | null,
 }
 
 /**
@@ -16,19 +19,25 @@ interface AgilityPreInstallReturn {
  * @returns {AgilityPreInstallReturn}
  */
 export const useAgilityPreInstall = (): AgilityPreInstallReturn => {
-
-	 const [configuration, setConfiguration] = useState<IConfig[]>([])
-
-	const appID = getAppID()
-	if (!appID) return { configuration }
+	const [initializing, setInitializing] = useState(true)
+	const [appInstallContext, setAppInstallContext] = useState<IAppInstallContext | null>(null)
+	const [instance, setInstance] = useState<IInstance | null>(null)
+	const [locale, setLocale] = useState<string | null>(null)
 
 	useEffect(() => {
+
+		const appID = getAppID()
+		if (!appID) return
+
+
 		//setup an operation observer to lcd isten for the context event after the initialize method
 
-		const operation = new Subject<IInstallContext>();
+		const operation = new Subject<IContextParam>();
 		operation.subscribe((context) => {
+
 			if (context) {
-				setConfiguration(context.configuration)
+				setAppInstallContext(context.app)
+				setInitializing(false)
 				operation.unsubscribe()
 			}
 		})
@@ -56,6 +65,9 @@ export const useAgilityPreInstall = (): AgilityPreInstallReturn => {
 	}, [])
 
 	return {
-		configuration
+		initializing,
+		appInstallContext,
+		instance,
+		locale
 	}
 }
