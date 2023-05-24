@@ -5,6 +5,11 @@ import { addOperation } from '../../lib/operationAccess';
 import { getAppID } from '../../lib/getAppID';
 import { invokeAppMethod } from '../../lib/invokeAppMethod';
 
+interface ISelectAssets {
+	title: string
+	singleSelectOnly: boolean
+	callback: (assets: IAssetItem[]) => void
+}
 
 /**
  * selectAssets
@@ -13,7 +18,7 @@ import { invokeAppMethod } from '../../lib/invokeAppMethod';
  *
  * @returns {Promise<any>}
  */
-export const selectAssets = ({ title, singleSelectOnly, callback }) => {
+export const selectAssets = ({ title, singleSelectOnly, callback }: ISelectAssets) => {
 
 	const appID = getAppID()
 	if (!appID) return

@@ -8,7 +8,7 @@ import { invokeAppMethod } from './lib/invokeAppMethod';
 import { getAppID } from './lib/getAppID';
 
 
-interface AgilityAddSKReturn {
+export interface AgilityAddSKReturn {
 	initializing: boolean,
 	appInstallContext: IAppInstallContext | null,
 	instance: IInstance | null,
