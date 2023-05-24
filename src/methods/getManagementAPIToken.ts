@@ -16,17 +16,17 @@ export const getManagementAPIToken = ():(Promise<any> | undefined) => {
 		operationType: "getManagementAPIToken"
 	}
 
-	const operation = new Subject<any>();
+	const operation = new Subject<{ token: string }>();
 
 	//setup the return promise so we can call it when the parent window returns the result
 	const p = new Promise<any>((resolve) => {
-		operation.subscribe((mgmtApiKey) => {
-			resolve(mgmtApiKey)
+		operation.subscribe(({ token }) => {
+			resolve(token)
 			operation.unsubscribe()
 		})
 	})
 
-	addOperation<any>({ operationID, operation })
+	addOperation<{ token: string }>({ operationID, operation })
 
 	//call the method in the parent windpow
 	invokeAppMethod(arg)
