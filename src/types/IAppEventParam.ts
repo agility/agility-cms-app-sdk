@@ -24,6 +24,8 @@ export interface IAppEventParam<T> {
 	| "removeSelectedItemListener"
 	| "setVisibility"
 	| "getPageItem"
+	| "getManagementAPIToken" 
+	| "getAPIKey" 
 	error?: string
 	arg?: T
 }
