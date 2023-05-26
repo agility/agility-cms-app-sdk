@@ -1,5 +1,5 @@
 export interface IModalParam<T> {
-	title: string
+	name: string
 	props?: any
 	callback: (result: T) => void
 }
