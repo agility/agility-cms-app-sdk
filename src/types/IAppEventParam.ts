@@ -5,6 +5,7 @@ export interface IAppEventParam<T> {
 	| "updateConfigurationValue"
 	| "getContentItem"
 	| "openModal"
+	| "closeModal"
 	| "selectAssets"
 	| "persistData"
 	| "refresh"
@@ -24,8 +25,8 @@ export interface IAppEventParam<T> {
 	| "removeSelectedItemListener"
 	| "setVisibility"
 	| "getPageItem"
-	| "getManagementAPIToken" 
-	| "getAPIKey" 
+	| "getManagementAPIToken"
+	| "getAPIKey"
 	error?: string
 	arg?: T
 }

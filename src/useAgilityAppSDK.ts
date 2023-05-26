@@ -17,6 +17,7 @@ export interface AgilityAddSKReturn {
 	contentItem: IContentItem | null,
 	contentModel: IContentModel | null
 	pageItem: IPageItem | null,
+	modalProps: any
 }
 
 /**
@@ -35,6 +36,8 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 	const [contentItem, setContentItem] = useState<IContentItem | null>(null)
 	const [pageItem, setPageItem] = useState<IPageItem | null>(null)
 
+	const [modalProps, setModalProps] = useState<any>(null)
+
 	useEffect(() => {
 		const appID = getAppID()
 		if (!appID) return
@@ -52,6 +55,7 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 
 				setContentItem(context.contentItem || null)
 				setContentModel(context.contentModel || null)
+				setModalProps(context.modalProps || null)
 
 				setInitializing(false)
 				operation.unsubscribe()
@@ -85,6 +89,7 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 		field,
 		contentItem,
 		contentModel,
-		pageItem
+		pageItem,
+		modalProps
 	}
 }

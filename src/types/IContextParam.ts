@@ -13,4 +13,6 @@ export interface IContextParam {
 	contentItem?: IContentItem
 	contentModel?: IContentModel
 	pageItem?: IPageItem
+	modalProps?: any
+	closeModalID?: string
 }

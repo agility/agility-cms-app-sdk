@@ -4,6 +4,7 @@ export * as assetsMethods from "./assets"
 export * as pageMethods from "./pages"
 export * from './setHeight'
 export * from './openModal'
+export * from './closeModal'
 export * from "./getAppInstall"
 export * from "./refresh"
 export * from "./setVisibility"

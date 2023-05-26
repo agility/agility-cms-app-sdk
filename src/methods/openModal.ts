@@ -14,20 +14,22 @@ import { invokeAppMethod } from '../lib/invokeAppMethod';
  * @template T
  * @param {Props<T>} { name, props, callback }
  */
-export const openModal = <T>({ title, callback }: IModalParam<T> ) => {
+export const openModal = <T>({ name, title, props, callback }: IModalParam<T> ) => {
 
 	const appID = getAppID()
 	if (!appID) return
 	const operationID = getOperationID()
 	const closeModalID = getOperationID()
 
-	const arg: IAppEventParam<{ closeModalID: string, title: string }> = {
+	const arg: IAppEventParam<{ closeModalID: string, name: string, title: string | null, props: any }> = {
 		appID,
 		operationID,
 		operationType: "openModal",
 		arg: {
 			closeModalID,
-			title
+			title: title || null,
+			name,
+			props
 		}
 	}
 
@@ -36,7 +38,7 @@ export const openModal = <T>({ title, callback }: IModalParam<T> ) => {
 
 	const closeOperation = new Subject<T>();
 	closeOperation.subscribe((ret: any) => {
-		callback(ret)
+		callback(ret?.props)
 		closeOperation.unsubscribe()
 	})
 
