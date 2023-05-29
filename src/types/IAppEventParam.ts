@@ -4,6 +4,7 @@ export interface IAppEventParam<T> {
 	operationType: "initialize" | "context"
 	| "updateConfigurationValue"
 	| "getContentItem"
+	| "openAlertModal"
 	| "openModal"
 	| "closeModal"
 	| "selectAssets"
