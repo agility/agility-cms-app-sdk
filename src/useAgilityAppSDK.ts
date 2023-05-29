@@ -6,18 +6,89 @@ import { addOperation } from './lib/operationAccess';
 import { operationDispatcher } from './lib/operationDispatcher';
 import { invokeAppMethod } from './lib/invokeAppMethod';
 import { getAppID } from './lib/getAppID';
+import { addFieldListener } from './methods/contentItem';
 
 
 export interface AgilityAddSKReturn {
+	/**
+	 * Indicates if the SDK is still initializing.
+	 *
+	 * @type {boolean}
+	 * @memberof AgilityAddSKReturn
+	 */
 	initializing: boolean,
+	/**
+	 * The app install context.
+	 *
+	 * @type {(IAppInstallContext | null)}
+	 * @memberof AgilityAddSKReturn
+	 */
 	appInstallContext: IAppInstallContext | null,
+
+	/**
+	 * The current instance.
+	 *
+	 * @type {(IInstance | null)}
+	 * @memberof AgilityAddSKReturn
+	 */
 	instance: IInstance | null,
+
+	/**
+	 * The current locale.
+	 *
+	 * @type {(string | null)}
+	 * @memberof AgilityAddSKReturn
+	 */
 	locale: string | null,
+
+	/**
+	 * The current field.  Only available when on a custom field.
+	 *
+	 * @type {(IField | null)}
+	 * @memberof AgilityAddSKReturn
+	 */
 	field: IField | null,
+
+	/**
+	 * The current content item.  Only available when on a custom field or content item sidebar.
+	 *
+	 * @type {(IContentItem | null)}
+	 * @memberof AgilityAddSKReturn
+	 */
 	contentItem: IContentItem | null,
+
+	/**
+	 * The current content model.  Only available when on a custom field, content item or list sidebar.
+	 *
+	 * @type {(IContentModel | null)}
+	 * @memberof AgilityAddSKReturn
+	 */
 	contentModel: IContentModel | null
+
+	/**
+	 * The current page.  Only available when on a page sidebar.
+	 *
+	 * @type {(IPageItem | null)}
+	 * @memberof AgilityAddSKReturn
+	 */
 	pageItem: IPageItem | null,
+
+	/**
+	 * The current modal props.  Only available when on a modal surface.
+	 *
+	 * @type {*}
+	 * @memberof AgilityAddSKReturn
+	 */
 	modalProps: any
+
+	/**
+	 * The current field value.  Only available when on a custom field.
+	 * If the field value changes outside of the SDK, this value will be updated.
+	 *
+	 * @type {string}
+	 * @memberof AgilityAddSKReturn
+	 */
+	fieldValue: string
 }
 
 /**
@@ -35,6 +106,7 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 	const [contentModel, setContentModel] = useState<IContentModel | null>(null)
 	const [contentItem, setContentItem] = useState<IContentItem | null>(null)
 	const [pageItem, setPageItem] = useState<IPageItem | null>(null)
+	const [fieldValue, setFieldValue] = useState<string>("")
 
 	const [modalProps, setModalProps] = useState<any>(null)
 
@@ -56,6 +128,19 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 				setContentItem(context.contentItem || null)
 				setContentModel(context.contentModel || null)
 				setModalProps(context.modalProps || null)
+
+				if (context.field) {
+					//if we are on a custom field, add a listener for the field value
+					setFieldValue(context.contentItem?.values[context.field.name] || "")
+
+					addFieldListener({
+						fieldName: context.field?.name,
+						onChange: (fieldValue) => {
+							setFieldValue(fieldValue || "")
+						}
+					})
+				}
+
 
 				setInitializing(false)
 				operation.unsubscribe()
@@ -90,6 +175,7 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 		contentItem,
 		contentModel,
 		pageItem,
-		modalProps
+		modalProps,
+		fieldValue
 	}
 }
