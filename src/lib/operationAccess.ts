@@ -7,7 +7,7 @@ export interface IOperation<T> {
 }
 
 interface IOperationsHash {
- [operationID: string]: { operation: Subject<any>, autoDelete?: boolean } 
+	[operationID: string]: { operation: Subject<any>, autoDelete?: boolean }
 }
 
 const operations: IOperationsHash = {}
@@ -25,14 +25,28 @@ export const addOperation = <T>({ operationID, operation, autoDelete = true }: I
 
 }
 
-export const getOperation = (operationID:string): Subject<any> | null => {
-	const { operation, autoDelete }: { operation: Subject<any>, autoDelete?: boolean } = operations[operationID]
+export const getOperation = (operationID: string): Subject<any> | null => {
+	const opCheck = operations[operationID]
+	if (opCheck) {
+		const { operation, autoDelete }: { operation: Subject<any>, autoDelete?: boolean } = opCheck
 
-	if (autoDelete) {
-		delete operations[operationID]
+		if (autoDelete) {
+			delete operations[operationID]
+		}
+
+		return operation || null
+	}
+	return null
+}
+
+export const peekOperation = (operationID: string): Subject<any> | null => {
+	const opCheck = operations[operationID]
+	if (opCheck) {
+		const { operation, autoDelete }: { operation: Subject<any>, autoDelete?: boolean } = opCheck
+		return operation
 	}
 
-	return operation || null
+	return null
 }
 
 export const deleteOperation = (operationID: string) => {

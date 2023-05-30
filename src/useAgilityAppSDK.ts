@@ -134,7 +134,7 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 					setFieldValue(context.contentItem?.values[context.field.name] || "")
 
 					addFieldListener({
-						fieldName: context.field?.name,
+						fieldName: context.field.name,
 						onChange: (fieldValue) => {
 							setFieldValue(fieldValue || "")
 						}
