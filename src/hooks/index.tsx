@@ -1,5 +1,5 @@
-import useElementHeight from "./useElementHeight";
+import useResizeHeight from "./useResizeHeight";
 
 export { 
-  useElementHeight
+  useResizeHeight
 }
