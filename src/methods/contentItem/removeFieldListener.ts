@@ -20,7 +20,7 @@ export const removeFieldListener = ({ fieldName }: Props) => {
 	const appID = getAppID()
 	if (!appID) return
 	const operationID = getOperationID()
-  const returnID = `fieldName-${appID}`
+	const returnID = `${fieldName}-${appID}`
 
 	const arg: IAppEventParam<{ fieldName: string, operationID: string }> = {
 		appID,
@@ -28,7 +28,7 @@ export const removeFieldListener = ({ fieldName }: Props) => {
 		operationType: "removeFieldListener",
 		arg: {
 			fieldName,
-      operationID: returnID
+			operationID: returnID
 		}
 	}
 
@@ -38,10 +38,10 @@ export const removeFieldListener = ({ fieldName }: Props) => {
 
 	const operation = new Subject<IOperation>();
 
-  operation.subscribe(({ removeOperationID }) => {
-    deleteOperation(removeOperationID)
-    operation.unsubscribe()
-  })
+	operation.subscribe(({ removeOperationID }) => {
+		deleteOperation(removeOperationID)
+		operation.unsubscribe()
+	})
 
 	addOperation<IOperation>({ operationID, operation })
 
