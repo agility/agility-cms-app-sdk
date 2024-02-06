@@ -1,8 +1,14 @@
 /**
- * Sets a visibility for the iframe and can accept px or %.
+ * Sets a field's visibility
  *
  */
 export interface IAppVisibility {
-	fieldID: string,
+	/**
+	 * The field name to set visibility for.  Case insensitive.
+	 */
+	fieldName: string
+	/**
+	 * True will show the field, false will hide the field.
+	 */
 	visibility: boolean
 }
