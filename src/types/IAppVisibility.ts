@@ -3,6 +3,6 @@
  *
  */
 export interface IAppVisibility {
-	fieldID: string,
+	fieldName: string
 	visibility: boolean
 }

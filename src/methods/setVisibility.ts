@@ -8,20 +8,20 @@ import { IAppEventParam, IAppVisibility } from "../types"
 /**
  * setVisibility
  * sends a message out to the iframe channel with a numeric height
- * @param visibility - true wills how the iframe, false will hdie the iframe 
+ * @param visibility - true wills how the iframe, false will hdie the iframe
  */
-export const setVisibility = ({ fieldID, visibility }: IAppVisibility) => {
+export const setVisibility = ({ fieldName, visibility }: IAppVisibility) => {
 
   const appID = getAppID()
-  if (!appID) return 
-  
+  if (!appID) return
+
   const operationID = getOperationID()
   const arg: IAppEventParam<{}> = {
     appID,
     operationID,
     operationType: 'setVisibility',
     arg: {
-      fieldID,
+      fieldName,
       visibility
     }
   }
