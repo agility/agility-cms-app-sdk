@@ -1,6 +1,5 @@
-import { IAppEventParam } from "../types";
+import { IAppEventParam } from "../types"
 
 export const invokeAppMethod = <T>(param: IAppEventParam<T>) => {
-	window.parent.postMessage(param, "*")
-
+  window.parent.postMessage(param, "*")
 }

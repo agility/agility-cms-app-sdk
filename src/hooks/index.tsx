@@ -1,5 +1,2 @@
-import useResizeHeight from "./useResizeHeight";
-
-export { 
-  useResizeHeight
-}
+import useResizeHeight from "./useResizeHeight"
+export { useResizeHeight }
