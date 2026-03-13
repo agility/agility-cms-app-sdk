@@ -32,6 +32,7 @@ export interface IAppEventParam<T> {
     | "getManagementAPIToken"
     | "getAPIKey"
     | "setFocus"
+    | "translate"
   error?: string
   arg?: T
 }
