@@ -30,7 +30,7 @@ export interface IAppEventParam<T> {
     | "setVisibility"
     | "getPageItem"
     | "getManagementAPIToken"
-    | "getAPIKey"
+    | "getFetchAPIKey"
     | "setFocus"
   error?: string
   arg?: T

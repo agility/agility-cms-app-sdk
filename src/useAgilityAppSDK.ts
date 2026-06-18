@@ -127,6 +127,7 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 
 				setContentItem(context.contentItem || null)
 				setContentModel(context.contentModel || null)
+				setPageItem(context.pageItem || null)
 				setModalProps(context.modalProps || null)
 
 				if (context.field) {
