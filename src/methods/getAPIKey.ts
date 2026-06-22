@@ -5,17 +5,18 @@ import { getAppID } from '../lib/getAppID';
 import { invokeAppMethod } from '../lib/invokeAppMethod';
 import { IAppEventParam, IAPIKeyParam, APITypes } from '../types';
 
-export const getAPIKey = ({ apiType }: IAPIKeyParam):(Promise<any> | undefined) => {
+export const getAPIKey = ({ apiType, fullKey }: IAPIKeyParam):(Promise<any> | undefined) => {
 
 	const appID = getAppID()
 	if (!appID) return
 	const operationID = getOperationID()
-	const arg: IAppEventParam<{ apiType: APITypes }> = {
+	const arg: IAppEventParam<{ apiType: APITypes, fullKey?: boolean }> = {
 		appID,
 		operationID,
 		operationType: "getAPIKey",
 		arg: {
-			apiType
+			apiType,
+			fullKey
 		}
 	}
 
