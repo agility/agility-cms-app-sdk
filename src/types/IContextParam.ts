@@ -1,6 +1,7 @@
 import { IAppInstallContext } from "./IAppInstallContext"
 import { IContentItem } from "./IContentItem"
 import { IContentModel } from "./IContentModel"
+import { IEmbedContext } from "./IEmbedContext"
 import { IField } from "./IFieldParam"
 import { IInstance } from "./IInstance"
 import { IPageItem } from "./IPageItem"
@@ -14,5 +15,6 @@ export interface IContextParam {
 	contentModel?: IContentModel
 	pageItem?: IPageItem
 	modalProps?: any
+	embed?: IEmbedContext
 	closeModalID?: string
 }

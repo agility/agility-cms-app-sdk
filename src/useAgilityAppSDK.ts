@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Subject } from 'rxjs';
-import { IAppInstallContext, IInstance, IContextParam, IField, IContentItem, IContentModel, IPageItem } from './types';
+import { IAppInstallContext, IInstance, IContextParam, IField, IContentItem, IContentModel, IPageItem, IEmbedContext } from './types';
 import { getOperationID } from './lib/getOperationID';
 import { addOperation } from './lib/operationAccess';
 import { operationDispatcher } from './lib/operationDispatcher';
@@ -82,6 +82,15 @@ export interface AgilityAddSKReturn {
 	modalProps: any
 
 	/**
+	 * The rich text editor embed being inserted or edited.  Only available when on the
+	 * rteToolbar surface.
+	 *
+	 * @type {(IEmbedContext | null)}
+	 * @memberof AgilityAddSKReturn
+	 */
+	embed: IEmbedContext | null
+
+	/**
 	 * The current field value.  Only available when on a custom field.
 	 * If the field value changes outside of the SDK, this value will be updated.
 	 *
@@ -109,6 +118,7 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 	const [fieldValue, setFieldValue] = useState<string>("")
 
 	const [modalProps, setModalProps] = useState<any>(null)
+	const [embed, setEmbed] = useState<IEmbedContext | null>(null)
 
 	useEffect(() => {
 		const appID = getAppID()
@@ -128,6 +138,7 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 				setContentItem(context.contentItem || null)
 				setContentModel(context.contentModel || null)
 				setModalProps(context.modalProps || null)
+				setEmbed(context.embed || null)
 
 				if (context.field) {
 					//if we are on a custom field, add a listener for the field value
@@ -176,6 +187,7 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 		contentModel,
 		pageItem,
 		modalProps,
+		embed,
 		fieldValue
 	}
 }

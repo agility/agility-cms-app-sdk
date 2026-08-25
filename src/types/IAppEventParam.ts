@@ -33,6 +33,7 @@ export interface IAppEventParam<T> {
     | "getAPIKey"
     | "setFocus"
     | "translate"
+    | "resolveEmbed"
   error?: string
   arg?: T
 }
