@@ -6,7 +6,17 @@ This project follows [semantic versioning](https://semver.org/). Because the SDK
 are a public contract shared with the Agility Manager App, changes are additive — fields
 are added, never renamed or removed.
 
-## 2.3.0
+## 2.3.0-beta.0
+
+Pre-release, published under the **`beta`** dist-tag so demos can be built against the
+`rteToolbar` surface before the Manager App host ships:
+
+```bash
+npm install @agility/app-sdk@beta
+```
+
+`latest` stays on 2.2.1. The `rteToolbar` surface needs a Manager App build with
+`enable-rte-toolbar-apps` enabled, so this is not useful to general app authors yet.
 
 ### Added
 
@@ -32,6 +42,13 @@ are added, never renamed or removed.
   [API reference](docs/api-reference.md), the [protocol architecture](docs/architecture.md),
   and [troubleshooting](docs/troubleshooting.md). Plus
   [`CONTRIBUTING.md`](CONTRIBUTING.md), [`AGENTS.md`](AGENTS.md) and this changelog.
+
+### Packaging
+
+- Added a `files` field so the published tarball contains only `dist/` (plus `README.md`,
+  `LICENSE` and `package.json`, which npm always includes). Previously the tarball also
+  shipped the stale `types/` build artifact, `tsconfig.json`, `rollup.config.mjs` and
+  `.vscode/`. 202 files -> 136; 88.5 kB -> 64.0 kB.
 
 ### Notes
 
