@@ -22,6 +22,7 @@ Before using any of it, read the two rules that apply to **every** method:
 - [Assets](#assets) — `assetsMethods`
 - [Modals](#modals)
 - [Rich text embeds](#rich-text-embeds)
+- [Navigation](#navigation)
 - [App shell](#app-shell)
 - [Configuration](#configuration) — `configMethods`
 - [Auth](#auth)
@@ -36,6 +37,7 @@ import {
   useAgilityAppSDK, useResizeHeight,
   contentItemMethods, configMethods, assetsMethods, pageMethods,
   openModal, closeModal, resolveEmbed, setHeight, refresh,
+  navigate, getNavigationUrl,
   getManagementAPIToken, getAPIKey, getAppInstall,
 } from "@agility/app-sdk"
 
@@ -319,6 +321,80 @@ like `closeModal` it needs `?closeModalID=` and returns silently without it.
 
 Pass exactly one of `value` / `contentItemID`, matching the `storage` your button declared,
 or `cancelled: true`. See [Surfaces](surfaces.md#the-rtetoolbar-surface) for the full flow.
+
+---
+
+## Navigation
+
+Both work on **every surface**. Added in **2.4.0**; against an older Manager App they
+resolve `undefined`, which is the signal to fall back to whatever the app did before.
+
+### `navigate`
+
+```ts
+navigate({ target: INavigationTarget, openInStack?: boolean }): Promise<INavigationUrl> | undefined
+```
+
+Moves the Manager App to another screen, client-side. No reload, no new tab.
+
+```ts
+navigate({ target: { type: "contentItem", contentID: 1866 } })
+navigate({ target: { type: "newContentItem", containerID: 30 } })
+```
+
+A **target is an intent, not a URL**. The host builds the address from the instance and
+locale the editor is already in, so an app cannot navigate out of its own instance, and
+the CMS's URL grammar stays free to change under apps that pinned an old SDK.
+
+| Target | Opens |
+|---|---|
+| `{ type: "contentItem", contentID, containerID? }` | an item in the content editor |
+| `{ type: "newContentItem", containerID }` | a blank form in that container |
+| `{ type: "contentList", containerID }` | a content list |
+| `{ type: "page", pageID }` | a page in the Pages section |
+
+`openInStack` (default `true`) opens the destination **on top of the current screen**,
+keeping it in the breadcrumb — the way the CMS's own nested-content fields behave, so the
+editor gets back with one click. Set it `false` for a screen of its own; `contentItem`
+then needs `containerID`, since there is no parent screen to resolve it from. Pages always
+open in the Pages section.
+
+> ⚠️ **Await it to learn that it *failed*, not that it worked.** Navigating unmounts the
+> iframe that asked, so the success reply usually arrives nowhere. The promise settling
+> means nothing happened — an unresolvable target, or a host too old to know the
+> operation.
+
+> ⚠️ **Unsaved changes are lost, silently.** The content item form does not prompt before
+> the route changes. If your app holds edits that have not been saved — a custom field's
+> value, most obviously — confirm with [`openAlertModal`](#openalertmodal) first, or offer
+> a link built with `getNavigationUrl` so the editor can open it in a second tab instead.
+
+### `getNavigationUrl`
+
+```ts
+getNavigationUrl({ target: INavigationTarget, openInStack?: boolean }): Promise<INavigationUrl> | undefined
+```
+
+The same resolution without going anywhere, so you can render a real `<a href>`. Resolves
+`{ url, path }` — `url` **absolute**, which is the one a link needs, and `path` as the
+CMS's own router sees it.
+
+```tsx
+const [href, setHref] = useState<string | null>(null)
+useEffect(() => {
+  getNavigationUrl({ target: { type: "contentItem", contentID } })?.then((r) => setHref(r?.url ?? null))
+}, [contentID])
+
+return href ? <a href={href} target="_blank" rel="noopener noreferrer">Edit</a> : null
+```
+
+Worth preferring wherever a destination is a link rather than an action: an anchor gives
+the editor middle-click, ⌘-click, the address on hover and "copy link address", none of
+which a button can.
+
+`url` is absolute because it has to be — your app is served from its own origin, so a
+relative href inside it would point at your app rather than at the CMS. It is still only
+ever an `href`: the CMS is a different origin, so it is not a `fetch` target.
 
 ---
 

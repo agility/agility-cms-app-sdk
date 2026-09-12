@@ -6,6 +6,44 @@ This project follows [semantic versioning](https://semver.org/). Because the SDK
 are a public contract shared with the Agility Manager App, changes are additive — fields
 are added, never renamed or removed.
 
+## 2.4.0-beta.0
+
+Pre-release. Adds the one thing an app could never do: move the editor somewhere else.
+
+### Added
+
+- **Navigation, on every surface.** `navigate({ target })` takes the Manager App to another
+  screen client-side, and `getNavigationUrl({ target })` resolves the same destination to a
+  URL without going there, so an app can render a real `<a href>` instead of a button.
+
+  ```ts
+  navigate({ target: { type: "contentItem", contentID: 1866 } })
+  navigate({ target: { type: "newContentItem", containerID: 30 } })
+  ```
+
+  A target is an **intent, not a URL**: `contentItem`, `newContentItem`, `contentList` or
+  `page`. The host builds the address from the instance and locale the editor is already
+  in, which is what keeps an app inside its own instance and leaves the CMS's URL grammar
+  free to change under apps pinned to an old SDK. There is deliberately no raw-path
+  variant; new destinations arrive as new target types, which is additive.
+
+  `openInStack` (default `true`) opens the destination on top of the current screen,
+  keeping it in the breadcrumb — how the CMS's own nested-content fields already behave.
+
+  Both resolve `{ url, path }`. `url` is **absolute** — an app is served from its own
+  origin, so a relative href inside it would point back at the app rather than at the CMS.
+
+  New exported types `INavigationTarget`, `INavigateParam` and `INavigationUrl`; the
+  `"navigate"` and `"getNavigationUrl"` operation types.
+
+  ⚠️ Awaiting `navigate` tells you it **failed** — navigating unmounts the iframe that
+  asked, so a success reply usually arrives nowhere. ⚠️ Unsaved changes on the screen being
+  left are lost without a prompt; confirm first, or hand the editor a link.
+
+  Needs a Manager App build carrying the host handlers (branch
+  `jv/tinymce-8-and-rte-toolbar`). Against an older host both resolve `undefined`, so an
+  app can offer navigation and fall back to whatever it did before.
+
 ## 2.3.0-beta.0
 
 Pre-release, published under the **`beta`** dist-tag so demos can be built against the

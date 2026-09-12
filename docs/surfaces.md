@@ -122,6 +122,8 @@ Legend: ✅ available · — no handler
 | `selectAssets` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | `openModal` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | —² |
 | `openAlertModal` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | —² |
+| `navigate` ⁴ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `getNavigationUrl` ⁴ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **Content item** | | | | | | | | |
 | `getContentItem` | ✅ | ✅ | — | — | — | — | — | — |
 | `setFieldValue` | ✅ | ✅ | — | — | — | — | — | — |
@@ -153,6 +155,11 @@ Legend: ✅ available · — no handler
 log `"no app is loaded on this surface"` and **return without replying — the app's
 `callback` never fires**. `selectAssets` and the two auth operations do not need it and
 work fine.
+
+⁴ `navigate` and `getNavigationUrl` are new in SDK **2.4.0**. The host for them is on
+branch `jv/tinymce-8-and-rte-toolbar`, not yet on `main`. Against an older Manager App
+both resolve `undefined` rather than failing loudly, so an app can offer them and fall
+back.
 
 ³ `rteToolbar` is new in SDK **2.3.0** and ships dark behind the Manager App feature flag
 `enable-rte-toolbar-apps`. The host for it is on branch `jv/rte-toolbar-app-surface`, not
