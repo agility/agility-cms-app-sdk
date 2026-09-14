@@ -364,10 +364,12 @@ open in the Pages section.
 > means nothing happened — an unresolvable target, or a host too old to know the
 > operation.
 
-> ⚠️ **Unsaved changes are lost, silently.** The content item form does not prompt before
-> the route changes. If your app holds edits that have not been saved — a custom field's
-> value, most obviously — confirm with [`openAlertModal`](#openalertmodal) first, or offer
-> a link built with `getNavigationUrl` so the editor can open it in a second tab instead.
+> **Unsaved changes survive.** Leaving a dirty content item does not prompt, and does not
+> need to: the Manager App caches an item's edits into `sessionStorage` as they are made —
+> and into Liveblocks when presence is connected — and reads that cache before the server
+> when the editor comes back. Your custom field's value is cached with everything else, so
+> navigating away and returning restores it. You do not need to confirm before calling
+> this.
 
 ### `getNavigationUrl`
 

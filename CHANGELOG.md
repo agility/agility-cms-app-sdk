@@ -37,8 +37,10 @@ Pre-release. Adds the one thing an app could never do: move the editor somewhere
   `"navigate"` and `"getNavigationUrl"` operation types.
 
   ⚠️ Awaiting `navigate` tells you it **failed** — navigating unmounts the iframe that
-  asked, so a success reply usually arrives nowhere. ⚠️ Unsaved changes on the screen being
-  left are lost without a prompt; confirm first, or hand the editor a link.
+  asked, so a success reply usually arrives nowhere. Unsaved changes on the screen being
+  left are *kept*: the Manager App caches an item's edits into `sessionStorage` and
+  Liveblocks as they are made, and restores them on the way back, so there is nothing to
+  confirm before navigating.
 
   Needs a Manager App build carrying the host handlers (branch
   `jv/tinymce-8-and-rte-toolbar`). Against an older host both resolve `undefined`, so an

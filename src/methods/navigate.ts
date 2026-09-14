@@ -32,10 +32,12 @@ import { IAppEventParam, INavigateParam, INavigationUrl } from "../types"
  * }
  * ```
  *
- * ⚠️ **Unsaved changes are lost, silently.** The content item form does not prompt before
- * the route changes. If your app holds edits the editor has not saved — a custom field's
- * value, most obviously — ask them first with `openAlertModal`, or give them a link with
- * {@link getNavigationUrl} and let them open it in a new tab instead.
+ * Unsaved changes on the screen being left are **kept**, which is worth knowing because it
+ * looks like it should not be. The Manager App caches a content item's edits into
+ * `sessionStorage` as they are made — and into Liveblocks when presence is connected — and
+ * reads that cache before the server on the way back in. That is why leaving a dirty item
+ * does not prompt: there is nothing to prompt about, and an app does not need to ask
+ * before calling this.
  *
  * @param {INavigateParam} { target, openInStack }
  * @returns {(Promise<INavigationUrl> | undefined)} the address the host went to, if it replies
