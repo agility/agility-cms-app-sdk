@@ -63,7 +63,7 @@ typings/
 # next.js build output
 .next
 
-# make sure the docs are never checked in
-docs/
+# hand-written documentation lives in docs/ and IS checked in.
+# (this previously ignored a generated typedoc output folder)
 
 .vscode

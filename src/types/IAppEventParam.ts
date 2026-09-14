@@ -33,6 +33,9 @@ export interface IAppEventParam<T> {
     | "getAPIKey"
     | "setFocus"
     | "translate"
+    | "resolveEmbed"
+    | "navigate"
+    | "getNavigationUrl"
   error?: string
   arg?: T
 }
