@@ -6,22 +6,13 @@ import { getCloseModalID } from '../lib/getCloseModalID';
 
 export interface IResolveEmbedParam {
 	/**
-	 * The value to serialize onto the embed element, for a button declaring
-	 * `storage: "value"`.  Written to `data-agility-value` as JSON.
+	 * The value to serialize onto the embed element.  Written to `data-agility-value` as JSON,
+	 * and handed back as `embed.value` when the author reopens the embed.
 	 *
 	 * @type {unknown}
 	 * @memberof IResolveEmbedParam
 	 */
 	value?: unknown
-
-	/**
-	 * The ID of the content item backing the embed, for a button declaring
-	 * `storage: "contentItem"`.  Written to `data-agility-id`.
-	 *
-	 * @type {number}
-	 * @memberof IResolveEmbedParam
-	 */
-	contentItemID?: number
 
 	/**
 	 * Pass true to close the dialog without touching the document.
@@ -37,8 +28,7 @@ export interface IResolveEmbedParam {
  * the rteToolbar surface.
  *
  * The host writes the embed markup into the rich text field based on what is passed here:
- * `value` becomes `data-agility-value`, `contentItemID` becomes `data-agility-id`, and
- * `cancelled` writes nothing at all.
+ * `value` becomes `data-agility-value`, and `cancelled` writes nothing at all.
  *
  * @param {IResolveEmbedParam} result
  */

@@ -6,6 +6,31 @@ This project follows [semantic versioning](https://semver.org/). Because the SDK
 are a public contract shared with the Agility Manager App, changes are additive — fields
 are added, never renamed or removed.
 
+## 2.4.0 (unreleased)
+
+The first release of the `rteToolbar` surface and navigation on npm `latest`.
+
+### Removed before reaching `latest`
+
+- **The `contentItem` storage mode.** `IResolveEmbedParam.contentItemID` and
+  `IEmbedContext.contentItemID` are gone, along with the manifest's `storage` key from the
+  docs. The Manager App never read `storage`, and an embed backed by a content item has no
+  lifecycle yet: deleting the embed leaves the item behind, and copying it shares one item
+  between two embeds. `value` is the only storage mode.
+
+  This is an exception to the additive-only rule, and a deliberate one. These fields only
+  ever shipped in the `2.3.0-beta.0` and `2.4.0-beta.0` pre-releases, never on `latest`.
+  The Manager App still accepts `contentItemID` on the wire, so a beta app that passes it
+  keeps working. A content-item mode can come back later as an addition, once it has a
+  lifecycle.
+
+### Fixed
+
+- The docs no longer say the surface needs the `enable-rte-toolbar-apps` feature flag. It
+  doesn't exist: the surface turns on when an app declaring it is installed.
+- `surfaces.md` now says that an `rteToolbar` app runs inside the editor with the editing
+  user's access, which the Manager App also tells admins at install.
+
 ## 2.4.0-beta.0
 
 Pre-release. Adds the one thing an app could never do: move the editor somewhere else.

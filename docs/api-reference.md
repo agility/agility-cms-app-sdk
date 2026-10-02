@@ -310,17 +310,15 @@ Closes the modal you are in and passes `props` to the opener's `callback`.
 
 ```ts
 resolveEmbed({
-  value?: unknown,        // for a storage:"value" button   → data-agility-value (JSON)
-  contentItemID?: number, // for a storage:"contentItem" button → data-agility-id
-  cancelled?: boolean     // close without touching the document
+  value?: unknown,     // → data-agility-value (JSON); handed back as embed.value on edit
+  cancelled?: boolean  // close without touching the document
 }): void
 ```
 
 Resolves the current rich-text embed and closes the dialog. **rteToolbar surface only** —
 like `closeModal` it needs `?closeModalID=` and returns silently without it.
 
-Pass exactly one of `value` / `contentItemID`, matching the `storage` your button declared,
-or `cancelled: true`. See [Surfaces](surfaces.md#the-rtetoolbar-surface) for the full flow.
+Pass either `value` or `cancelled: true`. See [Surfaces](surfaces.md#the-rtetoolbar-surface) for the full flow.
 
 ---
 

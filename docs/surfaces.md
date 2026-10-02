@@ -161,9 +161,9 @@ branch `jv/tinymce-8-and-rte-toolbar`, not yet on `main`. Against an older Manag
 both resolve `undefined` rather than failing loudly, so an app can offer them and fall
 back.
 
-³ `rteToolbar` is new in SDK **2.3.0** and ships dark behind the Manager App feature flag
-`enable-rte-toolbar-apps`. The host for it is on branch `jv/rte-toolbar-app-surface`, not
-yet on `main`.
+³ `rteToolbar` is new in SDK **2.3.0**. There is no feature flag: the surface turns on in
+an instance as soon as an app declaring it is installed. The host for it is on branch
+`jv/tinymce-8-and-rte-toolbar`, not yet on `main`.
 
 ### Operations with no host handler
 
@@ -197,8 +197,15 @@ older Manager App build. There are still no timeouts in this SDK.
 **New in SDK 2.3.0.** Lets an app contribute buttons to the rich text editor toolbar and
 own the UI for inserting and editing its own embeds.
 
-The Manager App ships this dark behind the feature flag `enable-rte-toolbar-apps`, and its
-host code is on branch `jv/rte-toolbar-app-surface` rather than `main`. Requires TinyMCE 8.
+There is no feature flag: the surface turns on in an instance as soon as an app declaring it
+is installed. Its host code is on branch `jv/tinymce-8-and-rte-toolbar` rather than `main`,
+and it requires TinyMCE 8, which ships with it.
+
+> ⚠️ **An `rteToolbar` app runs inside the editor with the editing user's access.** The rich
+> text editor's frame shares the Manager App's origin, so an `editorComponentUrl` script, and
+> any markup your dialog returns, run with the same session as the person editing. The Manager
+> App says so when an admin installs or configures your app. Treat it accordingly: never put
+> untrusted input into the markup you return.
 
 ### 1. Declare buttons in the manifest
 
@@ -212,7 +219,6 @@ host code is on branch `jv/rte-toolbar-app-surface` rather than `main`. Requires
         "name": "flipcard",                          // route segment + data-agility-embed
         "label": "Flip Card",
         "description": "Insert a flip card",
-        "storage": "value",                          // or "contentItem"; defaults to "value"
         "element": "agility-flipcard",                // optional; defaults to <div>
         "editorComponentUrl": "/components/flipcard.js", // optional; classic script only
         "icon": "embed",                              // optional TinyMCE icon name
@@ -223,12 +229,9 @@ host code is on branch `jv/rte-toolbar-app-surface` rather than `main`. Requires
 }
 ```
 
-`storage` decides what the host writes into the field:
-
-| `storage` | `resolveEmbed` call | Host writes |
-|---|---|---|
-| `"value"` | `resolveEmbed({ value })` | `data-agility-value` — your JSON, on the element |
-| `"contentItem"` | `resolveEmbed({ contentItemID })` | `data-agility-id` — a reference to an item you created via the Management API |
+The host stores whatever you pass to `resolveEmbed({ value })` as JSON in
+`data-agility-value` on the element, and hands it back as `embed.value` when the author
+reopens the embed. That is the only storage mode: keep the widget's settings in `value`.
 
 ### 2. Serve the route
 
@@ -267,8 +270,7 @@ export default function FlipCardEmbed() {
 {
   buttonName: string              // which button was clicked
   mode: "insert" | "edit"
-  value?: unknown                 // previous value, when editing a storage:"value" embed
-  contentItemID?: number          // previous item, when editing a storage:"contentItem" embed
+  value?: unknown                 // the previously saved value, when editing
   contentItem?: IContentItem      // the item the RTE field itself belongs to
 }
 ```
@@ -285,11 +287,11 @@ the document; without any call, the dialog just sits there.
 <agility-flipcard class="agility-embed mceNonEditable"
                   data-agility-embed="flipcard"
                   data-agility-app="tmu-learning-objects"
-                  data-agility-id="4821"></agility-flipcard>
+                  data-agility-value="{&quot;front&quot;:&quot;Hello&quot;}"></agility-flipcard>
 ```
 
 Render this on your front end by matching `data-agility-embed` and reading
-`data-agility-value` or `data-agility-id`.
+`data-agility-value`.
 
 > ⚠️ **`data-agility-app` is the slugified `appJson.name`.** It is deliberately not the
 > install id, which is per-instance and would break the moment content was copied from

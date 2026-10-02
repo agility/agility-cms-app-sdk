@@ -130,7 +130,6 @@ Also check:
   and refuses anything else.
 - The RTE is on TinyMCE 8. Component upgrading does not work on 7.
 - Your button declares `element` — a plain `div` can never be upgraded by the browser.
-- The feature flag `enable-rte-toolbar-apps` is on for the instance.
 
 ## Hooks crash with "Invalid hook call" in local development
 

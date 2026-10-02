@@ -28,22 +28,12 @@ export interface IEmbedContext {
 	mode: "insert" | "edit"
 
 	/**
-	 * The previously saved value.  Only present when editing an embed whose button
-	 * declares `storage: "value"`.
+	 * The previously saved value.  Only present when editing an existing embed.
 	 *
 	 * @type {unknown}
 	 * @memberof IEmbedContext
 	 */
 	value?: unknown
-
-	/**
-	 * The ID of the content item backing the embed.  Only present when editing an
-	 * embed whose button declares `storage: "contentItem"`.
-	 *
-	 * @type {number}
-	 * @memberof IEmbedContext
-	 */
-	contentItemID?: number
 
 	/**
 	 * The content item that the rich text field being edited belongs to.
