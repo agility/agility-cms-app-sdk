@@ -6,7 +6,7 @@ This project follows [semantic versioning](https://semver.org/). Because the SDK
 are a public contract shared with the Agility Manager App, changes are additive — fields
 are added, never renamed or removed.
 
-## 2.4.0 (unreleased)
+## 2.4.0
 
 The first release of the `rteToolbar` surface and navigation on npm `latest`.
 
