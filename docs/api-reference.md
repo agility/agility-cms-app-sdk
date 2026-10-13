@@ -322,8 +322,7 @@ Pass either `value` or `cancelled: true`. See [Surfaces](surfaces.md#the-rtetool
 
 ## Navigation
 
-Both work on **every surface**. Added in **2.4.0**; against an older Manager App they
-resolve `undefined`, which is the signal to fall back to whatever the app did before.
+Both work on **every surface**. Added in **2.4.0**; against a Manager App without the handler, the promise resolves to the host's error string instead of an `INavigationUrl` (a very old host may never reply). Check `result?.url`: a missing `url` is the signal to fall back to whatever the app did before.
 
 ### `navigate`
 

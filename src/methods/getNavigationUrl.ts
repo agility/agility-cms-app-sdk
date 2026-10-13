@@ -30,8 +30,8 @@ import { IAppEventParam, INavigateParam, INavigationUrl } from "../types"
  * inside it would point at the app rather than at the CMS. It is still only ever an
  * `href` — the CMS is a different origin, so it is not a `fetch` target.
  *
- * Resolves `undefined` when the host does not support the operation, which is the signal
- * to fall back to whatever the app did before.
+ * When the host does not support the operation, the promise resolves to the host's error
+ * string rather than an `INavigationUrl`. Check `result?.url` and fall back when it is missing.
  *
  * @param {INavigateParam} { target, openInStack }
  * @returns {(Promise<INavigationUrl> | undefined)}

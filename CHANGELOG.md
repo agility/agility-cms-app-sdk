@@ -29,6 +29,8 @@ The first release of the `rteToolbar` surface and navigation on npm `latest`.
 - **`pageItem` is no longer always `null`.** The page sidebar has always sent the page in its initialize
   context, but `useAgilityAppSDK()` never stored it. Page-sidebar apps now get it from the hook;
   `getPageItem()` keeps working.
+- The docs no longer say `navigate` and `getNavigationUrl` resolve `undefined` when the host
+  can't handle them. They resolve to the host's error string; check `result?.url`.
 - The docs no longer say the surface needs the `enable-rte-toolbar-apps` feature flag. It
   doesn't exist: the surface turns on when an app declaring it is installed.
 - `surfaces.md` now says that an `rteToolbar` app runs inside the editor with the editing
@@ -77,8 +79,9 @@ Pre-release. Adds the one thing an app could never do: move the editor somewhere
   confirm before navigating.
 
   Needs a Manager App build carrying the host handlers (branch
-  `jv/tinymce-8-and-rte-toolbar`). Against an older host both resolve `undefined`, so an
-  app can offer navigation and fall back to whatever it did before.
+  `jv/tinymce-8-and-rte-toolbar`). Against an older host both resolve to the host's error
+  string (corrected in 2.4.0's notes: check `result?.url`), so an app can offer navigation
+  and fall back to whatever it did before.
 
 ## 2.3.0-beta.0
 

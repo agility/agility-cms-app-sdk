@@ -27,7 +27,7 @@ import { IAppEventParam, INavigateParam, INavigationUrl } from "../types"
  *
  * ```ts
  * const result = await navigate({ target })
- * if (result === undefined) {
+ * if (!result?.url) {
  *   // Still here: the host did not navigate. Fall back to a link.
  * }
  * ```

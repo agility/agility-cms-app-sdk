@@ -108,8 +108,8 @@ should be added as a field on `IContextParam` rather than as a second host→app
 
 The single most common cause of a broken app is calling an operation the current surface
 does not implement. This matrix reflects `agility-cms-manager-app-react` as of
-**2026-08-25** — `main`, plus the `rteToolbar` column from branch
-`jv/rte-toolbar-app-surface`.
+**2026-08-25** — `main`, plus the `rteToolbar` and navigation handlers from the TinyMCE 8 release
+(October 2026).
 
 Legend: ✅ available · — no handler
 
@@ -155,14 +155,13 @@ log `"no app is loaded on this surface"` and **return without replying — the a
 `callback` never fires**. `selectAssets` and the two auth operations do not need it and
 work fine.
 
-⁴ `navigate` and `getNavigationUrl` are new in SDK **2.4.0**. The host for them is on
-branch `jv/tinymce-8-and-rte-toolbar`, not yet on `main`. Against an older Manager App
-both resolve `undefined` rather than failing loudly, so an app can offer them and fall
-back.
+⁴ `navigate` and `getNavigationUrl` are new in SDK **2.4.0**. Against an older Manager App
+both resolve to the host's error string rather than an `INavigationUrl`, so check
+`result?.url` and fall back when it is missing.
 
-³ `rteToolbar` is new in SDK **2.3.0**. There is no feature flag: the surface turns on in
-an instance as soon as an app declaring it is installed. The host for it is on branch
-`jv/tinymce-8-and-rte-toolbar`, not yet on `main`.
+³ `rteToolbar` is new in SDK **2.4.0** (it first appeared in the `2.3.0-beta.0` pre-release).
+There is no feature flag: the surface turns on in an instance as soon as an app declaring
+it is installed.
 
 ### Operations with no host handler
 
@@ -193,12 +192,11 @@ older Manager App build. There are still no timeouts in this SDK.
 
 ## The `rteToolbar` surface
 
-**New in SDK 2.3.0.** Lets an app contribute buttons to the rich text editor toolbar and
+**New in SDK 2.4.0.** Lets an app contribute buttons to the rich text editor toolbar and
 own the UI for inserting and editing its own embeds.
 
 There is no feature flag: the surface turns on in an instance as soon as an app declaring it
-is installed. Its host code is on branch `jv/tinymce-8-and-rte-toolbar` rather than `main`,
-and it requires TinyMCE 8, which ships with it.
+is installed. It needs the Manager App's TinyMCE 8 release (October 2026) or later.
 
 > ⚠️ **An `rteToolbar` app runs inside the editor with the editing user's access.** The rich
 > text editor's frame shares the Manager App's origin, so an `editorComponentUrl` script, and
@@ -285,7 +283,7 @@ the document; without any call, the dialog just sits there.
 ```html
 <agility-flipcard class="agility-embed mceNonEditable"
                   data-agility-embed="flipcard"
-                  data-agility-app="tmu-learning-objects"
+                  data-agility-app="acme-flipcards"
                   data-agility-value="{&quot;front&quot;:&quot;Hello&quot;}"></agility-flipcard>
 ```
 
