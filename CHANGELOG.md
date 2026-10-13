@@ -26,10 +26,19 @@ The first release of the `rteToolbar` surface and navigation on npm `latest`.
 
 ### Fixed
 
+- **`pageItem` is no longer always `null`.** The page sidebar has always sent the page in its initialize
+  context, but `useAgilityAppSDK()` never stored it. Page-sidebar apps now get it from the hook;
+  `getPageItem()` keeps working.
 - The docs no longer say the surface needs the `enable-rte-toolbar-apps` feature flag. It
   doesn't exist: the surface turns on when an app declaring it is installed.
 - `surfaces.md` now says that an `rteToolbar` app runs inside the editor with the editing
   user's access, which the Manager App also tells admins at install.
+
+### Internal
+
+- Build toolchain only: rollup 3.30, and patched `brace-expansion`, `minimatch`, `picomatch` and `shell-quote` in
+  the lockfile (Dependabot). The SDK has no runtime dependencies and ships only `dist/`, which is byte-identical
+  before and after.
 
 ## 2.4.0-beta.0
 

@@ -71,14 +71,12 @@ const {
 | `fieldValue` | `string` | custom-field surface only; **stays live** via an auto-registered field listener |
 | `contentItem` | `IContentItem \| null` | custom field + content item sidebar |
 | `contentModel` | `IContentModel \| null` | custom field + content item sidebar |
-| `pageItem` | `IPageItem \| null` | ⚠️ **always `null` — see below** |
+| `pageItem` | `IPageItem \| null` | The page, on the page sidebar (from 2.4.0; `null` before, see below) |
 | `modalProps` | `any` | modal surface only; whatever `openModal({ props })` passed |
 | `embed` | `IEmbedContext \| null` | rteToolbar surface only |
 
-> ⚠️ **`pageItem` is always `null`.** The host sends it in the page-sidebar context and
-> `IContextParam` declares it, but the hook never calls its own `setPageItem`. Use
-> [`pageMethods.getPageItem()`](#getpageitem) instead. This is a bug in this SDK, not in
-> the host.
+> **`pageItem` before 2.4.0 was always `null`:** the host sent it in the page-sidebar context, but the hook never
+> stored it. Fixed in 2.4.0. On older SDKs, call `getPageItem()`.
 
 The `context` handshake is **one-shot** — the hook unsubscribes after the first reply. Only
 `fieldValue` keeps updating afterwards.
@@ -224,8 +222,8 @@ this one, so calling it once is correct.
 pageMethods.getPageItem(): Promise<IPageItem> | undefined
 ```
 
-The full current page. **Page-sidebar surface only, and the only way to get the page** —
-the hook's `pageItem` is always `null`.
+The full current page. **Page-sidebar surface only.** From 2.4.0 the hook's `pageItem` holds the same page at
+initialize; call this for a fresh copy, or on older SDKs, where the hook's `pageItem` was always `null`.
 
 ---
 

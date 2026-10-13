@@ -90,17 +90,16 @@ Beyond that, only some fields populate:
 |---|---|
 | `fields` | `field`, `contentItem`, `contentModel`, plus live `fieldValue` |
 | `contentItemSidebar` | `contentItem`, `contentModel` |
-| `pageSidebar` | `pageItem` is **sent by the host but dropped by the SDK** — see below |
+| `pageSidebar` | `pageItem` (from 2.4.0; before that the SDK dropped it — see below) |
 | `contentListSidebar` | *(none — call `getSelectedItems()`)* |
 | `homeDashboard` / `contentDashboard` / `pagesDashboard` | *(none)* |
 | `modal` | `modalProps` |
 | `rteToolbar` | `embed` |
 | install screen | `appInstallContext` only; `instance` and `locale` stay `null` |
 
-> ⚠️ **`pageItem` from `useAgilityAppSDK()` is always `null`.** The host *does* send it in
-> the page-sidebar context and `IContextParam` declares it, but the hook never calls
-> `setPageItem`. **Call [`getPageItem()`](api-reference.md#getpageitem) explicitly.**
-> `useAgilityPreInstall` has the same defect for `instance` and `locale`.
+> **`pageItem` before 2.4.0:** the SDK dropped it from the page-sidebar context, so `useAgilityAppSDK()` returned
+> `null`. Fixed in 2.4.0. On older SDKs, call [`getPageItem()`](api-reference.md#getpageitem) instead (it still works).
+> ⚠️ `useAgilityPreInstall` still has a similar defect: `instance` and `locale` stay `null` there.
 
 `modalProps` is the general-purpose channel for host→app payload. New host→app data
 should be added as a field on `IContextParam` rather than as a second host→app operation.

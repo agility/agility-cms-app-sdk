@@ -136,6 +136,8 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 				setField(context.field || null)
 
 				setContentItem(context.contentItem || null)
+				// The page sidebar sends the page in its initialize context; this was never read, so pageItem was always null.
+				setPageItem(context.pageItem || null)
 				setContentModel(context.contentModel || null)
 				setModalProps(context.modalProps || null)
 				setEmbed(context.embed || null)
