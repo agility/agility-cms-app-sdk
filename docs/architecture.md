@@ -118,7 +118,7 @@ operation, copy the matching one.
 
 | Shape | Returns | Examples |
 |---|---|---|
-| **Fire-and-forget** — build the param, `invokeAppMethod`, done | `void` | `setHeight`, `setFieldValue`, `refresh`, `saveContentItem`, `closeModal`, `setFocus`, `setVisibility` |
+| **Fire-and-forget** — build the param, `invokeAppMethod`, done | `void` | `setHeight`, `setFieldValue`, `refresh`, `saveContentItem`, `closeModal`, `setFocus`, `setVisibility`, `setTitle` |
 | **Request/reply** — a Subject wrapped in a Promise, resolved by the dispatcher | `Promise<T> \| undefined` | `getContentItem`, `getPageItem`, `getSelectedItems`, `getManagementAPIToken`, `getAPIKey`, `translate`, `persistData`, `updateConfigurationValue`, `setExtraConfigValues`, `getAppInstall` |
 | **Callback + long-lived Subject** | `void` | `addFieldListener`, `addSelectedItemListener` (both `autoDelete: false`); also `openModal`, `openAlertModal`, `selectAssets`, which take a `callback` and are answered against a *second* id |
 

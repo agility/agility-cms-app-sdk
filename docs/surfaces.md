@@ -41,6 +41,11 @@ directly whenever a surface fails to appear.
     // one route per button — see "The rteToolbar surface" below
     "rteToolbar": [ { "name": "flipcard", "label": "Flip Card", "description": "..." } ],
 
+    // an app's own top-level section, and its own stack items (from 2.5.0) —
+    // see "The sections surface" and "The items surface" below
+    "sections": [ { "name": "my-library", "label": "My Library", "description": "...", "icon": "IconFolder", "permissions": [1] } ],
+    "items":    [ { "name": "libraryfolder", "label": "Folder", "description": "..." } ],
+
     // opt in to the pre-install screen
     "installScreen": true
   }
@@ -66,10 +71,16 @@ each path it claims.**
 | `fields` | `/fields/{fieldType}` | `appID` |
 | `modal` | `/modals/{modalName}` | `appID`, `closeModalID` |
 | `rteToolbar` | `/rte-toolbar/{buttonName}` | `appID`, `closeModalID` |
+| `sections` | `/sections/{sectionName}` | `appID` |
+| `items` | `/items/{itemName}` | `appID` |
 | install screen | `/install` | `appID` |
 
 `{fieldType}` is the `name` of the entry in `capabilities.fields`. `{modalName}` is the
-`name` you passed to [`openModal`](api-reference.md#openmodal).
+`name` you passed to [`openModal`](api-reference.md#openmodal). `{sectionName}` and
+`{itemName}` are the `name`s of entries in `capabilities.sections` and `capabilities.items`.
+
+> On the `items` surface the item's **id is not in your route**. It arrives as `item.id` in
+> the context, so one page serves every item of that name.
 
 > `appID` is mandatory on every route. Without it the SDK silently does nothing — see
 > [Troubleshooting](troubleshooting.md#initializing-never-becomes-false).
@@ -84,6 +95,14 @@ instance           // { guid, websiteName }
 locale             // e.g. "en-us"
 ```
 
+and, from SDK 2.5.0 on a Manager App that sends it, a fourth:
+
+```ts
+user               // IUser: { userID, emailAddress, fullName, isOrgAdmin, permissions, teamIDs }
+```
+
+See [The `user` context](#the-user-context). On an older Manager App `user` is `null`.
+
 Beyond that, only some fields populate:
 
 | Surface | Extra context fields |
@@ -95,7 +114,9 @@ Beyond that, only some fields populate:
 | `homeDashboard` / `contentDashboard` / `pagesDashboard` | *(none)* |
 | `modal` | `modalProps` |
 | `rteToolbar` | `embed` |
-| install screen | `appInstallContext` only; `instance` and `locale` stay `null` |
+| `sections` | `section` (from 2.5.0) |
+| `items` | `item`, `parent` (from 2.5.0) |
+| install screen | `appInstallContext` (and `user`, from 2.5.0) only; `instance` and `locale` stay `null` |
 
 > **`pageItem` before 2.4.0:** the SDK dropped it from the page-sidebar context, so `useAgilityAppSDK()` returned
 > `null`. Fixed in 2.4.0. On older SDKs, call [`getPageItem()`](api-reference.md#getpageitem) instead (it still works).
@@ -109,43 +130,45 @@ should be added as a field on `IContextParam` rather than as a second host→app
 The single most common cause of a broken app is calling an operation the current surface
 does not implement. This matrix reflects `agility-cms-manager-app-react` as of
 **2026-08-25** — `main`, plus the `rteToolbar` and navigation handlers from the TinyMCE 8 release
-(October 2026).
+(October 2026). The `sections` and `items` columns and the `setTitle` row describe the Manager
+App release that adds those surfaces (SDK 2.5.0), which reaches `qa/main` first.
 
 Legend: ✅ available · — no handler
 
-| Operation | fields | contentItem&#8203;Sidebar | contentList&#8203;Sidebar | page&#8203;Sidebar | dashboards¹ | modal | rte&#8203;Toolbar³ | install |
-|---|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-| **Core — every surface** | | | | | | | | |
-| `getManagementAPIToken` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `getAPIKey` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `selectAssets` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `openModal` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | —² |
-| `openAlertModal` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | —² |
-| `navigate` ⁴ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `getNavigationUrl` ⁴ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Content item** | | | | | | | | |
-| `getContentItem` | ✅ | ✅ | — | — | — | — | — | — |
-| `setFieldValue` | ✅ | ✅ | — | — | — | — | — | — |
-| `addFieldListener` / `removeFieldListener` | ✅ | ✅ | — | — | — | — | — | — |
-| `saveContentItem` | — | ✅ | — | — | — | — | — | — |
-| `setVisibility` | ✅ | — | — | — | — | — | — | — |
-| `setFocus` | ✅ | — | — | — | — | — | — | — |
-| **Content list** | | | | | | | | |
-| `getSelectedItems` | — | — | ✅ | — | — | — | — | — |
-| `addSelectedItemListener` / `removeSelectedItemListener` | — | — | ✅ | — | — | — | — | — |
-| **Pages** | | | | | | | | |
-| `getPageItem` | — | — | — | ✅ | — | — | — | — |
-| **App shell** | | | | | | | | |
-| `setHeight` | ✅ | — | — | — | ✅ | — | — | — |
-| `refresh` | — | — | ✅ | ✅ | — | — | — | — |
-| `closeModal` | — | — | — | — | — | ✅ | — | — |
-| `resolveEmbed` | — | — | — | — | — | — | ✅ | — |
-| `getAppInstall` | — | — | — | — | ✅ | — | — | — |
-| `updateConfigurationValue` | — | — | — | — | ✅ | — | — | — |
-| `setExtraConfigValues` | — | — | — | — | — | — | — | ✅ |
-| **No host handler anywhere** | | | | | | | | |
-| `translate` | — | — | — | — | — | — | — | — |
-| `persistData` | — | — | — | — | — | — | — | — |
+| Operation | fields | contentItem&#8203;Sidebar | contentList&#8203;Sidebar | page&#8203;Sidebar | dashboards¹ | modal | rte&#8203;Toolbar³ | sections⁵ | items⁵ | install |
+|---|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| **Core — every surface** | | | | | | | | | | |
+| `getManagementAPIToken` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `getAPIKey` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `selectAssets` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `openModal` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | —² |
+| `openAlertModal` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | —² |
+| `navigate` ⁴ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `getNavigationUrl` ⁴ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Content item** | | | | | | | | | | |
+| `getContentItem` | ✅ | ✅ | — | — | — | — | — | — | — | — |
+| `setFieldValue` | ✅ | ✅ | — | — | — | — | — | — | — | — |
+| `addFieldListener` / `removeFieldListener` | ✅ | ✅ | — | — | — | — | — | — | — | — |
+| `saveContentItem` | — | ✅ | — | — | — | — | — | — | — | — |
+| `setVisibility` | ✅ | — | — | — | — | — | — | — | — | — |
+| `setFocus` | ✅ | — | — | — | — | — | — | — | — | — |
+| **Content list** | | | | | | | | | | |
+| `getSelectedItems` | — | — | ✅ | — | — | — | — | — | — | — |
+| `addSelectedItemListener` / `removeSelectedItemListener` | — | — | ✅ | — | — | — | — | — | — | — |
+| **Pages** | | | | | | | | | | |
+| `getPageItem` | — | — | — | ✅ | — | — | — | — | — | — |
+| **App shell** | | | | | | | | | | |
+| `setHeight` | ✅ | — | — | — | ✅ | — | — | — | — | — |
+| `refresh` | — | — | ✅ | ✅ | — | — | — | — | — | — |
+| `closeModal` | — | — | — | — | — | ✅ | — | — | — | — |
+| `resolveEmbed` | — | — | — | — | — | — | ✅ | — | — | — |
+| `setTitle` ⁵ | — | — | — | — | — | — | — | ✅ | ✅ | — |
+| `getAppInstall` | — | — | — | — | ✅ | — | — | — | — | — |
+| `updateConfigurationValue` | — | — | — | — | ✅ | — | — | — | — | — |
+| `setExtraConfigValues` | — | — | — | — | — | — | — | — | — | ✅ |
+| **No host handler anywhere** | | | | | | | | | | |
+| `translate` | — | — | — | — | — | — | — | — | — | — |
+| `persistData` | — | — | — | — | — | — | — | — | — | — |
 
 ¹ `homeDashboard`, `contentDashboard` and `pagesDashboard` all share one host component
 (`DashboardSurface.tsx`) and therefore have identical operation support.
@@ -162,6 +185,11 @@ both resolve to the host's error string rather than an `INavigationUrl`, so chec
 ³ `rteToolbar` is new in SDK **2.4.0** (it first appeared in the `2.3.0-beta.0` pre-release).
 There is no feature flag: the surface turns on in an instance as soon as an app declaring
 it is installed.
+
+⁵ The `sections` and `items` surfaces and `setTitle` are new in SDK **2.5.0** and need a
+Manager App that supports them; they reach the Manager App's `qa/main` first. Against an
+older host the surfaces never mount, and `setTitle` is ignored (it is fire-and-forget, so
+the host's error reply goes nowhere).
 
 ### Operations with no host handler
 
@@ -320,3 +348,222 @@ Two pieces of editor-side advice:
 > This is why the host **origin-locks** `editorComponentUrl` to your app's own registered
 > `appUrl` and refuses anything else. Your component script is markedly more trusted than
 > your iframe; treat it accordingly.
+
+### 6. Insert a link instead of an element
+
+**New in SDK 2.5.0**, and it needs a Manager App that supports it. A button that declares
+`insert: "link"` puts an ordinary `<a>` into the document instead of an embed element, for
+buttons such as "attach a file" or "link to an issue":
+
+```jsonc
+"rteToolbar": [
+  { "name": "attach-file", "label": "Attach File", "icon": "link", "group": "My Files", "insert": "link" }
+]
+```
+
+`insert` is `"element"` (the default, everything above) or `"link"`. A `link` button needs
+no `element` and no `editorComponentUrl`, and the host ignores them, with a console warning,
+if you declare them. It runs no code in the editor.
+
+The dialog opens at the same `/rte-toolbar/{buttonName}` route with `embed.mode === "insert"`.
+Whatever text the author had selected arrives as `embed.selectionText` (plain text). Resolve with
+`insert` instead of `value`:
+
+```ts
+resolveEmbed({
+  insert: {
+    kind: "link",
+    href: "https://files.example.com/f/6f1c",
+    text: "Quarterly report.pdf",            // optional; defaults to the selected text, then the href
+    attributes: { "data-file-id": "6f1c" }
+  }
+})
+```
+
+| Field | Notes |
+|---|---|
+| `kind` | `"link"`, the only kind today |
+| `href` | a site-relative path (`/files/...`), a `#fragment`, or an `http(s):` or `mailto:` URL. Anything else (`javascript:`, `data:`, `//host`) is refused and nothing is inserted |
+| `text` | the link text. When omitted, the selected text is used, then the `href`. The link replaces the selection |
+| `attributes` | extra attributes on the `<a>`; the host keeps only `data-*`, `class`, `title`, `rel` and `target` (`_blank` or `_self`; `_blank` gets `rel="noopener noreferrer"` unless you set `rel`) |
+
+`data-*` attributes survive save and reach the Fetch API, so your website can find your
+links by them. The author edits the link afterwards with the editor's own link dialog; the
+host does not reopen your app for it. `resolveEmbed({ cancelled: true })` still closes
+without writing anything.
+
+> On a Manager App without `insert: "link"` support, the button is treated as an ordinary
+> element button, and `resolveEmbed({ insert })` writes an element with no value.
+
+## The sections surface
+
+**New in SDK 2.5.0**, and it needs a Manager App that supports it (it reaches the Manager
+App's `qa/main` first). Gives your app its own top-level section: an entry in the main
+navigation and a full-pane screen inside the normal header, breadcrumb and back button. The
+host draws the chrome; your app paints the pane.
+
+### Declare it
+
+```jsonc
+"capabilities": {
+  "sections": [
+    {
+      "name": "my-library",              // route segment; see the name rules
+      "label": "My Library",              // the nav entry and the first breadcrumb
+      "description": "Browse the library.",
+      "icon": "IconFolder",               // optional
+      "permissions": [1]                  // optional; who sees the entry
+    }
+  ]
+}
+```
+
+| Key | Rules |
+|---|---|
+| `name` | lowercase `[a-z0-9-]`, **2–40 characters**, unique across the apps installed in the instance. Reserved: `home`, `pages`, `layouts`, `content`, `media`, `models`, `reports`, `web-studio`, `settings`, `ecommerce`, `website-users`, `user-content`, `agilitysearch`, `apps` |
+| `label` | the nav entry's text |
+| `icon` | a Tabler icon name from the host's allow-list, for example `IconLock`, `IconFolder`, `IconFiles`, `IconApps`, `IconDatabase`, `IconPhoto`, `IconChartPie`. Not a URL. Anything else falls back to `IconApps` |
+| `permissions` | the [permission IDs](api-reference.md#permission) the user needs to see the entry, **any** of which is enough, with FullControl always passing. Defaults to `[1]` (Read) |
+
+A name that breaks the rules is logged in the console and skipped; it never breaks another
+app. When two installed apps declare the same name, the first by app name wins and the
+other is skipped with a console warning.
+
+### Serve the route
+
+The host opens your app at `{appUrl}/sections/{sectionName}?appID=…`. The iframe fills the
+pane, so `setHeight` is not needed and is not answered.
+
+### What arrives
+
+```ts
+const { section, user } = useAgilityAppSDK()
+// section: { name: "my-library" }
+```
+
+There is no path inside a section. A screen worth linking to, such as one folder, is a
+[stack item](#the-items-surface): `navigate` to it and the host gives it a URL, a
+breadcrumb and a back button.
+
+In the Manager App the section lives under `/instance/{guid}/{locale}/apps/{sectionName}`.
+That prefix is the host's business: link to it with `getNavigationUrl({ target: { type:
+"appSection", name } })`, never by building the address.
+
+## The items surface
+
+**New in SDK 2.5.0**, with the same Manager App requirement. An app screen that opens on
+the Manager App's item stack, with its own URL segment, breadcrumb and back button, on top
+of your app's section or on top of a content item, list, page or report.
+
+### Declare it
+
+```jsonc
+"capabilities": {
+  "items": [
+    { "name": "libraryfolder", "label": "Folder", "description": "A folder in the library." },
+    { "name": "libraryfile",   "label": "File",   "description": "One file." }
+  ]
+}
+```
+
+| Key | Rules |
+|---|---|
+| `name` | lowercase `[a-z0-9]`, **3–30 characters, no hyphen** (it is the left side of the `{name}-{id}` URL segment), unique across the apps installed in the instance. Reserved: `page`, `layout`, `pageversion`, `item`, `list`, `listitem`, `newlistitem`, `itemversion`, `urlredirections`, `batch`, `batches`, `folder`, `gallery` |
+| `label` | the breadcrumb until your app calls `setTitle` |
+
+The same skip-and-warn rules as sections apply to bad and duplicate names.
+
+### Serve the route
+
+The host opens your app at `{appUrl}/items/{itemName}?appID=…`. The **id is not in the
+route**: it arrives in the context, so one page serves every item of that name. The id is
+any string without a `/` (hyphens included), and your app owns its meaning.
+
+### What arrives
+
+```ts
+const { item, parent } = useAgilityAppSDK()
+// item:   { name: "libraryfolder", id: "12" }
+// parent: { name: "listitem", id: "1001" }, or null when the item is first on the stack
+```
+
+`parent` is whatever the item was opened on top of: another of your items, or one of the
+Manager App's own stack entries (`listitem`, `page`, …). Its `id` is always a string.
+
+### Set the title
+
+```ts
+setTitle({ title: folder.name })
+```
+
+The breadcrumb shows your manifest `label` and the id until you call
+[`setTitle`](api-reference.md#settitle), which sets the breadcrumb and the document title.
+It works on the `sections` surface too. Fire-and-forget; an older host ignores it.
+
+### Open an item
+
+Navigate by intent, never by URL. Inside a section with a stack (content, pages, reports, or
+your app's section), the item opens on top of the current screen:
+
+```ts
+navigate({ target: { type: "appItem", name: "libraryfile", id: "6f1c-ab12" } })
+```
+
+Pass `replace: true` to swap the top of the stack instead of adding to it. The host also
+does that without being asked when the top item already has the same `name`, which is how
+browsing folder to folder keeps one panel on the stack:
+
+```ts
+navigate({ target: { type: "appItem", name: "libraryfolder", id: "13", replace: true } })
+```
+
+From a surface with no stack (a dashboard, or a field in Models or Settings), or with
+`openInStack: false`, the item opens inside your app's first section. An app that declares
+no section gets the host's error string back. To go back to the section's home:
+
+```ts
+navigate({ target: { type: "appSection", name: "my-library" } })
+```
+
+Both targets name only your own app's sections and items: the host knows the calling app
+from its `appID`, so an app cannot open another app's screens. `getNavigationUrl` resolves
+the same targets to a link.
+
+> ⚠️ On a Manager App without these surfaces, `appSection` and `appItem` resolve to the
+> host's "unsupported" error string. Check `result?.url`.
+
+## The `user` context
+
+**New in SDK 2.5.0**, on every surface, when the Manager App sends it. The signed-in user
+and their permissions in this instance:
+
+```ts
+const { user } = useAgilityAppSDK()
+// {
+//   userID: 1234,
+//   emailAddress: "editor@example.com",
+//   fullName: "Example Editor",
+//   isOrgAdmin: false,
+//   permissions: [1, 3, 5],    // Permission IDs; 7 = FullControl
+//   teamIDs: [12]
+// }
+
+if (hasPermission(user, [Permission.Manage])) {
+  // show the Manage button
+}
+```
+
+[`hasPermission(user, ids)`](api-reference.md#haspermission) applies the Manager App's own
+rule: **any** of the listed IDs, with FullControl always passing; `false` when there is no
+user.
+
+> 🔴 **For the UI only. Your server must re-verify.** `user` arrives over the same
+> unauthenticated `postMessage` channel as everything else, and the person using the app can
+> change anything in their own iframe. Use it to decide what to show. Any request your app's
+> own server acts on must resolve the user and their access itself, from the Management API
+> token ([`getManagementAPIToken`](api-reference.md#getmanagementapitoken)), never from
+> these values.
+
+The handshake is one-shot, as for the rest of the context: a role change shows the next
+time the surface mounts. On an older Manager App `user` is `null`, and `hasPermission`
+returns `false`.

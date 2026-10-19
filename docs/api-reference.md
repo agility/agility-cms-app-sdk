@@ -24,6 +24,7 @@ Before using any of it, read the two rules that apply to **every** method:
 - [Rich text embeds](#rich-text-embeds)
 - [Navigation](#navigation)
 - [App shell](#app-shell)
+- [User and permissions](#user-and-permissions) — `Permission`, `hasPermission`
 - [Configuration](#configuration) — `configMethods`
 - [Auth](#auth)
 
@@ -37,8 +38,9 @@ import {
   useAgilityAppSDK, useResizeHeight,
   contentItemMethods, configMethods, assetsMethods, pageMethods,
   openModal, closeModal, resolveEmbed, setHeight, refresh,
-  navigate, getNavigationUrl,
+  navigate, getNavigationUrl, setTitle,
   getManagementAPIToken, getAPIKey, getAppInstall,
+  Permission, hasPermission,
 } from "@agility/app-sdk"
 
 contentItemMethods.setFieldValue({ value: "hello" })
@@ -58,6 +60,7 @@ const {
   initializing, appInstallContext, instance, locale,
   field, fieldValue, contentItem, contentModel,
   pageItem, modalProps, embed,
+  section, item, parent, user,
 } = useAgilityAppSDK()
 ```
 
@@ -74,6 +77,10 @@ const {
 | `pageItem` | `IPageItem \| null` | The page, on the page sidebar (from 2.4.0; `null` before, see below) |
 | `modalProps` | `any` | modal surface only; whatever `openModal({ props })` passed |
 | `embed` | `IEmbedContext \| null` | rteToolbar surface only |
+| `section` | `ISectionContext \| null` | sections surface only: `{ name }`. New in 2.5.0 |
+| `item` | `IStackItemContext \| null` | items surface only: `{ name, id }`, `id` always a string. New in 2.5.0 |
+| `parent` | `IStackItemContext \| null` | items surface only: the stack entry the item was opened on top of; `null` when it is first on the stack. New in 2.5.0 |
+| `user` | `IUser \| null` | every surface, when the host sends it; `null` on older hosts. **For the UI only** — see [User and permissions](#user-and-permissions). New in 2.5.0 |
 
 > **`pageItem` before 2.4.0 was always `null`:** the host sent it in the page-sidebar context, but the hook never
 > stored it. Fixed in 2.4.0. On older SDKs, call `getPageItem()`.
@@ -86,8 +93,10 @@ The `context` handshake is **one-shot** — the hook unsubscribes after the firs
 The install-screen variant. Same handshake with `operationType: "preInstall"`.
 
 ```ts
-const { initializing, appInstallContext, instance, locale } = useAgilityPreInstall()
+const { initializing, appInstallContext, instance, locale, user } = useAgilityPreInstall()
 ```
+
+`user` (from 2.5.0) is the signed-in user when the host sends it, as on every other surface.
 
 > ⚠️ **`instance` and `locale` are always `null`** — declared and returned, never set. Same
 > class of bug as `pageItem` above. Only `initializing` and `appInstallContext` are usable.
@@ -309,14 +318,23 @@ Closes the modal you are in and passes `props` to the opener's `callback`.
 ```ts
 resolveEmbed({
   value?: unknown,     // → data-agility-value (JSON); handed back as embed.value on edit
-  cancelled?: boolean  // close without touching the document
+  cancelled?: boolean, // close without touching the document
+  insert?: {           // insert: "link" buttons only (2.5.0): an <a> instead of an element
+    kind: "link",
+    href: string,
+    text?: string,                      // link text when nothing was selected
+    attributes?: Record<string, string> // data-*, target, rel, class, title only
+  }
 }): void
 ```
 
 Resolves the current rich-text embed and closes the dialog. **rteToolbar surface only** —
 like `closeModal` it needs `?closeModalID=` and returns silently without it.
 
-Pass either `value` or `cancelled: true`. See [Surfaces](surfaces.md#the-rtetoolbar-surface) for the full flow.
+Pass `value` (an element button), `insert` (an `insert: "link"` button, from 2.5.0) or
+`cancelled: true`. For a link button the author's selected text arrives as `embed.selectionText`.
+See [Surfaces](surfaces.md#the-rtetoolbar-surface) for the full flow, and
+[Insert a link](surfaces.md#6-insert-a-link-instead-of-an-element) for `insert`.
 
 ---
 
@@ -347,6 +365,16 @@ the CMS's URL grammar stays free to change under apps that pinned an old SDK.
 | `{ type: "newContentItem", containerID }` | a blank form in that container |
 | `{ type: "contentList", containerID }` | a content list |
 | `{ type: "page", pageID }` | a page in the Pages section |
+| `{ type: "appSection", name }` | one of **your own app's** sections, at its home (2.5.0) |
+| `{ type: "appItem", name, id, replace? }` | one of **your own app's** stack items (2.5.0). `replace: true` swaps the top of the stack instead of adding to it |
+
+`appSection` and `appItem` name only the calling app's own sections and items; the host
+knows the app from its `appID`. An `appItem` opens on top of the current screen inside a
+section with a stack (content, pages, reports, an app section); anywhere else, or with
+`openInStack: false`, it opens inside your app's first section, and an app with no section
+gets the host's error string. Against a Manager App without these surfaces, both resolve to
+the host's "unsupported" error string. See
+[Surfaces § Open an item](surfaces.md#open-an-item).
 
 `openInStack` (default `true`) opens the destination **on top of the current screen**,
 keeping it in the breadcrumb — the way the CMS's own nested-content fields behave, so the
@@ -424,6 +452,17 @@ setFocus({ isFocused: boolean }): void
 Tells the host your field gained or lost focus, which drives the editor's field-presence
 UI. **Custom-field surface only.** Call it from your input's `onFocus`/`onBlur`.
 
+### `setTitle`
+
+```ts
+setTitle({ title: string }): void
+```
+
+Sets the breadcrumb label and the browser's document title for the screen your app is
+showing. **Sections and items surfaces.** Until you call it, a stack item's breadcrumb is
+its manifest `label` plus its id. Plain text. Fire-and-forget, new in **2.5.0**: a Manager
+App without the handler ignores it.
+
 ### `refresh`
 
 ```ts
@@ -442,6 +481,60 @@ getAppInstall(): Promise<IAppInstallInfo> | null
 The full install record — `{ appInstall, appConfiguration }` — including config values with
 their labels, types and `isHiddenSetting` flags. **Dashboard surfaces only.** For just the
 values, the hook's `appInstallContext.configuration` is simpler and works everywhere.
+
+---
+
+## User and permissions
+
+New in **2.5.0**. The hook's `user` holds the signed-in user on every surface, when the
+Manager App sends it.
+
+> 🔴 **For the UI only.** Use `user` and `hasPermission` to show or hide things. Your app's
+> own server must re-verify every request from the Management API token, never from these
+> values: they cross an unauthenticated `postMessage` channel, and the user can change
+> anything in their own iframe.
+
+### `IUser`
+
+```ts
+interface IUser {
+  userID: number
+  emailAddress: string
+  fullName: string
+  isOrgAdmin: boolean
+  permissions: number[]   // Permission IDs held in this instance; 7 = FullControl
+  teamIDs: number[]
+}
+```
+
+### `Permission`
+
+```ts
+enum Permission {
+  Deny = 0, Read = 1, Contribute = 2, Edit = 3, Approve = 4, Publish = 5, Manage = 6,
+  FullControl = 7, Delete = 8, Develop = 9, Moderate = 10, ManageUGC = 11, ReadUGC = 12,
+  ReadEcommerce = 13, EditEcommerce = 14, ManageEcommerce = 15, CallCenter = 16,
+  ReportViewer = 17
+}
+```
+
+The permission IDs in `IUser.permissions`, the same ones the Manager App uses and the ones a
+section's manifest `permissions` takes. `FullControl` grants every other permission.
+
+### `hasPermission`
+
+```ts
+hasPermission(user: IUser | null | undefined, ids: number[]): boolean
+```
+
+`true` when the user holds **any** of `ids`, with `FullControl` always passing: the Manager
+App's own rule. `false` when there is no user (an older host, or before the context
+arrives) and when `ids` is empty.
+
+```ts
+const { user } = useAgilityAppSDK()
+const canPublish = hasPermission(user, [Permission.Publish, Permission.Manage])
+```
 
 ---
 

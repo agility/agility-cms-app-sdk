@@ -22,6 +22,8 @@ Reference documentation for [`@agility/app-sdk`](../README.md). Start with the
 | How do I get a Management API token? | [Auth](api-reference.md#auth) |
 | How do I declare my app's capabilities? | [The app manifest](surfaces.md#declaring-surfaces-the-app-manifest) |
 | How do I add an RTE toolbar button? | [The `rteToolbar` surface](surfaces.md#the-rtetoolbar-surface) |
+| How do I give my app its own section or stack items? | [Sections](surfaces.md#the-sections-surface) and [Items](surfaces.md#the-items-surface) |
+| Who is the signed-in user, and what can they do? | [The `user` context](surfaces.md#the-user-context) |
 | `initializing` never becomes false | [Troubleshooting](troubleshooting.md#initializing-never-becomes-false) |
 | My awaited call resolved with a string | [Troubleshooting](troubleshooting.md#an-awaited-method-resolves-with-a-string-instead-of-an-object) |
 | How do I add a new operation to the SDK? | [Contributing](../CONTRIBUTING.md#adding-a-new-operation) |

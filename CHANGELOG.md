@@ -6,6 +6,60 @@ This project follows [semantic versioning](https://semver.org/). Because the SDK
 are a public contract shared with the Agility Manager App, changes are additive — fields
 are added, never renamed or removed.
 
+## 2.5.0-beta.0
+
+Pre-release, on the `beta` dist-tag. Two new surfaces, so an app can have screens of its
+own, plus the three small pieces they need. Everything is additive and optional: every
+2.4 app keeps working unchanged, and every new context field is absent on an older host.
+
+> ⚠️ **Needs a Manager App that supports it.** The sections and items surfaces, the `user`
+> context and `insert: "link"` land in the Manager App's `qa/main` first and reach
+> production later. Against an older Manager App the new surfaces never mount, `user` is
+> `null`, `setTitle` is ignored, and `navigate` / `getNavigationUrl` with an `appSection` or
+> `appItem` target resolve to the host's "unsupported" error string (check `result?.url`).
+
+### Added
+
+- **The `sections` surface.** `capabilities.sections[]` (`{ name, label, description, icon?, permissions? }`)
+  gives an app its own entry in the main navigation and a full-pane screen at
+  `{appUrl}/sections/{sectionName}`. The hook returns `section: { name }`. Section names are
+  `[a-z0-9-]`, 2–40 characters, unique across installed apps, and not a built-in section
+  name.
+- **The `items` surface.** `capabilities.items[]` (`{ name, label, description }`) gives an
+  app screens on the Manager App's item stack, with their own URL segment, breadcrumb and
+  back button, at `{appUrl}/items/{itemName}`. The hook returns `item: { name, id }` and
+  `parent: { name, id } | null`. Item names are `[a-z0-9]`, 3–30 characters, **no hyphen**,
+  unique across installed apps; the id is any string without `/`.
+- **`setTitle({ title })`**, fire-and-forget: sets the breadcrumb label and document title
+  on the sections and items surfaces. New `"setTitle"` operation type.
+- **Two navigation targets**: `{ type: "appSection", name }` and
+  `{ type: "appItem", name, id, replace? }`. Both name only the calling app's own sections
+  and items. `replace: true` swaps the top of the stack instead of adding to it.
+  `navigate` and `getNavigationUrl` are otherwise unchanged.
+- **`user` on every surface**: `{ userID, emailAddress, fullName, isOrgAdmin, permissions, teamIDs }`
+  (`IUser`), from `useAgilityAppSDK()` and `useAgilityPreInstall()`. For the UI only: an
+  app's server must re-verify every request.
+- **`Permission`**, an enum of the 18 permission IDs (`Deny` 0 … `ReportViewer` 17), and
+  **`hasPermission(user, ids)`**: any of `ids`, with `FullControl` always passing, the
+  Manager App's own rule; `false` with no user.
+- **`rteToolbar` link buttons.** A button declaring `insert: "link"` resolves with
+  `resolveEmbed({ insert: { kind: "link", href, text?, attributes? } })`, and the host
+  inserts an ordinary `<a>` instead of an embed element. The author's selected text arrives as
+  `embed.selectionText` (new). `IEmbedContext.innerHTML`, which the host already sent for
+  element embeds, is now typed too.
+- New exported types: `IUser`, `ISectionContext`, `IStackItemContext`, `ISetTitleParam`,
+  `IEmbedLinkInsert`, `IEmbedInsert`. New optional fields on `IContextParam`: `section`,
+  `item`, `parent`, `user`.
+
+### Docs
+
+- `docs/surfaces.md`: the sections and items surfaces (manifest, name rules, reserved names,
+  routes, context, `setTitle`, the two targets and `replace`), the `user` context, and
+  `insert: "link"`. The operation availability matrix gains `sections` and `items` columns
+  and a `setTitle` row.
+- `docs/api-reference.md`: `setTitle`, `Permission`, `hasPermission`, `IUser`, the new hook
+  fields, the new navigation targets and `resolveEmbed({ insert })`.
+
 ## 2.4.0
 
 The first release of the `rteToolbar` surface and navigation on npm `latest`.

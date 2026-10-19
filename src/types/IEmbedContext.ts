@@ -42,4 +42,24 @@ export interface IEmbedContext {
 	 * @memberof IEmbedContext
 	 */
 	contentItem?: IContentItem
+
+	/**
+	 * For an element embed being edited, the element's current children, serialised as they
+	 * would be saved.
+	 *
+	 * Typed in 2.5.0; the Manager App already sends it.
+	 *
+	 * @type {string}
+	 * @memberof IEmbedContext
+	 */
+	innerHTML?: string
+
+	/**
+	 * For an `insert: "link"` button, the plain text the author had selected when they
+	 * clicked it, so the dialog can offer it as the link text.
+	 *
+	 * @type {string}
+	 * @memberof IEmbedContext
+	 */
+	selectionText?: string
 }
