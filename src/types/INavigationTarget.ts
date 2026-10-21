@@ -99,7 +99,10 @@ export type INavigationTarget =
 			 */
 			name: string
 			/**
-			 * The item's id.  Any string without a `/`; your app owns its meaning.
+			 * The item's id.  Your app owns its meaning.  It goes into the URL, so the host
+			 * accepts only 1–128 characters of `A–Z a–z 0–9 . _ ~ -` (hyphens included, so a
+			 * UUID works) and answers anything else with its error string.  Encode other ids,
+			 * for example as base64url.
 			 *
 			 * @type {string}
 			 */

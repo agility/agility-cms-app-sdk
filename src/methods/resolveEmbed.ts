@@ -21,7 +21,10 @@ export interface IEmbedLinkInsert {
 	kind: "link"
 
 	/**
-	 * The link's address.  The host refuses `javascript:` URLs.
+	 * The link's address, up to 2048 characters.  The host accepts only a site-relative path
+	 * (`/files/report.pdf`), a fragment (`#top`), or an absolute `http://`, `https://` or
+	 * `mailto:` URL.  Anything else, including `javascript:`, `data:`, `tel:`, `//host`,
+	 * `?query` and a relative path such as `docs/a.pdf`, is dropped: nothing is inserted.
 	 *
 	 * @type {string}
 	 * @memberof IEmbedLinkInsert
@@ -38,8 +41,14 @@ export interface IEmbedLinkInsert {
 	text?: string
 
 	/**
-	 * Extra attributes for the `<a>`.  The host keeps only `data-*`, `target`, `rel`,
-	 * `class` and `title`, and drops the rest.
+	 * Extra attributes for the `<a>`.  The host keeps only:
+	 *
+	 * - `data-*` names matching `data-[a-z0-9][a-z0-9-]*` (names are lowercased first);
+	 * - `title`, `class` and `rel`;
+	 * - `target`, and only `_blank` or `_self`.  `_blank` gets `rel="noopener noreferrer"`
+	 *   unless you set `rel`.
+	 *
+	 * Everything else is dropped, and each value is cut at 500 characters.
 	 *
 	 * @type {Record<string, string>}
 	 * @memberof IEmbedLinkInsert
@@ -61,6 +70,38 @@ export interface IResolveEmbedParam {
 	 * @memberof IResolveEmbedParam
 	 */
 	value?: unknown
+
+	/**
+	 * For an element embed that keeps its content as real children, the element's new
+	 * children, serialised.  The host replaces the children with it; leave it out to keep
+	 * them as they are.  See `embed.innerHTML`.
+	 *
+	 * @type {string}
+	 * @memberof IResolveEmbedParam
+	 */
+	innerHTML?: string
+
+	/**
+	 * For an element embed, the `data-*` attributes the app owns on the element.  The set is
+	 * the whole set: on an edit, any app-owned `data-*` attribute missing from it is
+	 * removed.  Leave it out to keep them as they are.  Don't use the host's own
+	 * `data-agility-*` names.  See `embed.attributes`.
+	 *
+	 * @type {Record<string, string>}
+	 * @memberof IResolveEmbedParam
+	 */
+	attributes?: Record<string, string>
+
+	/**
+	 * @deprecated The `contentItem` storage mode was removed before 2.4.0 reached `latest`:
+	 * an embed backed by a content item has no lifecycle.  Use `value`.  The host still
+	 * writes it, as `data-agility-id`, for apps built on the 2.3.0 and 2.4.0 betas, and it
+	 * is typed only so that those apps compile.
+	 *
+	 * @type {number}
+	 * @memberof IResolveEmbedParam
+	 */
+	contentItemID?: number
 
 	/**
 	 * Pass true to close the dialog without touching the document.

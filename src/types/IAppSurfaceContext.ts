@@ -37,7 +37,8 @@ export interface IStackItemContext {
 
 	/**
 	 * The stack item's id, exactly as it appears in the URL, as a string.  For the app's
-	 * own items the app owns its meaning, and it may contain hyphens.
+	 * own items the app owns its meaning: 1–128 characters of `A–Z a–z 0–9 . _ ~ -`,
+	 * hyphens included.
 	 *
 	 * @type {string}
 	 * @memberof IStackItemContext

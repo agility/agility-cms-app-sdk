@@ -116,7 +116,7 @@ Beyond that, only some fields populate:
 | `rteToolbar` | `embed` |
 | `sections` | `section` (from 2.5.0) |
 | `items` | `item`, `parent` (from 2.5.0) |
-| install screen | `appInstallContext` (and `user`, from 2.5.0) only; `instance` and `locale` stay `null` |
+| install screen | `appInstallContext` (and `user`, from 2.5.0) only; `instance` and `locale` stay `null`. Opened from the organization's Apps page, `user` currently has empty `permissions` and `teamIDs` and `isOrgAdmin: false` ([why](#the-user-context)) |
 
 > **`pageItem` before 2.4.0:** the SDK dropped it from the page-sidebar context, so `useAgilityAppSDK()` returned
 > `null`. Fixed in 2.4.0. On older SDKs, call [`getPageItem()`](api-reference.md#getpageitem) instead (it still works).
@@ -293,12 +293,21 @@ export default function FlipCardEmbed() {
 
 ```ts
 {
-  buttonName: string              // which button was clicked
+  buttonName: string                    // which button was clicked
   mode: "insert" | "edit"
-  value?: unknown                 // the previously saved value, when editing
-  contentItem?: IContentItem      // the item the RTE field itself belongs to
+  value?: unknown                       // the previously saved value, when editing
+  contentItem?: IContentItem            // the item the RTE field itself belongs to
+  innerHTML?: string                    // editing an element that keeps real children: those children (typed in 2.5.0)
+  attributes?: Record<string, string>   // editing: the element's data-* attributes the host doesn't own (typed in 2.5.0)
+  selectionText?: string                // insert: "link" buttons: the author's selected text (2.5.0)
 }
 ```
+
+An app that keeps its content as the element's children, or its settings on `data-*`
+attributes, hands the new set back with `resolveEmbed({ innerHTML, attributes })`. The
+`attributes` you return are the whole set you own: on an edit, any of your `data-*`
+attributes missing from it is removed. The host's own `data-agility-*` attributes and the
+editor's `data-mce-*` are never in it.
 
 Like `modalProps`, it arrives on the existing `initialize` → `context` reply rather than
 through a second host→app operation — one round-trip and one operation fewer.
@@ -366,15 +375,17 @@ no `element` and no `editorComponentUrl`, and the host ignores them, with a cons
 if you declare them. It runs no code in the editor.
 
 The dialog opens at the same `/rte-toolbar/{buttonName}` route with `embed.mode === "insert"`.
-Whatever text the author had selected arrives as `embed.selectionText` (plain text). Resolve with
-`insert` instead of `value`:
+Whatever text the author had selected arrives as `embed.selectionText` (plain text). **When
+there is a selection, the selection becomes the link text**, and the `<a>` wraps it in place.
+Show it in your dialog rather than asking for link text. Resolve with `insert` instead of
+`value`:
 
 ```ts
 resolveEmbed({
   insert: {
     kind: "link",
     href: "https://files.example.com/f/6f1c",
-    text: "Quarterly report.pdf",            // optional; defaults to the selected text, then the href
+    text: "Quarterly report.pdf",            // optional; used only when nothing is selected
     attributes: { "data-file-id": "6f1c" }
   }
 })
@@ -383,9 +394,9 @@ resolveEmbed({
 | Field | Notes |
 |---|---|
 | `kind` | `"link"`, the only kind today |
-| `href` | a site-relative path (`/files/...`), a `#fragment`, or an `http(s):` or `mailto:` URL. Anything else (`javascript:`, `data:`, `//host`) is refused and nothing is inserted |
-| `text` | the link text. When omitted, the selected text is used, then the `href`. The link replaces the selection |
-| `attributes` | extra attributes on the `<a>`; the host keeps only `data-*`, `class`, `title`, `rel` and `target` (`_blank` or `_self`; `_blank` gets `rel="noopener noreferrer"` unless you set `rel`) |
+| `href` | up to 2048 characters, and one of: a site-relative path starting with `/` (`/files/...`), a `#fragment`, or an absolute `http://`, `https://` or `mailto:` URL. Anything else is refused and nothing is inserted: `javascript:`, `data:`, `tel:`, `//host`, `?query`, and a relative path such as `docs/a.pdf` |
+| `text` | the link text **when nothing is selected**. With a selection, the selected text is the link text and `text` is ignored. With neither, the `href` is the text |
+| `attributes` | extra attributes on the `<a>`. The host lowercases each name and keeps only `data-*` names matching `data-[a-z0-9][a-z0-9-]*`, `title`, `class`, `rel`, and `target` when it is exactly `_blank` or `_self` (`_blank` gets `rel="noopener noreferrer"` unless you set `rel`). Every other attribute is dropped, and each value is cut at 500 characters |
 
 `data-*` attributes survive save and reach the Fetch API, so your website can find your
 links by them. The author edits the link afterwards with the editor's own link dialog; the
@@ -420,9 +431,9 @@ host draws the chrome; your app paints the pane.
 
 | Key | Rules |
 |---|---|
-| `name` | lowercase `[a-z0-9-]`, **2–40 characters**, unique across the apps installed in the instance. Reserved: `home`, `pages`, `layouts`, `content`, `media`, `models`, `reports`, `web-studio`, `settings`, `ecommerce`, `website-users`, `user-content`, `agilitysearch`, `apps` |
+| `name` | **2–40 characters** of lowercase letters, digits and hyphens, **starting with a letter** (`^[a-z][a-z0-9-]{1,39}$`), unique across the apps installed in the instance. Reserved: `home`, `pages`, `layouts`, `content`, `media`, `models`, `reports`, `web-studio`, `settings`, `ecommerce`, `website-users`, `user-content`, `agilitysearch`, `apps` |
 | `label` | the nav entry's text |
-| `icon` | a Tabler icon name from the host's allow-list, for example `IconLock`, `IconFolder`, `IconFiles`, `IconApps`, `IconDatabase`, `IconPhoto`, `IconChartPie`. Not a URL. Anything else falls back to `IconApps` |
+| `icon` | a Tabler icon name from the host's allow-list: `IconApps`, `IconArchive`, `IconBook`, `IconBriefcase`, `IconChartBar`, `IconChecklist`, `IconDatabase`, `IconFile`, `IconFiles`, `IconFolder`, `IconFolders`, `IconLock`, `IconPhoto`, `IconShieldLock`, `IconTable`. Not a URL. Anything else, or no icon, falls back to `IconApps` |
 | `permissions` | the [permission IDs](api-reference.md#permission) the user needs to see the entry, **any** of which is enough, with FullControl always passing. Defaults to `[1]` (Read) |
 
 A name that breaks the rules is logged in the console and skipped; it never breaks another
@@ -468,16 +479,19 @@ of your app's section or on top of a content item, list, page or report.
 
 | Key | Rules |
 |---|---|
-| `name` | lowercase `[a-z0-9]`, **3–30 characters, no hyphen** (it is the left side of the `{name}-{id}` URL segment), unique across the apps installed in the instance. Reserved: `page`, `layout`, `pageversion`, `item`, `list`, `listitem`, `newlistitem`, `itemversion`, `urlredirections`, `batch`, `batches`, `folder`, `gallery` |
-| `label` | the breadcrumb until your app calls `setTitle` |
+| `name` | **3–30 characters** of lowercase letters and digits, **starting with a letter, no hyphen** (`^[a-z][a-z0-9]{2,29}$`; it is the left side of the `{name}-{id}` URL segment), unique across the apps installed in the instance. Reserved: `page`, `layout`, `pageversion`, `item`, `list`, `listitem`, `newlistitem`, `itemversion`, `urlredirections`, `batch`, `batches`, `folder`, `gallery`, `report`, and the Reports screens `recentchanges`, `readytopublish`, `accessreport`, `useractivity`, `contentsearch`, `syncstatus`, `domainstatus` |
+| `label` | the header and breadcrumb until your app calls `setTitle` (the `name` when there is no label) |
 
 The same skip-and-warn rules as sections apply to bad and duplicate names.
 
 ### Serve the route
 
 The host opens your app at `{appUrl}/items/{itemName}?appID=…`. The **id is not in the
-route**: it arrives in the context, so one page serves every item of that name. The id is
-any string without a `/` (hyphens included), and your app owns its meaning.
+route**: it arrives in the context, so one page serves every item of that name. Your app
+owns the id's meaning, but it goes into the URL, so the host accepts only **1–128
+characters of `A–Z a–z 0–9 . _ ~ -`** (`^[A-Za-z0-9._~-]{1,128}$`; hyphens are fine, so a
+UUID works). `navigate` and `getNavigationUrl` answer any other id with the host's error
+string. Encode other ids, for example as base64url.
 
 ### What arrives
 
@@ -496,9 +510,11 @@ Manager App's own stack entries (`listitem`, `page`, …). Its `id` is always a 
 setTitle({ title: folder.name })
 ```
 
-The breadcrumb shows your manifest `label` and the id until you call
-[`setTitle`](api-reference.md#settitle), which sets the breadcrumb and the document title.
-It works on the `sections` surface too. Fire-and-forget; an older host ignores it.
+The header and the breadcrumb show your manifest `label` (or the `name`, with no label; the
+id is never shown) until you call [`setTitle`](api-reference.md#settitle), which replaces
+both. On the `sections` surface it sets the section header. It doesn't change the browser's
+document title. The host trims the title and cuts a stack item's title at 200 characters.
+Fire-and-forget; an older host ignores it.
 
 ### Open an item
 
@@ -567,3 +583,9 @@ user.
 The handshake is one-shot, as for the rest of the context: a role change shows the next
 time the surface mounts. On an older Manager App `user` is `null`, and `hasPermission`
 returns `false`.
+
+> ⚠️ **On the install screen opened from the organization's Apps page**, the host has no
+> instance user to read yet, so `user.permissions` and `user.teamIDs` are empty and
+> `user.isOrgAdmin` is `false`, even for the org admin doing the install. `userID`,
+> `emailAddress` and `fullName` are filled in. Don't hide install steps on the empty
+> fields there.

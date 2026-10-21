@@ -97,6 +97,9 @@ const { initializing, appInstallContext, instance, locale, user } = useAgilityPr
 ```
 
 `user` (from 2.5.0) is the signed-in user when the host sends it, as on every other surface.
+⚠️ On the install screen opened from the organization's Apps page, `user.permissions` and
+`user.teamIDs` are currently empty and `user.isOrgAdmin` is `false`, even for an org admin;
+see [Surfaces § The `user` context](surfaces.md#the-user-context).
 
 > ⚠️ **`instance` and `locale` are always `null`** — declared and returned, never set. Same
 > class of bug as `pageItem` above. Only `initializing` and `appInstallContext` are usable.
@@ -318,12 +321,14 @@ Closes the modal you are in and passes `props` to the opener's `callback`.
 ```ts
 resolveEmbed({
   value?: unknown,     // → data-agility-value (JSON); handed back as embed.value on edit
+  innerHTML?: string,  // element embeds with real children: the new children (typed in 2.5.0)
+  attributes?: Record<string, string>, // element embeds: the whole set of data-* attributes you own (typed in 2.5.0)
   cancelled?: boolean, // close without touching the document
   insert?: {           // insert: "link" buttons only (2.5.0): an <a> instead of an element
     kind: "link",
-    href: string,
-    text?: string,                      // link text when nothing was selected
-    attributes?: Record<string, string> // data-*, target, rel, class, title only
+    href: string,                       // "/…", "#…", http(s):// or mailto:, ≤ 2048 chars; anything else inserts nothing
+    text?: string,                      // link text when nothing was selected; a selection always wins
+    attributes?: Record<string, string> // data-[a-z0-9][a-z0-9-]*, title, class, rel, target (_blank | _self); values ≤ 500 chars
   }
 }): void
 ```
@@ -332,7 +337,9 @@ Resolves the current rich-text embed and closes the dialog. **rteToolbar surface
 like `closeModal` it needs `?closeModalID=` and returns silently without it.
 
 Pass `value` (an element button), `insert` (an `insert: "link"` button, from 2.5.0) or
-`cancelled: true`. For a link button the author's selected text arrives as `embed.selectionText`.
+`cancelled: true`. For a link button the author's selected text arrives as `embed.selectionText`,
+and when there is one it becomes the link text. `contentItemID` is still accepted, for apps
+built on the 2.3.0 and 2.4.0 betas, but is `@deprecated`: use `value`.
 See [Surfaces](surfaces.md#the-rtetoolbar-surface) for the full flow, and
 [Insert a link](surfaces.md#6-insert-a-link-instead-of-an-element) for `insert`.
 
@@ -366,7 +373,7 @@ the CMS's URL grammar stays free to change under apps that pinned an old SDK.
 | `{ type: "contentList", containerID }` | a content list |
 | `{ type: "page", pageID }` | a page in the Pages section |
 | `{ type: "appSection", name }` | one of **your own app's** sections, at its home (2.5.0) |
-| `{ type: "appItem", name, id, replace? }` | one of **your own app's** stack items (2.5.0). `replace: true` swaps the top of the stack instead of adding to it |
+| `{ type: "appItem", name, id, replace? }` | one of **your own app's** stack items (2.5.0). `id` is 1–128 characters of `A–Z a–z 0–9 . _ ~ -`; any other id gets the host's error string. `replace: true` swaps the top of the stack instead of adding to it |
 
 `appSection` and `appItem` name only the calling app's own sections and items; the host
 knows the app from its `appID`. An `appItem` opens on top of the current screen inside a
@@ -458,10 +465,13 @@ UI. **Custom-field surface only.** Call it from your input's `onFocus`/`onBlur`.
 setTitle({ title: string }): void
 ```
 
-Sets the breadcrumb label and the browser's document title for the screen your app is
-showing. **Sections and items surfaces.** Until you call it, a stack item's breadcrumb is
-its manifest `label` plus its id. Plain text. Fire-and-forget, new in **2.5.0**: a Manager
-App without the handler ignores it.
+Sets the title the Manager App shows for your screen. **Sections and items surfaces.** On a
+stack item it replaces the header above your app and the item's breadcrumb; on a section's
+home screen, the section header. It does **not** change the browser's document title.
+Until you call it, the host shows the manifest `label`, or the `name` when there is no
+label; the id is never shown. Plain text, trimmed; a stack item's title is cut at 200
+characters. Fire-and-forget, new in **2.5.0**: a Manager App without the handler ignores
+it.
 
 ### `refresh`
 

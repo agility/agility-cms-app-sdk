@@ -5,7 +5,8 @@ import { IAppEventParam } from "../types"
 
 export interface ISetTitleParam {
 	/**
-	 * The text to show.  Plain text, not HTML.
+	 * The text to show.  Plain text, not HTML.  Keep it short: the host trims it and cuts
+	 * a stack item's title at 200 characters.
 	 *
 	 * @type {string}
 	 * @memberof ISetTitleParam
@@ -16,9 +17,14 @@ export interface ISetTitleParam {
 /**
  * setTitle
  *
- * Sets the breadcrumb label and the browser's document title for the screen the app is
- * showing.  For the `items` and `sections` surfaces: until it is called, an app's stack
- * item shows its manifest `label` and its id.
+ * Sets the title the Manager App shows for the screen the app is painting.  For the
+ * `items` and `sections` surfaces only:
+ *
+ * - on a stack item, the header above the app and the item's breadcrumb;
+ * - on a section's home screen, the section header.
+ *
+ * It does not change the browser's document title.  Until it is called, the host shows
+ * the manifest `label`, or the `name` when there is no label.  The id is not shown.
  *
  * ```ts
  * const { item } = useAgilityAppSDK()

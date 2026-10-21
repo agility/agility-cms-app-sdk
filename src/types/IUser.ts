@@ -9,6 +9,12 @@
  * person using it, so **your own server must re-verify** every request against the
  * Management API token rather than trust these values.
  *
+ * ⚠️ **On the install screen opened from the organization's Apps page**, the host
+ * currently has no instance user to read, so `permissions` and `teamIDs` are empty and
+ * `isOrgAdmin` is `false`, even for the org admin doing the install.  `userID`,
+ * `emailAddress` and `fullName` are filled in.  Don't hide install steps on those
+ * fields there.
+ *
  * @export
  * @interface IUser
  */
