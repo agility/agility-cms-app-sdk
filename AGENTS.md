@@ -48,14 +48,18 @@ either resolves with an error string. Do not add a third.
 
 ```bash
 yarn install       # runs `prepare`, which builds
-yarn build         # clean + rollup. THIS IS THE ONLY GATE.
+yarn build         # clean + rollup
+yarn test          # vitest: message shapes and hasPermission (test/)
 yarn watch         # rollup -c -w, for use with yarn link
 ```
 
-**There are no tests and no CI.** `yarn test` is `echo "Error: no test specified" && exit 1`.
-Do not claim a change is verified because it compiled. If you need behavioural
-verification, `yarn link` into a scratch app and drive it through the Manager App, or add
-a case to the host's test file in the other repo.
+**The tests are thin and there is no CI on pull requests.** `yarn test` checks the
+messages the SDK posts (with a stubbed `window`) and `hasPermission`; it can't check what
+the host does with them. Do not claim a change is verified because it compiled and the
+tests pass. If you need behavioural verification, `yarn link` into a scratch app and drive
+it through the Manager App, or add a case to the host's test file in the other repo.
+Publishing happens only from the `npm-publish` workflow, on a `v*` tag (see
+`CONTRIBUTING.md`).
 
 ## Repo layout
 
@@ -74,7 +78,10 @@ src/
   methods/                  one file per operation
   types/                    the wire contract
   hooks/useResizeHeight.tsx ResizeObserver → setHeight
+test/                       vitest: the messages each operation posts, hasPermission
 docs/                       see docs/README.md
+.github/workflows/
+  npm-publish.yml           on a v* tag: build, test, publish, GitHub release
 ```
 
 ## Traps

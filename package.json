@@ -28,6 +28,10 @@
     "url": "https://github.com/agility/agility-cms-app-sdk/issues"
   },
   "homepage": "https://github.com/agility/agility-cms-app-sdk",
+  "publishConfig": {
+    "access": "public",
+    "tag": "beta"
+  },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.1.0",
     "@rollup/plugin-node-resolve": "^15.0.2",

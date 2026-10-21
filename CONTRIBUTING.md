@@ -121,15 +121,37 @@ arrives as the error instead. Reply with an object (`{ ok: true }`, not `true`).
 
 ## Releasing
 
+Releases are published by the [`npm-publish`](.github/workflows/npm-publish.yml) workflow,
+not by hand.
+
 1. Bump `version` in `package.json` (semver — a new operation is a **minor**).
-2. Add a [`CHANGELOG.md`](CHANGELOG.md) entry.
-3. `yarn build` and confirm `dist/index.d.ts` exports what you expect.
-4. `npm publish`.
-5. Tag the release.
+2. Add a `## <version>` section to [`CHANGELOG.md`](CHANGELOG.md). It becomes the GitHub
+   release notes, and the workflow fails without it.
+3. `yarn build` and `yarn test`, and confirm `dist/index.d.ts` exports what you expect.
+4. Merge, then tag the merged commit and push the tag:
+   `git tag v2.5.0-beta.0 && git push origin v2.5.0-beta.0`.
+5. The workflow checks that the tag matches `package.json`, builds, tests, publishes with
+   provenance (npm Trusted Publishing, so no token is stored), and creates the GitHub
+   release from the changelog section.
+
+The workflow picks the npm dist-tag from the version, and always passes `--tag`:
+
+| Version | Branch | npm dist-tag | GitHub release |
+|---|---|---|---|
+| `2.5.0-beta.0` | any | `beta` (the prerelease id) | prerelease |
+| `2.5.0` | `main` | `latest` | Latest |
+| `2.4.1` | `release/2.x` | `release-2.x`, never `latest` | not marked Latest |
+
+> ⚠️ **`package.json` sets `"publishConfig": { "tag": "beta" }`**, so a publish without an
+> explicit tag goes to `beta`, never `latest`. That's the safe default, and it stays. A
+> stable release reaches `latest` only because the workflow passes `--tag latest`. If you
+> ever have to publish by hand, pass `--tag` explicitly (`npm publish --tag latest` for a
+> stable release from `main`), and never use `yarn publish`. Then tag the commit and
+> create the GitHub release yourself.
 
 > ⚠️ **`package.json` on `main` has historically lagged npm** — patches have shipped
 > without a version-bump commit. Run `npm view @agility/app-sdk version` before assuming a
-> release is unshipped. The `next` dist-tag is stale and should not be used.
+> release is unshipped.
 
 If your change adds a surface or an operation, **publish before app authors need it**: an
 app author with no released SDK has nothing to call.
