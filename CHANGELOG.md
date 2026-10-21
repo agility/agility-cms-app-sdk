@@ -23,15 +23,21 @@ own, plus the three small pieces they need. Everything is additive and optional:
 - **The `sections` surface.** `capabilities.sections[]` (`{ name, label, description, icon?, permissions? }`)
   gives an app its own entry in the main navigation and a full-pane screen at
   `{appUrl}/sections/{sectionName}`. The hook returns `section: { name }`. Section names are
-  `[a-z0-9-]`, 2–40 characters, unique across installed apps, and not a built-in section
-  name.
+  2–40 lowercase letters, digits and hyphens, starting with a letter, unique across
+  installed apps, and not a built-in section name. `icon` is a name from the host's
+  allow-list (`IconFolder`, `IconChartBar`, … see `docs/surfaces.md`); anything else falls
+  back to `IconApps`.
 - **The `items` surface.** `capabilities.items[]` (`{ name, label, description }`) gives an
   app screens on the Manager App's item stack, with their own URL segment, breadcrumb and
   back button, at `{appUrl}/items/{itemName}`. The hook returns `item: { name, id }` and
-  `parent: { name, id } | null`. Item names are `[a-z0-9]`, 3–30 characters, **no hyphen**,
-  unique across installed apps; the id is any string without `/`.
-- **`setTitle({ title })`**, fire-and-forget: sets the breadcrumb label and document title
-  on the sections and items surfaces. New `"setTitle"` operation type.
+  `parent: { name, id } | null`. Item names are 3–30 lowercase letters and digits, starting
+  with a letter, **no hyphen**, unique across installed apps, and not a built-in stack name
+  (including `report` and the Reports screens). The id is 1–128 characters of
+  `A–Z a–z 0–9 . _ ~ -`.
+- **`setTitle({ title })`**, fire-and-forget: sets the header and breadcrumb of a stack item,
+  or the header of a section's home screen. It does not set the browser's document title.
+  Until it's called the host shows the manifest `label` (or the `name`); a stack item's
+  title is cut at 200 characters. New `"setTitle"` operation type.
 - **Two navigation targets**: `{ type: "appSection", name }` and
   `{ type: "appItem", name, id, replace? }`. Both name only the calling app's own sections
   and items. `replace: true` swaps the top of the stack instead of adding to it.
@@ -45,11 +51,43 @@ own, plus the three small pieces they need. Everything is additive and optional:
 - **`rteToolbar` link buttons.** A button declaring `insert: "link"` resolves with
   `resolveEmbed({ insert: { kind: "link", href, text?, attributes? } })`, and the host
   inserts an ordinary `<a>` instead of an embed element. The author's selected text arrives as
-  `embed.selectionText` (new). `IEmbedContext.innerHTML`, which the host already sent for
-  element embeds, is now typed too.
+  `embed.selectionText` (new), and **when there is a selection it is the link text**: `text`
+  is used only when nothing is selected. `href` must be `/…`, `#…`, `http(s)://` or
+  `mailto:`, up to 2048 characters. `attributes` keeps `data-*`, `title`, `class`, `rel` and
+  `target` (`_blank` or `_self`), with values cut at 500 characters.
+- **The rest of the embed contract is typed.** The host already sent and read these; now the
+  types say so. `IEmbedContext` gains `innerHTML` and `attributes`, and
+  `IResolveEmbedParam` gains `innerHTML` and `attributes`, for element embeds that keep their
+  content as children or their settings on `data-*` attributes. Both also gain
+  `contentItemID` again, marked `@deprecated`: the host still writes and sends
+  `data-agility-id` for apps built on the 2.3.0 and 2.4.0 betas, and the type lets them
+  compile. Use `value`; the 2.4.0 removal still stands.
 - New exported types: `IUser`, `ISectionContext`, `IStackItemContext`, `ISetTitleParam`,
   `IEmbedLinkInsert`, `IEmbedInsert`. New optional fields on `IContextParam`: `section`,
   `item`, `parent`, `user`.
+- `"publishConfig": { "tag": "beta" }` in `package.json`, and a publish workflow
+  (`.github/workflows/npm-publish.yml`): a `v*` tag publishes with npm Trusted Publishing and
+  provenance, picks the dist-tag from the version, and creates the GitHub release from this
+  file.
+- Unit tests (`yarn test`, vitest) for `hasPermission` and the messages the new operations
+  send.
+
+### Known limitations
+
+- On the install screen opened from the organization's Apps page, `user.permissions` and
+  `user.teamIDs` are currently empty and `user.isOrgAdmin` is `false`, even for an org admin.
+  `userID`, `emailAddress` and `fullName` are filled in.
+
+### Typing changes that can break strict code
+
+The changes are additive on the wire, but two of them can fail a strict TypeScript build:
+
+- **`AgilityAddSKReturn` gains four required fields**: `section`, `item`, `parent` and
+  `user` (each `null` when absent). A typed mock of `useAgilityAppSDK()`'s return value in
+  your tests must add them.
+- **`INavigationTarget` is a wider union**, with `appSection` and `appItem`. A `switch` over
+  `target.type` that ends in an exhaustive `never` check no longer compiles until it handles
+  the two new members.
 
 ### Docs
 
