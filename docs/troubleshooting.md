@@ -164,4 +164,5 @@ curl {appUrl}/.well-known/agility-app.json
 From the **Manager App** side, put a breakpoint in
 `src/hooks/iframes/useAppSurfaceMessages.ts`. Every inbound app message passes through it,
 and its tests (`src/hooks/iframes/tests/useAppSurfaceMessages.test.tsx`) are the only
-executable spec of this protocol that exists anywhere — **this repo has no tests.**
+executable spec of how the host answers this protocol. This repo's own tests (`test/`) only
+check the messages the SDK sends.

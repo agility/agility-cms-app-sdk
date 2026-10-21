@@ -17,6 +17,7 @@ git clone https://github.com/agility/agility-cms-app-sdk.git
 cd agility-cms-app-sdk
 yarn install          # `prepare` builds automatically
 yarn build            # clean + rollup
+yarn test             # vitest: message shapes and hasPermission
 yarn watch            # rebuild on change, for use with `yarn link`
 ```
 
@@ -25,10 +26,13 @@ app, including the duplicate-React fix.
 
 ## The state of testing
 
-**There are no tests and no CI in this repo.** `yarn test` is a placeholder that exits 1.
+`yarn test` runs a small vitest suite in `test/`. It stubs `window` and checks the exact
+messages the SDK posts to the host, plus `hasPermission`. It can't tell you whether the host
+answers those messages the way you expect. There is no CI on pull requests: run
+`yarn build` and `yarn test` yourself, and please don't describe a change as verified
+because they pass.
 
-`yarn build` is the only automated gate, and it only proves the TypeScript compiles. Please
-don't describe a change as verified because the build passed.
+When you add or change an operation, add a case to `test/messages.test.ts`.
 
 The nearest thing to an executable spec for this protocol lives in the host repo, at
 `src/hooks/iframes/tests/useAppSurfaceMessages.test.tsx` in `agility-cms-manager-app-react`.

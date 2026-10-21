@@ -15,7 +15,8 @@
     "build": "run-s build:*",
     "prepare": "yarn build",
     "watch": "rollup -c -w",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "repository": {
     "type": "git",
@@ -44,7 +45,8 @@
     "rollup-plugin-typescript2": "^0.34.1",
     "rxjs": "^7.8.1",
     "ts-loader": "^9.4.2",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "vitest": "^3.2.4"
   },
   "peerDependencies": {
     "react": "^18.2.0",
