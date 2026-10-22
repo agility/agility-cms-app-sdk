@@ -77,7 +77,7 @@ const {
 | `pageItem` | `IPageItem \| null` | The page, on the page sidebar (from 2.4.0; `null` before, see below) |
 | `modalProps` | `any` | modal surface only; whatever `openModal({ props })` passed |
 | `embed` | `IEmbedContext \| null` | rteToolbar surface only |
-| `section` | `ISectionContext \| null` | sections surface only: `{ name }`. New in 2.5.0 |
+| `section` | `ISectionContext \| null` | sections surface only: `{ name }`, plus `panel: true` on a section's navigation panel (2.5.0-beta.1). New in 2.5.0 |
 | `item` | `IStackItemContext \| null` | items surface only: `{ name, id }`, `id` always a string. New in 2.5.0 |
 | `parent` | `IStackItemContext \| null` | items surface only: the stack entry the item was opened on top of; `null` when it is first on the stack. New in 2.5.0 |
 | `user` | `IUser \| null` | every surface, when the host sends it; `null` on older hosts. **For the UI only** — see [User and permissions](#user-and-permissions). New in 2.5.0 |
