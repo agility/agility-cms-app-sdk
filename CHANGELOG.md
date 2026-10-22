@@ -6,6 +6,20 @@ This project follows [semantic versioning](https://semver.org/). Because the SDK
 are a public contract shared with the Agility Manager App, changes are additive — fields
 are added, never renamed or removed.
 
+## 2.5.0-beta.1
+
+Pre-release, on the `beta` dist-tag. Additive.
+
+### Added
+
+- **Section navigation panels.** A section can declare `"panel": true`. The Manager App then
+  loads `{appUrl}/sections/{sectionName}/panel` in the section's resizable left column and
+  keeps it there while the right side shows the section's home or any open item, the way
+  Assets keeps its folder tree. `section.panel` is `true` in the panel's context.
+- **`contextUpdated`.** On a section panel the hook's `item` and `parent` follow the item open
+  on the right (`null` at the section's home): the host posts each change and the hook
+  re-renders. Only messages from the parent window for the app's own `appID` are read.
+
 ## 2.5.0-beta.0
 
 Pre-release, on the `beta` dist-tag. Two new surfaces, so an app can have screens of its

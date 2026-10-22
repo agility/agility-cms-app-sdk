@@ -423,7 +423,8 @@ host draws the chrome; your app paints the pane.
       "label": "My Library",              // the nav entry and the first breadcrumb
       "description": "Browse the library.",
       "icon": "IconFolder",               // optional
-      "permissions": [1]                  // optional; who sees the entry
+      "permissions": [1],                 // optional; who sees the entry
+      "panel": true                       // optional; a navigation panel beside it (2.5.0-beta.1)
     }
   ]
 }
@@ -435,6 +436,7 @@ host draws the chrome; your app paints the pane.
 | `label` | the nav entry's text |
 | `icon` | a Tabler icon name from the host's allow-list: `IconApps`, `IconArchive`, `IconBook`, `IconBriefcase`, `IconChartBar`, `IconChecklist`, `IconDatabase`, `IconFile`, `IconFiles`, `IconFolder`, `IconFolders`, `IconLock`, `IconPhoto`, `IconShieldLock`, `IconTable`. Not a URL. Anything else, or no icon, falls back to `IconApps` |
 | `permissions` | the [permission IDs](api-reference.md#permission) the user needs to see the entry, **any** of which is enough, with FullControl always passing. Defaults to `[1]` (Read); an empty list also means Read. (`hasPermission(user, [])` returns `false`, so pass `[Permission.Read]`, not `[]`, to mirror the host.) |
+| `panel` | optional, `true` to give the section a [navigation panel](#a-navigation-panel). Anything but `true` means no panel. New in 2.5.0-beta.1 |
 
 A name that breaks the rules is logged in the console and skipped; it never breaks another
 app. When two installed apps declare the same name, the first by app name wins and the
@@ -455,6 +457,35 @@ const { section, user } = useAgilityAppSDK()
 There is no path inside a section. A screen worth linking to, such as one folder, is a
 [stack item](#the-items-surface): `navigate` to it and the host gives it a URL, a
 breadcrumb and a back button.
+
+### A navigation panel
+
+**New in 2.5.0-beta.1.** A section that declares `"panel": true` gets a second iframe in the
+section's **left column**: the same resizable column Content and Assets use for their trees,
+which the user collapses by clicking the active section in the main navigation. The host
+opens it at `{appUrl}/sections/{sectionName}/panel?appID=…` and **keeps it mounted** while the
+right side shows the section's home or any item stacked on it, the way Assets keeps its
+folder tree beside an open folder or asset.
+
+```ts
+const { section, item, parent } = useAgilityAppSDK()
+// section: { name: "my-library", panel: true }
+// item:    the item open on the right, e.g. { name: "libraryfolder", id: "12" }; null at the home
+// parent:  the stack entry under it, or null
+```
+
+`item` and `parent` **update as the user navigates**: the host posts them as `contextUpdated`
+and the hook re-renders, so the panel can highlight the open folder without reloading. Open
+things from the panel with `navigate` to an `appItem` (with `replace: true` to swap the top of
+the stack rather than push onto it) or an `appSection`, exactly as from the section itself.
+
+Panel guidelines:
+
+- **Paint the whole iframe.** The host gives it a white column; the app draws everything in it.
+- **Keep the section's own screen free of the same navigation.** With a panel, the home and
+  the items on the right are the content; the tree lives only in the panel.
+- **Work at 300–600 px wide**, the column's range.
+- `setTitle` from a panel is ignored: the heading belongs to the screen on the right.
 
 In the Manager App the section lives under `/instance/{guid}/{locale}/apps/{sectionName}`.
 That prefix is the host's business: link to it with `getNavigationUrl({ target: { type:

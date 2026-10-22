@@ -13,13 +13,24 @@ export interface ISectionContext {
 	 * @memberof ISectionContext
 	 */
 	name: string
+
+	/**
+	 * `true` when this iframe is the section's **navigation panel** (the manifest's section
+	 * declared `panel: true` and the app was opened at `/sections/{sectionName}/panel`), shown
+	 * in the section's left column beside its home or any open item.  Absent otherwise.
+	 * New in 2.5.0-beta.1.
+	 *
+	 * @type {boolean}
+	 * @memberof ISectionContext
+	 */
+	panel?: boolean
 }
 
 /**
  * One entry on the Manager App's item stack: the `{name}-{id}` segment of its URL.
  *
  * Used for `item` (the app's own stack item) and `parent` (whatever it was opened on top
- * of) on the `items` surface.
+ * of) on the `items` surface, and on a section panel for the open item and the one under it.
  *
  * @export
  * @interface IStackItemContext
