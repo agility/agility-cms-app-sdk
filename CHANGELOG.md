@@ -75,8 +75,8 @@ own, plus the three small pieces they need. Everything is additive and optional:
 ### Known limitations
 
 - On the install screen opened from the organization's Apps page, `user.permissions` and
-  `user.teamIDs` are currently empty and `user.isOrgAdmin` is `false`, even for an org admin.
-  `userID`, `emailAddress` and `fullName` are filled in.
+  `user.teamIDs` are empty. `userID`, `emailAddress`, `fullName` and `user.isOrgAdmin`
+  (from the organization's admin list) are filled in.
 
 ### Typing changes that can break strict code
 

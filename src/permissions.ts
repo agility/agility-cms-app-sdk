@@ -36,7 +36,8 @@ export enum Permission {
  * passing.  The same rule the Manager App applies to its own navigation and screens.
  *
  * Returns `false` when there is no user (an older Manager App that sends none, or the
- * context has not arrived yet) and when `ids` is empty.
+ * context has not arrived yet) and when `ids` is empty.  Note the host reads a section's
+ * empty `permissions` as Read; to mirror that, pass `[Permission.Read]`, not `[]`.
  *
  * ```ts
  * const { user } = useAgilityAppSDK()

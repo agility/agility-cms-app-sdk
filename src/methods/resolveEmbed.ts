@@ -25,6 +25,8 @@ export interface IEmbedLinkInsert {
 	 * (`/files/report.pdf`), a fragment (`#top`), or an absolute `http://`, `https://` or
 	 * `mailto:` URL.  Anything else, including `javascript:`, `data:`, `tel:`, `//host`,
 	 * `?query` and a relative path such as `docs/a.pdf`, is dropped: nothing is inserted.
+	 * The host trims the href first, then refuses one that still contains whitespace, a
+	 * backslash or a control character anywhere.
 	 *
 	 * @type {string}
 	 * @memberof IEmbedLinkInsert

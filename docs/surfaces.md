@@ -116,7 +116,7 @@ Beyond that, only some fields populate:
 | `rteToolbar` | `embed` |
 | `sections` | `section` (from 2.5.0) |
 | `items` | `item`, `parent` (from 2.5.0) |
-| install screen | `appInstallContext` (and `user`, from 2.5.0) only; `instance` and `locale` stay `null`. Opened from the organization's Apps page, `user` currently has empty `permissions` and `teamIDs` and `isOrgAdmin: false` ([why](#the-user-context)) |
+| install screen | `appInstallContext` (and `user`, from 2.5.0) only; `instance` and `locale` stay `null`. Opened from the organization's Apps page, `user` has empty `permissions` and `teamIDs`; `isOrgAdmin` comes from the organization's admin list ([why](#the-user-context)) |
 
 > **`pageItem` before 2.4.0:** the SDK dropped it from the page-sidebar context, so `useAgilityAppSDK()` returned
 > `null`. Fixed in 2.4.0. On older SDKs, call [`getPageItem()`](api-reference.md#getpageitem) instead (it still works).
@@ -434,7 +434,7 @@ host draws the chrome; your app paints the pane.
 | `name` | **2–40 characters** of lowercase letters, digits and hyphens, **starting with a letter** (`^[a-z][a-z0-9-]{1,39}$`), unique across the apps installed in the instance. Reserved: `home`, `pages`, `layouts`, `content`, `media`, `models`, `reports`, `web-studio`, `settings`, `ecommerce`, `website-users`, `user-content`, `agilitysearch`, `apps` |
 | `label` | the nav entry's text |
 | `icon` | a Tabler icon name from the host's allow-list: `IconApps`, `IconArchive`, `IconBook`, `IconBriefcase`, `IconChartBar`, `IconChecklist`, `IconDatabase`, `IconFile`, `IconFiles`, `IconFolder`, `IconFolders`, `IconLock`, `IconPhoto`, `IconShieldLock`, `IconTable`. Not a URL. Anything else, or no icon, falls back to `IconApps` |
-| `permissions` | the [permission IDs](api-reference.md#permission) the user needs to see the entry, **any** of which is enough, with FullControl always passing. Defaults to `[1]` (Read) |
+| `permissions` | the [permission IDs](api-reference.md#permission) the user needs to see the entry, **any** of which is enough, with FullControl always passing. Defaults to `[1]` (Read); an empty list also means Read. (`hasPermission(user, [])` returns `false`, so pass `[Permission.Read]`, not `[]`, to mirror the host.) |
 
 A name that breaks the rules is logged in the console and skipped; it never breaks another
 app. When two installed apps declare the same name, the first by app name wins and the
@@ -479,7 +479,7 @@ of your app's section or on top of a content item, list, page or report.
 
 | Key | Rules |
 |---|---|
-| `name` | **3–30 characters** of lowercase letters and digits, **starting with a letter, no hyphen** (`^[a-z][a-z0-9]{2,29}$`; it is the left side of the `{name}-{id}` URL segment), unique across the apps installed in the instance. Reserved: `page`, `layout`, `pageversion`, `item`, `list`, `listitem`, `newlistitem`, `itemversion`, `urlredirections`, `batch`, `batches`, `folder`, `gallery`, `report`, and the Reports screens `recentchanges`, `readytopublish`, `accessreport`, `useractivity`, `contentsearch`, `syncstatus`, `domainstatus` |
+| `name` | **3–30 characters** of lowercase letters and digits, **starting with a letter, no hyphen** (`^[a-z][a-z0-9]{2,29}$`; it is the left side of the `{name}-{id}` URL segment), unique across the apps installed in the instance. Reserved: `page`, `layout`, `pageversion`, `item`, `list`, `listitem`, `newlistitem`, `itemversion`, `urlredirections`, `batch`, `batches`, `folder`, `gallery`, `report`, and the Reports screens `recentchanges`, `readytopublish`, `accessreport`, `useractivity`, `contentsearch`, `syncstatus`, `detailedsyncstatus`, `domainstatus`, `configurationtracking`, `customreports` |
 | `label` | the header and breadcrumb until your app calls `setTitle` (the `name` when there is no label) |
 
 The same skip-and-warn rules as sections apply to bad and duplicate names.
@@ -585,7 +585,7 @@ time the surface mounts. On an older Manager App `user` is `null`, and `hasPermi
 returns `false`.
 
 > ⚠️ **On the install screen opened from the organization's Apps page**, the host has no
-> instance user to read yet, so `user.permissions` and `user.teamIDs` are empty and
-> `user.isOrgAdmin` is `false`, even for the org admin doing the install. `userID`,
-> `emailAddress` and `fullName` are filled in. Don't hide install steps on the empty
-> fields there.
+> instance user to read, so `user.permissions` and `user.teamIDs` are empty. `userID`,
+> `emailAddress` and `fullName` are filled in, and `user.isOrgAdmin` is set from the
+> organization's admin list, so it is `true` for an org admin. Don't hide install steps
+> on the empty fields there.

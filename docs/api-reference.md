@@ -98,8 +98,8 @@ const { initializing, appInstallContext, instance, locale, user } = useAgilityPr
 
 `user` (from 2.5.0) is the signed-in user when the host sends it, as on every other surface.
 ⚠️ On the install screen opened from the organization's Apps page, `user.permissions` and
-`user.teamIDs` are currently empty and `user.isOrgAdmin` is `false`, even for an org admin;
-see [Surfaces § The `user` context](surfaces.md#the-user-context).
+`user.teamIDs` are empty; `user.isOrgAdmin` is set from the organization's admin list. See
+[Surfaces § The `user` context](surfaces.md#the-user-context).
 
 > ⚠️ **`instance` and `locale` are always `null`** — declared and returned, never set. Same
 > class of bug as `pageItem` above. Only `initializing` and `appInstallContext` are usable.

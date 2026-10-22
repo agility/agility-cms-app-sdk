@@ -10,10 +10,9 @@
  * Management API token rather than trust these values.
  *
  * ⚠️ **On the install screen opened from the organization's Apps page**, the host
- * currently has no instance user to read, so `permissions` and `teamIDs` are empty and
- * `isOrgAdmin` is `false`, even for the org admin doing the install.  `userID`,
- * `emailAddress` and `fullName` are filled in.  Don't hide install steps on those
- * fields there.
+ * has no instance user to read, so `permissions` and `teamIDs` are empty.  `userID`,
+ * `emailAddress`, `fullName` and `isOrgAdmin` (from the organization's admin list) are
+ * filled in.  Don't hide install steps on the empty fields there.
  *
  * @export
  * @interface IUser

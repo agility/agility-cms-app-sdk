@@ -13,8 +13,8 @@ interface AgilityPreInstallReturn {
 	locale: string | null,
 	/**
 	 * The signed-in user, when the Manager App sends it.  For the UI only.  New in 2.5.0.
-	 * ⚠️ From the organization's Apps page, `permissions` and `teamIDs` are currently empty
-	 * and `isOrgAdmin` is `false`; see {@link IUser}.
+	 * ⚠️ From the organization's Apps page, `permissions` and `teamIDs` are empty;
+	 * `isOrgAdmin` is set from the organization's admin list.  See {@link IUser}.
 	 */
 	user: IUser | null,
 }
