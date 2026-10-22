@@ -67,6 +67,55 @@ export type INavigationTarget =
 			 */
 			pageID: number
 	  }
+	| {
+			/**
+			 * One of **your own app's** sections, at its home screen.  New in 2.5.0.
+			 *
+			 * The host knows the calling app from its `appID`, so the app never names itself
+			 * and cannot open another app's section.
+			 */
+			type: "appSection"
+			/**
+			 * The `name` of the entry in your manifest's `capabilities.sections`.
+			 *
+			 * @type {string}
+			 */
+			name: string
+	  }
+	| {
+			/**
+			 * One of **your own app's** stack items, opened on the item stack.  New in 2.5.0.
+			 *
+			 * Inside a section that has a stack (content, pages, reports, or an app section)
+			 * and with `openInStack` not `false`, the item opens on top of the current screen.
+			 * Anywhere else it opens inside your app's first section; an app that declares no
+			 * section gets the host's error string back instead.
+			 */
+			type: "appItem"
+			/**
+			 * The `name` of the entry in your manifest's `capabilities.items`.
+			 *
+			 * @type {string}
+			 */
+			name: string
+			/**
+			 * The item's id.  Your app owns its meaning.  It goes into the URL, so the host
+			 * accepts only 1–128 characters of `A–Z a–z 0–9 . _ ~ -` (hyphens included, so a
+			 * UUID works) and answers anything else with its error string.  Encode other ids,
+			 * for example as base64url.
+			 *
+			 * @type {string}
+			 */
+			id: string
+			/**
+			 * Replace the top of the stack instead of adding to it.  The host also replaces
+			 * it, without being asked, when the top item already has the same `name`.  That
+			 * is how browsing folder to folder keeps one panel on the stack.
+			 *
+			 * @type {boolean}
+			 */
+			replace?: boolean
+	  }
 
 export interface INavigateParam {
 	/**

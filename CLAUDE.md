@@ -10,7 +10,7 @@ Quick orientation:
 | Question | Answer |
 |---|---|
 | What is this? | The client half of the Agility marketplace-apps `postMessage` protocol. See [`docs/architecture.md`](docs/architecture.md). |
-| How do I verify a change? | `yarn build`. **There are no tests and no CI** — do not report a change as verified because it compiled. |
+| How do I verify a change? | `yarn build` and `yarn test`. The tests only check the messages the SDK sends, and there is no PR CI — do not report a change as verified because it compiled. |
 | The rule I must not break | These types are a public contract: **add fields, never rename or remove**. |
 | Where does the other half live? | `agility-cms-manager-app-react` — a method here without a handler there is dead code. |
 | What should I never read? | `types/` at the repo root — a stale 2023 build artifact. Real types are generated into `dist/`. |

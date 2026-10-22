@@ -50,8 +50,8 @@ actually *does*. The host half lives in `agility-cms-manager-app-react`:
 
 - `src/hooks/iframes/useAppSurfaceMessages.ts` — the operation handler map
 - `src/hooks/iframes/useAppConfig.ts` — which iframe URL each surface loads
-- `src/hooks/iframes/tests/useAppSurfaceMessages.test.tsx` — the only executable spec of
-  the protocol that exists anywhere, since **this repo has no tests**
+- `src/hooks/iframes/tests/useAppSurfaceMessages.test.tsx` — the executable spec of how
+  the host answers the protocol. This repo's `test/` only checks the messages the SDK sends
 
 ## The wire format
 
@@ -118,7 +118,7 @@ operation, copy the matching one.
 
 | Shape | Returns | Examples |
 |---|---|---|
-| **Fire-and-forget** — build the param, `invokeAppMethod`, done | `void` | `setHeight`, `setFieldValue`, `refresh`, `saveContentItem`, `closeModal`, `setFocus`, `setVisibility` |
+| **Fire-and-forget** — build the param, `invokeAppMethod`, done | `void` | `setHeight`, `setFieldValue`, `refresh`, `saveContentItem`, `closeModal`, `setFocus`, `setVisibility`, `setTitle` |
 | **Request/reply** — a Subject wrapped in a Promise, resolved by the dispatcher | `Promise<T> \| undefined` | `getContentItem`, `getPageItem`, `getSelectedItems`, `getManagementAPIToken`, `getAPIKey`, `translate`, `persistData`, `updateConfigurationValue`, `setExtraConfigValues`, `getAppInstall` |
 | **Callback + long-lived Subject** | `void` | `addFieldListener`, `addSelectedItemListener` (both `autoDelete: false`); also `openModal`, `openAlertModal`, `selectAssets`, which take a `callback` and are answered against a *second* id |
 
@@ -213,8 +213,9 @@ all from [`src/index.ts`](../src/index.ts):
 - `react` / `react-dom` are **peer dependencies** and marked `external` — never bundled.
 - `dist/` is gitignored; the `prepare` script runs the build, so both `npm publish` and
   `yarn link` produce it.
-- **There are no tests.** `yarn test` is `echo "Error: no test specified" && exit 1`, and
-  there is no CI workflow.
+- **The tests are thin.** `yarn test` (vitest, `test/`) checks the messages the SDK posts
+  and `hasPermission`. There is no CI on pull requests; the only workflow is
+  `npm-publish.yml`, which runs on a `v*` tag.
 
 ### Known repo hazards
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Subject } from 'rxjs';
-import { IInstallContext, IConfig, IContextParam, IAppInstallContext, IInstance  } from './types';
+import { IInstallContext, IConfig, IContextParam, IAppInstallContext, IInstance, IUser  } from './types';
 import { getOperationID } from './lib/getOperationID';
 import { addOperation } from './lib/operationAccess';
 import { operationDispatcher } from './lib/operationDispatcher';
@@ -11,6 +11,12 @@ interface AgilityPreInstallReturn {
 	appInstallContext: IAppInstallContext | null,
 	instance: IInstance | null,
 	locale: string | null,
+	/**
+	 * The signed-in user, when the Manager App sends it.  For the UI only.  New in 2.5.0.
+	 * ⚠️ From the organization's Apps page, `permissions` and `teamIDs` are empty;
+	 * `isOrgAdmin` is set from the organization's admin list.  See {@link IUser}.
+	 */
+	user: IUser | null,
 }
 
 /**
@@ -23,6 +29,7 @@ export const useAgilityPreInstall = (): AgilityPreInstallReturn => {
 	const [appInstallContext, setAppInstallContext] = useState<IAppInstallContext | null>(null)
 	const [instance, setInstance] = useState<IInstance | null>(null)
 	const [locale, setLocale] = useState<string | null>(null)
+	const [user, setUser] = useState<IUser | null>(null)
 
 	useEffect(() => {
 
@@ -37,6 +44,7 @@ export const useAgilityPreInstall = (): AgilityPreInstallReturn => {
 
 			if (context) {
 				setAppInstallContext(context.app)
+				setUser(context.user || null)
 				setInitializing(false)
 				operation.unsubscribe()
 			}
@@ -68,6 +76,7 @@ export const useAgilityPreInstall = (): AgilityPreInstallReturn => {
 		initializing,
 		appInstallContext,
 		instance,
-		locale
+		locale,
+		user
 	}
 }

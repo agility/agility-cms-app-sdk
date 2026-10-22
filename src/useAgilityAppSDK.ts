@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Subject } from 'rxjs';
-import { IAppInstallContext, IInstance, IContextParam, IField, IContentItem, IContentModel, IPageItem, IEmbedContext } from './types';
+import { IAppInstallContext, IInstance, IContextParam, IField, IContentItem, IContentModel, IPageItem, IEmbedContext, ISectionContext, IStackItemContext, IUser } from './types';
 import { getOperationID } from './lib/getOperationID';
 import { addOperation } from './lib/operationAccess';
 import { operationDispatcher } from './lib/operationDispatcher';
@@ -98,6 +98,45 @@ export interface AgilityAddSKReturn {
 	 * @memberof AgilityAddSKReturn
 	 */
 	fieldValue: string
+
+	/**
+	 * The app section the app was opened in.  Only available on the sections surface.
+	 * New in 2.5.0.
+	 *
+	 * @type {(ISectionContext | null)}
+	 * @memberof AgilityAddSKReturn
+	 */
+	section: ISectionContext | null
+
+	/**
+	 * The app's own stack item, from the `{name}-{id}` segment of the URL.  Only available
+	 * on the items surface.  New in 2.5.0.
+	 *
+	 * @type {(IStackItemContext | null)}
+	 * @memberof AgilityAddSKReturn
+	 */
+	item: IStackItemContext | null
+
+	/**
+	 * The stack item the app's item was opened on top of, such as `{ name: "listitem", id: "1001" }`.
+	 * `null` when the item is the first on the stack, and on every other surface.  New in 2.5.0.
+	 *
+	 * @type {(IStackItemContext | null)}
+	 * @memberof AgilityAddSKReturn
+	 */
+	parent: IStackItemContext | null
+
+	/**
+	 * The signed-in user and their permissions in this instance.  Available on every surface
+	 * when the Manager App sends it; `null` on older hosts.  New in 2.5.0.
+	 *
+	 * ⚠️ For the UI only: use it to show or hide things.  Your server must re-verify every
+	 * request.
+	 *
+	 * @type {(IUser | null)}
+	 * @memberof AgilityAddSKReturn
+	 */
+	user: IUser | null
 }
 
 /**
@@ -119,6 +158,10 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 
 	const [modalProps, setModalProps] = useState<any>(null)
 	const [embed, setEmbed] = useState<IEmbedContext | null>(null)
+	const [section, setSection] = useState<ISectionContext | null>(null)
+	const [item, setItem] = useState<IStackItemContext | null>(null)
+	const [parent, setParent] = useState<IStackItemContext | null>(null)
+	const [user, setUser] = useState<IUser | null>(null)
 
 	useEffect(() => {
 		const appID = getAppID()
@@ -141,6 +184,10 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 				setContentModel(context.contentModel || null)
 				setModalProps(context.modalProps || null)
 				setEmbed(context.embed || null)
+				setSection(context.section || null)
+				setItem(context.item || null)
+				setParent(context.parent || null)
+				setUser(context.user || null)
 
 				if (context.field) {
 					//if we are on a custom field, add a listener for the field value
@@ -190,6 +237,10 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 		pageItem,
 		modalProps,
 		embed,
-		fieldValue
+		fieldValue,
+		section,
+		item,
+		parent,
+		user
 	}
 }

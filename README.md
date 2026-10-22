@@ -56,7 +56,9 @@ the integration, or the workflow shortcut your editors actually need.
 | **Page sidebar** | beside a page | preview links, analytics for that URL |
 | **Dashboards** | Home, Content and Pages sections | analytics, team to-dos, shortcuts |
 | **Modal** | a dialog over any surface | a picker or wizard launched from your own app |
-| **RTE toolbar** | the rich text editor toolbar | custom embeds — callouts, flip cards, charts |
+| **RTE toolbar** | the rich text editor toolbar | custom embeds — callouts, flip cards, charts — or plain links |
+| **Section** | its own entry in the main navigation, full-pane | a file library, a dashboard of your own, an admin screen |
+| **Stack item** | on the item stack, with its own breadcrumb and back button | one folder or record, opened from your section or on top of a content item |
 | **Install screen** | during installation | OAuth connect, account pickers |
 
 ## Installation

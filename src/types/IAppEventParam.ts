@@ -36,6 +36,7 @@ export interface IAppEventParam<T> {
     | "resolveEmbed"
     | "navigate"
     | "getNavigationUrl"
+    | "setTitle"
   error?: string
   arg?: T
 }
