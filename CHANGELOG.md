@@ -6,6 +6,26 @@ This project follows [semantic versioning](https://semver.org/). Because the SDK
 are a public contract shared with the Agility Manager App, changes are additive — fields
 are added, never renamed or removed.
 
+## 2.5.0-beta.2
+
+Pre-release, on the `beta` dist-tag. Additive.
+
+### Added
+
+- **`group` and `order` on a report** (`IAppReportCapability`). `group` is the heading of the
+  Reports left-panel group the report is listed under, so an app can put each report where it
+  wants:
+  - a built-in group's key or English label, in any case (`agility-reports` / "Agility
+    Reports", `custom-reports` / "Custom Reports"), joins that group after its own entries;
+  - anything else makes a group with that heading, shared by every app that names it
+    (ignoring case);
+  - absent, the app's install name, as in 2.5.0-beta.1.
+
+  Built-in groups come first, then app groups alphabetically by heading. `order` sorts reports
+  within a group, ascending; reports without it come last. `group` is trimmed and must be 1–60
+  characters of plain text; an invalid `group` or `order` is logged and ignored. The report's
+  breadcrumb reads Reports › {group} › {report}. Report URLs don't change.
+
 ## 2.5.0-beta.1
 
 Pre-release, on the `beta` dist-tag. Additive.

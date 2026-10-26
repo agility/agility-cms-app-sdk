@@ -52,9 +52,9 @@ export interface IAppItemCapability {
 }
 
 /**
- * One entry of `capabilities.reports`: an entry in the Reports section's left panel, under a
- * group headed by your app's name, and a full-pane report at `{appUrl}/reports/{name}`.
- * New in 2.5.0-beta.1.
+ * One entry of `capabilities.reports`: an entry in the Reports section's left panel, under the
+ * group `group` names (your app's name when absent), and a full-pane report at
+ * `{appUrl}/reports/{name}`.  New in 2.5.0-beta.1; `group` and `order` in 2.5.0-beta.2.
  *
  * @export
  * @interface IAppReportCapability
@@ -67,4 +67,23 @@ export interface IAppReportCapability {
 	description?: string
 	/** ANY of these permission ids (or FullControl) shows the report.  Absent or empty means Read. */
 	permissions?: number[]
+	/**
+	 * The heading of the Reports left-panel group to list the report under.  New in 2.5.0-beta.2.
+	 *
+	 * - A built-in group's key or English label, in any case, joins that group, after its own entries:
+	 *   `"agility-reports"` / `"Agility Reports"`, `"custom-reports"` / `"Custom Reports"`.
+	 * - Anything else makes a group with that heading.  Reports from different apps with the same
+	 *   `group` (ignoring case) share one group.
+	 * - Absent: your app's install name.
+	 *
+	 * Trimmed; 1–60 characters of plain text (no control characters, no `<` or `>`), always shown
+	 * as text.  An invalid value is logged and treated as absent.  The report's URL doesn't change
+	 * with its group.
+	 */
+	group?: string
+	/**
+	 * The report's position within its group, ascending.  Reports without one follow those with
+	 * one.  Not a number: logged and treated as absent.  New in 2.5.0-beta.2.
+	 */
+	order?: number
 }

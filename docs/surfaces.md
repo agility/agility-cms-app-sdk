@@ -47,7 +47,7 @@ directly whenever a surface fails to appear.
     "items":    [ { "name": "libraryfolder", "label": "Folder", "description": "..." } ],
 
     // your own reports in the Reports section (from 2.5.0-beta.1) — see "The reports surface" below
-    "reports":  [ { "name": "usage-by-day", "label": "Usage by day", "description": "...", "permissions": [1] } ],
+    "reports":  [ { "name": "usage-by-day", "label": "Usage by day", "description": "...", "permissions": [1], "group": "My Library", "order": 1 } ],
 
     // opt in to the pre-install screen
     "installScreen": true
@@ -616,8 +616,9 @@ the same targets to a link.
 
 **New in SDK 2.5.0-beta.1**, and it needs a Manager App that supports it (it reaches the
 Manager App's `qa/main` first). Puts your app's reports in the Manager App's **Reports**
-section: a group in the Reports left panel, headed by your app's name and listed after the
-built-in groups, with one entry per report, and a full-pane screen for each.
+section: an entry per report in the Reports left panel, under the group heading you choose
+(your app's name by default), and a full-pane screen for each. `group` and `order` are new in
+2.5.0-beta.2.
 
 ### Declare it
 
@@ -628,7 +629,9 @@ built-in groups, with one entry per report, and a full-pane screen for each.
       "name": "usage-by-day",       // route segment; see the name rules
       "label": "Usage by day",      // the left-panel entry and the heading
       "description": "Downloads per day.",
-      "permissions": [1]            // optional; who sees the entry
+      "permissions": [1],           // optional; who sees the entry
+      "group": "My Library",        // optional; the left-panel group heading (2.5.0-beta.2)
+      "order": 1                    // optional; position within the group (2.5.0-beta.2)
     }
   ]
 }
@@ -639,15 +642,35 @@ built-in groups, with one entry per report, and a full-pane screen for each.
 | `name` | **2–40 characters** of lowercase letters, digits and hyphens, **starting with a letter** (`^[a-z][a-z0-9-]{1,39}$`), unique within your app. Another app may use the same name: reports live under their app |
 | `label` | the left-panel entry and the report's heading until `setTitle` |
 | `permissions` | as a section's: **any** of these [permission IDs](api-reference.md#permission), FullControl always passing. Absent or empty means Read. The Reports section's own rule still applies first: it opens for FullControl, Manage, Develop and Report Viewer |
+| `group` | optional (2.5.0-beta.2): the heading of the left-panel group to list the report under. Trimmed; **1–60 characters** of plain text (no control characters, no `<` or `>`); always shown as text. Absent: your app's install name |
+| `order` | optional (2.5.0-beta.2): a number, the report's position within its group, ascending. Reports without one come after those with one |
+
+### Groups
+
+- **A built-in group:** a `group` equal to a built-in group's key or its **English** label, in
+  any case, joins that group, after its own entries: `"agility-reports"` or `"Agility Reports"`,
+  `"custom-reports"` or `"Custom Reports"`. The English label is matched whatever language the
+  user's Manager App is in, and Custom Reports shows for your report even when the instance has
+  no custom reports of its own.
+- **Your own group:** any other `group` makes a group with that heading. Reports from different
+  apps with the same `group` (ignoring case) share one group.
+- **No `group`:** a group headed by your app's install name, as in 2.5.0-beta.1.
+- **Order:** built-in groups first, then app groups alphabetically by heading (ignoring case).
+  Within a group, reports are sorted by `order`; reports without one keep the order the apps and
+  manifests list them in, after those with one.
+
+An invalid `group` or `order` is logged in the console and treated as absent; the report still
+shows. Where a report is listed never changes its URL.
 
 A bad or duplicate name is logged in the console and skipped; a `reports` value that isn't an
-array is ignored. Your app's group shows only the reports the user may open, and doesn't show
-at all when there are none.
+array is ignored. A group shows only the reports the user may open, and doesn't show at all
+when there are none.
 
 ### Serve the route
 
 The host opens your app at `{appUrl}/reports/{reportName}?appID=…`, filling the right side of
-the Reports section, under a heading and a breadcrumb (Reports › your app › the report). The
+the Reports section, under a heading and a breadcrumb (Reports › the report's group › the report; with no `group`,
+Reports › your app › the report). The
 report's own Manager App URL is `/instance/{guid}/{locale}/reports/apps/{appName}/{reportName}`.
 
 ### What arrives

@@ -58,7 +58,7 @@ the integration, or the workflow shortcut your editors actually need.
 | **Modal** | a dialog over any surface | a picker or wizard launched from your own app |
 | **RTE toolbar** | the rich text editor toolbar | custom embeds — callouts, flip cards, charts — or plain links |
 | **Section** | its own entry in the main navigation, full-pane | a file library, a dashboard of your own, an admin screen |
-| **Report** | an entry in the Reports section, under your app's name, full-pane | usage, audit or sync reports about your app's data |
+| **Report** | an entry in the Reports section, under a group heading you choose (your app's name by default), full-pane | usage, audit or sync reports about your app's data |
 | **Stack item** | on the item stack, with its own breadcrumb and back button | one folder or record, opened from your section or on top of a content item |
 | **Install screen** | during installation | OAuth connect, account pickers |
 

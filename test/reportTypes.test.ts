@@ -15,6 +15,17 @@ describe("reports surface types", () => {
 		expectTypeOf(report).toMatchTypeOf<{ name: string; label: string; description?: string; permissions?: number[] }>()
 	})
 
+	it("lets a report choose its left-panel group and its order in it (2.5.0-beta.2)", () => {
+		const report: IAppReportCapability = {
+			name: "usage",
+			label: "Usage",
+			group: "Secure Assets",
+			order: 4
+		}
+		expectTypeOf(report.group).toEqualTypeOf<string | undefined>()
+		expectTypeOf(report.order).toEqualTypeOf<number | undefined>()
+	})
+
 	it("carries report: { name, appName } in the context and the hook", () => {
 		expectTypeOf<IContextParam["report"]>().toEqualTypeOf<IReportContext | undefined>()
 		expectTypeOf<AgilityAddSKReturn["report"]>().toEqualTypeOf<IReportContext | null>()
