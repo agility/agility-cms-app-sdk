@@ -16,6 +16,24 @@ Pre-release, on the `beta` dist-tag. Additive.
   loads `{appUrl}/sections/{sectionName}/panel` in the section's resizable left column and
   keeps it there while the right side shows the section's home or any open item, the way
   Assets keeps its folder tree. `section.panel` is `true` in the panel's context.
+- **The `reports` surface.** `capabilities.reports[]` (`{ name, label, description?, permissions? }`,
+  typed as `IAppReportCapability`) puts an app's reports in the Manager App's Reports section:
+  one left-panel group per app, headed by the app's name and listed after the built-in groups,
+  with one entry per report the user may open (`permissions` as a section's: absent or empty
+  means Read). A report opens full-pane at `{appUrl}/reports/{reportName}`, and the hook returns
+  `report: { name, appName }` (`IReportContext`). Report names follow the section rule
+  (`^[a-z][a-z0-9-]{1,39}$`) and need only be unique within the app. `appName` is the manifest
+  name slugified, the same on every instance. `setTitle` sets the report's heading.
+- **The `appReport` navigation target**: `{ type: "appReport", name }`, resolved only to the
+  calling app's own reports. From a report, `appItem` opens on top of it, with
+  `parent: { name: "appreport", id: reportName }`.
+- **`iconUrl` on a section**: the app's own SVG nav icon, on the app's origin and resolved
+  against its URL, drawn like the Manager App's own icons (20x20 viewBox, `fill="none"`,
+  `stroke="currentColor"`, no stroke width). The host inlines a sanitized copy, so the nav's
+  colours apply, and shows the named `icon` while it loads and whenever it's off-origin, fails
+  to load or uses anything outside the allowed shapes.
+- **Manifest types**: `IAppSectionCapability`, `IAppItemCapability` and `IAppReportCapability`,
+  for apps that build their manifest in TypeScript.
 - **`contextUpdated`.** On a section panel the hook's `item` and `parent` follow the item open
   on the right (`null` at the section's home): the host posts each change and the hook
   re-renders. Only messages from the parent window for the app's own `appID` are read.

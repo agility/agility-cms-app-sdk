@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Subject } from 'rxjs';
-import { IAppInstallContext, IInstance, IContextParam, IField, IContentItem, IContentModel, IPageItem, IEmbedContext, ISectionContext, IStackItemContext, IUser } from './types';
+import { IAppInstallContext, IInstance, IContextParam, IField, IContentItem, IContentModel, IPageItem, IEmbedContext, IReportContext, ISectionContext, IStackItemContext, IUser } from './types';
 import { getOperationID } from './lib/getOperationID';
 import { addOperation } from './lib/operationAccess';
 import { operationDispatcher } from './lib/operationDispatcher';
@@ -110,6 +110,15 @@ export interface AgilityAddSKReturn {
 	section: ISectionContext | null
 
 	/**
+	 * The app report the app was opened in: `{ name, appName }`.  Only available on the
+	 * reports surface.  New in 2.5.0-beta.1.
+	 *
+	 * @type {(IReportContext | null)}
+	 * @memberof AgilityAddSKReturn
+	 */
+	report: IReportContext | null
+
+	/**
 	 * The app's own stack item, from the `{name}-{id}` segment of the URL.  Available on the
 	 * items surface, and on a section panel, where it's the item open on the right (the top of
 	 * the section's stack; `null` at the section's home) and **updates as the user navigates**
@@ -163,6 +172,7 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 	const [modalProps, setModalProps] = useState<any>(null)
 	const [embed, setEmbed] = useState<IEmbedContext | null>(null)
 	const [section, setSection] = useState<ISectionContext | null>(null)
+	const [report, setReport] = useState<IReportContext | null>(null)
 	const [item, setItem] = useState<IStackItemContext | null>(null)
 	const [parent, setParent] = useState<IStackItemContext | null>(null)
 	const [user, setUser] = useState<IUser | null>(null)
@@ -189,6 +199,7 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 				setModalProps(context.modalProps || null)
 				setEmbed(context.embed || null)
 				setSection(context.section || null)
+				setReport(context.report || null)
 				setItem(context.item || null)
 				setParent(context.parent || null)
 				setUser(context.user || null)
@@ -254,6 +265,7 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 		embed,
 		fieldValue,
 		section,
+		report,
 		item,
 		parent,
 		user

@@ -56,3 +56,32 @@ export interface IStackItemContext {
 	 */
 	id: string
 }
+
+/**
+ * Which app report the app was opened in.  Sent on the `reports` surface only.
+ * New in 2.5.0-beta.1.
+ *
+ * @export
+ * @interface IReportContext
+ */
+export interface IReportContext {
+	/**
+	 * The `name` of the entry in the manifest's `capabilities.reports`.  Matches the
+	 * `{reportName}` segment of the route the app was opened at.
+	 *
+	 * @type {string}
+	 * @memberof IReportContext
+	 */
+	name: string
+
+	/**
+	 * Your app's segment in the report's Manager App URL
+	 * (`/reports/apps/{appName}/{reportName}`): the manifest's `name`, lowercased, with every
+	 * run of other characters turned into one hyphen (`"Secure Files"` → `secure-files`).
+	 * The same on every instance, so a report link copied from one instance works on another.
+	 *
+	 * @type {string}
+	 * @memberof IReportContext
+	 */
+	appName: string
+}

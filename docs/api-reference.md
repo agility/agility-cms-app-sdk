@@ -60,7 +60,7 @@ const {
   initializing, appInstallContext, instance, locale,
   field, fieldValue, contentItem, contentModel,
   pageItem, modalProps, embed,
-  section, item, parent, user,
+  section, report, item, parent, user,
 } = useAgilityAppSDK()
 ```
 
@@ -78,6 +78,7 @@ const {
 | `modalProps` | `any` | modal surface only; whatever `openModal({ props })` passed |
 | `embed` | `IEmbedContext \| null` | rteToolbar surface only |
 | `section` | `ISectionContext \| null` | sections surface only: `{ name }`, plus `panel: true` on a section's navigation panel (2.5.0-beta.1). New in 2.5.0 |
+| `report` | `IReportContext \| null` | reports surface only: `{ name, appName }`. New in 2.5.0-beta.1 |
 | `item` | `IStackItemContext \| null` | items surface only: `{ name, id }`, `id` always a string. New in 2.5.0 |
 | `parent` | `IStackItemContext \| null` | items surface only: the stack entry the item was opened on top of; `null` when it is first on the stack. New in 2.5.0 |
 | `user` | `IUser \| null` | every surface, when the host sends it; `null` on older hosts. **For the UI only** — see [User and permissions](#user-and-permissions). New in 2.5.0 |
@@ -373,11 +374,12 @@ the CMS's URL grammar stays free to change under apps that pinned an old SDK.
 | `{ type: "contentList", containerID }` | a content list |
 | `{ type: "page", pageID }` | a page in the Pages section |
 | `{ type: "appSection", name }` | one of **your own app's** sections, at its home (2.5.0) |
+| `{ type: "appReport", name }` | one of **your own app's** reports, in the Reports section (2.5.0-beta.1). Never stacked |
 | `{ type: "appItem", name, id, replace? }` | one of **your own app's** stack items (2.5.0). `id` is 1–128 characters of `A–Z a–z 0–9 . _ ~ -`; any other id gets the host's error string. `replace: true` swaps the top of the stack instead of adding to it |
 
-`appSection` and `appItem` name only the calling app's own sections and items; the host
+`appSection`, `appReport` and `appItem` name only the calling app's own sections, reports and items; the host
 knows the app from its `appID`. An `appItem` opens on top of the current screen inside a
-section with a stack (content, pages, reports, an app section); anywhere else, or with
+section with a stack (content, pages, reports, an app section, an app report); anywhere else, or with
 `openInStack: false`, it opens inside your app's first section, and an app with no section
 gets the host's error string. Against a Manager App without these surfaces, both resolve to
 the host's "unsupported" error string. See
@@ -465,9 +467,9 @@ UI. **Custom-field surface only.** Call it from your input's `onFocus`/`onBlur`.
 setTitle({ title: string }): void
 ```
 
-Sets the title the Manager App shows for your screen. **Sections and items surfaces.** On a
+Sets the title the Manager App shows for your screen. **Sections, items and reports surfaces.** On a
 stack item it replaces the header above your app and the item's breadcrumb; on a section's
-home screen, the section header. It does **not** change the browser's document title.
+home screen, the section header; on a report, the report's heading and its breadcrumb. It does **not** change the browser's document title.
 Until you call it, the host shows the manifest `label`, or the `name` when there is no
 label; the id is never shown. Plain text, trimmed; a stack item's title is cut at 200
 characters. Fire-and-forget, new in **2.5.0**: a Manager App without the handler ignores
