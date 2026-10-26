@@ -46,6 +46,9 @@ directly whenever a surface fails to appear.
     "sections": [ { "name": "my-library", "label": "My Library", "description": "...", "icon": "IconFolder", "permissions": [1] } ],
     "items":    [ { "name": "libraryfolder", "label": "Folder", "description": "..." } ],
 
+    // your own reports in the Reports section (from 2.5.0-beta.1) — see "The reports surface" below
+    "reports":  [ { "name": "usage-by-day", "label": "Usage by day", "description": "...", "permissions": [1], "group": "My Library", "order": 1 } ],
+
     // opt in to the pre-install screen
     "installScreen": true
   }
@@ -73,11 +76,13 @@ each path it claims.**
 | `rteToolbar` | `/rte-toolbar/{buttonName}` | `appID`, `closeModalID` |
 | `sections` | `/sections/{sectionName}` | `appID` |
 | `items` | `/items/{itemName}` | `appID` |
+| `reports` | `/reports/{reportName}` | `appID` |
 | install screen | `/install` | `appID` |
 
 `{fieldType}` is the `name` of the entry in `capabilities.fields`. `{modalName}` is the
-`name` you passed to [`openModal`](api-reference.md#openmodal). `{sectionName}` and
-`{itemName}` are the `name`s of entries in `capabilities.sections` and `capabilities.items`.
+`name` you passed to [`openModal`](api-reference.md#openmodal). `{sectionName}`,
+`{itemName}` and `{reportName}` are the `name`s of entries in `capabilities.sections`,
+`capabilities.items` and `capabilities.reports`.
 
 > On the `items` surface the item's **id is not in your route**. It arrives as `item.id` in
 > the context, so one page serves every item of that name.
@@ -116,11 +121,12 @@ Beyond that, only some fields populate:
 | `rteToolbar` | `embed` |
 | `sections` | `section` (from 2.5.0) |
 | `items` | `item`, `parent` (from 2.5.0) |
-| install screen | `appInstallContext` (and `user`, from 2.5.0) only; `instance` and `locale` stay `null`. Opened from the organization's Apps page, `user` has empty `permissions` and `teamIDs`; `isOrgAdmin` comes from the organization's admin list ([why](#the-user-context)) |
+| `reports` | `report` (from 2.5.0-beta.1) |
+| install screen | `appInstallContext`, `user` (from 2.5.0), and `instance` and `locale` (from 2.5.0-beta.3; `null` before). Opened from the organization's Apps page, `user` has empty `permissions` and `teamIDs`; `isOrgAdmin` comes from the organization's admin list ([why](#the-user-context)) |
 
 > **`pageItem` before 2.4.0:** the SDK dropped it from the page-sidebar context, so `useAgilityAppSDK()` returned
 > `null`. Fixed in 2.4.0. On older SDKs, call [`getPageItem()`](api-reference.md#getpageitem) instead (it still works).
-> ⚠️ `useAgilityPreInstall` still has a similar defect: `instance` and `locale` stay `null` there.
+> `useAgilityPreInstall` had a similar defect (`instance` and `locale` stayed `null`) until 2.5.0-beta.3.
 
 `modalProps` is the general-purpose channel for host→app payload. New host→app data
 should be added as a field on `IContextParam` rather than as a second host→app operation.
@@ -131,11 +137,13 @@ The single most common cause of a broken app is calling an operation the current
 does not implement. This matrix reflects `agility-cms-manager-app-react` as of
 **2026-08-25** — `main`, plus the `rteToolbar` and navigation handlers from the TinyMCE 8 release
 (October 2026). The `sections` and `items` columns and the `setTitle` row describe the Manager
-App release that adds those surfaces (SDK 2.5.0), which reaches `qa/main` first.
+App release that adds those surfaces (SDK 2.5.0), which reaches `qa/main` first. The `reports`
+surface (2.5.0-beta.1) shares the `items` column: both are one full-pane app screen with the same
+handlers.
 
 Legend: ✅ available · — no handler
 
-| Operation | fields | contentItem&#8203;Sidebar | contentList&#8203;Sidebar | page&#8203;Sidebar | dashboards¹ | modal | rte&#8203;Toolbar³ | sections⁵ | items⁵ | install |
+| Operation | fields | contentItem&#8203;Sidebar | contentList&#8203;Sidebar | page&#8203;Sidebar | dashboards¹ | modal | rte&#8203;Toolbar³ | sections⁵ | items, reports⁵ | install |
 |---|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | **Core — every surface** | | | | | | | | | | |
 | `getManagementAPIToken` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
@@ -186,7 +194,8 @@ both resolve to the host's error string rather than an `INavigationUrl`, so chec
 There is no feature flag: the surface turns on in an instance as soon as an app declaring
 it is installed.
 
-⁵ The `sections` and `items` surfaces and `setTitle` are new in SDK **2.5.0** and need a
+⁵ The `sections` and `items` surfaces and `setTitle` are new in SDK **2.5.0**, and `reports` in
+**2.5.0-beta.1**; all need a
 Manager App that supports them; they reach the Manager App's `qa/main` first. Against an
 older host the surfaces never mount, and `setTitle` is ignored (it is fire-and-forget, so
 the host's error reply goes nowhere).
@@ -423,7 +432,8 @@ host draws the chrome; your app paints the pane.
       "label": "My Library",              // the nav entry and the first breadcrumb
       "description": "Browse the library.",
       "icon": "IconFolder",               // optional
-      "permissions": [1]                  // optional; who sees the entry
+      "permissions": [1],                 // optional; who sees the entry
+      "panel": true                       // optional; a navigation panel beside it (2.5.0-beta.1)
     }
   ]
 }
@@ -433,12 +443,37 @@ host draws the chrome; your app paints the pane.
 |---|---|
 | `name` | **2–40 characters** of lowercase letters, digits and hyphens, **starting with a letter** (`^[a-z][a-z0-9-]{1,39}$`), unique across the apps installed in the instance. Reserved: `home`, `pages`, `layouts`, `content`, `media`, `models`, `reports`, `web-studio`, `settings`, `ecommerce`, `website-users`, `user-content`, `agilitysearch`, `apps` |
 | `label` | the nav entry's text |
-| `icon` | a Tabler icon name from the host's allow-list: `IconApps`, `IconArchive`, `IconBook`, `IconBriefcase`, `IconChartBar`, `IconChecklist`, `IconDatabase`, `IconFile`, `IconFiles`, `IconFolder`, `IconFolders`, `IconLock`, `IconPhoto`, `IconShieldLock`, `IconTable`. Not a URL. Anything else, or no icon, falls back to `IconApps` |
+| `icon` | a Tabler icon name from the host's allow-list: `IconApps`, `IconArchive`, `IconBook`, `IconBriefcase`, `IconChartBar`, `IconChecklist`, `IconDatabase`, `IconFile`, `IconFiles`, `IconFolder`, `IconFolders`, `IconLock`, `IconPhoto`, `IconShieldLock`, `IconTable`. Not a URL. Anything else, or no icon, falls back to `IconApps`. Also the fallback for `iconUrl` |
+| `iconUrl` | optional, your own nav icon (see [Your own nav icon](#your-own-nav-icon)). New in 2.5.0-beta.1 |
 | `permissions` | the [permission IDs](api-reference.md#permission) the user needs to see the entry, **any** of which is enough, with FullControl always passing. Defaults to `[1]` (Read); an empty list also means Read. (`hasPermission(user, [])` returns `false`, so pass `[Permission.Read]`, not `[]`, to mirror the host.) |
+| `panel` | optional, `true` to give the section a [navigation panel](#a-navigation-panel). Anything but `true` means no panel. New in 2.5.0-beta.1 |
 
 A name that breaks the rules is logged in the console and skipped; it never breaks another
 app. When two installed apps declare the same name, the first by app name wins and the
 other is skipped with a console warning.
+
+### Your own nav icon
+
+**New in 2.5.0-beta.1.** `iconUrl` points at an SVG on your app's own origin. It's resolved
+against your app's URL the way an `rteToolbar` `editorComponentUrl` is, so a path works:
+
+```jsonc
+{ "name": "secure-assets", "label": "Secure Assets", "icon": "IconLock", "iconUrl": "/secure-assets-icon.svg" }
+```
+
+Draw it the way the Manager App draws its own nav icons:
+
+- a `viewBox="0 0 20 20"`, `fill="none"` and `stroke="currentColor"` on the `<svg>`, and **no
+  `stroke-width`** (the nav sets a 1px stroke and its own colours, active and idle);
+- only `g`, `path`, `rect`, `circle`, `ellipse`, `line`, `polyline` and `polygon`, with geometry
+  and stroke-shape attributes (`stroke-linecap`, `stroke-linejoin`, `stroke-dasharray`, …);
+- served with `Access-Control-Allow-Origin: *` (the host fetches it, without credentials).
+
+The host never injects your file: it rebuilds the drawing from that list and inlines it. Colours
+are the nav's: a `fill` other than `none`/`currentColor`, or any `stroke` colour, is dropped. The
+named `icon` shows while the file loads, and instead of it when the URL isn't on your origin, the
+file doesn't load, or it uses anything outside the list (a `<script>`, `<style>`, `<image>`,
+`<use>`, …).
 
 ### Serve the route
 
@@ -455,6 +490,35 @@ const { section, user } = useAgilityAppSDK()
 There is no path inside a section. A screen worth linking to, such as one folder, is a
 [stack item](#the-items-surface): `navigate` to it and the host gives it a URL, a
 breadcrumb and a back button.
+
+### A navigation panel
+
+**New in 2.5.0-beta.1.** A section that declares `"panel": true` gets a second iframe in the
+section's **left column**: the same resizable column Content and Assets use for their trees,
+which the user collapses by clicking the active section in the main navigation. The host
+opens it at `{appUrl}/sections/{sectionName}/panel?appID=…` and **keeps it mounted** while the
+right side shows the section's home or any item stacked on it, the way Assets keeps its
+folder tree beside an open folder or asset.
+
+```ts
+const { section, item, parent } = useAgilityAppSDK()
+// section: { name: "my-library", panel: true }
+// item:    the item open on the right, e.g. { name: "libraryfolder", id: "12" }; null at the home
+// parent:  the stack entry under it, or null
+```
+
+`item` and `parent` **update as the user navigates**: the host posts them as `contextUpdated`
+and the hook re-renders, so the panel can highlight the open folder without reloading. Open
+things from the panel with `navigate` to an `appItem` (with `replace: true` to swap the top of
+the stack rather than push onto it) or an `appSection`, exactly as from the section itself.
+
+Panel guidelines:
+
+- **Paint the whole iframe.** The host gives it a white column; the app draws everything in it.
+- **Keep the section's own screen free of the same navigation.** With a panel, the home and
+  the items on the right are the content; the tree lives only in the panel.
+- **Work at 300–600 px wide**, the column's range.
+- `setTitle` from a panel is ignored: the heading belongs to the screen on the right.
 
 In the Manager App the section lives under `/instance/{guid}/{locale}/apps/{sectionName}`.
 That prefix is the host's business: link to it with `getNavigationUrl({ target: { type:
@@ -547,6 +611,101 @@ the same targets to a link.
 
 > ⚠️ On a Manager App without these surfaces, `appSection` and `appItem` resolve to the
 > host's "unsupported" error string. Check `result?.url`.
+
+## The reports surface
+
+**New in SDK 2.5.0-beta.1**, and it needs a Manager App that supports it (it reaches the
+Manager App's `qa/main` first). Puts your app's reports in the Manager App's **Reports**
+section: an entry per report in the Reports left panel, under the group heading you choose
+(your app's name by default), and a full-pane screen for each. `group` and `order` are new in
+2.5.0-beta.2.
+
+### Declare it
+
+```jsonc
+"capabilities": {
+  "reports": [
+    {
+      "name": "usage-by-day",       // route segment; see the name rules
+      "label": "Usage by day",      // the left-panel entry and the heading
+      "description": "Downloads per day.",
+      "permissions": [1],           // optional; who sees the entry
+      "group": "My Library",        // optional; the left-panel group heading (2.5.0-beta.2)
+      "order": 1                    // optional; position within the group (2.5.0-beta.2)
+    }
+  ]
+}
+```
+
+| Key | Rules |
+|---|---|
+| `name` | **2–40 characters** of lowercase letters, digits and hyphens, **starting with a letter** (`^[a-z][a-z0-9-]{1,39}$`), unique within your app. Another app may use the same name: reports live under their app |
+| `label` | the left-panel entry and the report's heading until `setTitle` |
+| `permissions` | as a section's: **any** of these [permission IDs](api-reference.md#permission), FullControl always passing. Absent or empty means Read. The Reports section's own rule still applies first: it opens for FullControl, Manage, Develop and Report Viewer |
+| `group` | optional (2.5.0-beta.2): the heading of the left-panel group to list the report under. Trimmed; **1–60 characters** of plain text (no control characters, no `<` or `>`); always shown as text. Absent: your app's install name |
+| `order` | optional (2.5.0-beta.2): a number, the report's position within its group, ascending. Reports without one come after those with one |
+
+### Groups
+
+- **A built-in group:** a `group` equal to a built-in group's key or its **English** label, in
+  any case, joins that group, after its own entries: `"agility-reports"` or `"Agility Reports"`,
+  `"custom-reports"` or `"Custom Reports"`. The English label is matched whatever language the
+  user's Manager App is in, and Custom Reports shows for your report even when the instance has
+  no custom reports of its own.
+- **Your own group:** any other `group` makes a group with that heading. Reports from different
+  apps with the same `group` (ignoring case) share one group.
+- **No `group`:** a group headed by your app's install name, as in 2.5.0-beta.1.
+- **Order:** built-in groups first, then app groups alphabetically by heading (ignoring case).
+  Within a group, reports are sorted by `order`; reports without one keep the order the apps and
+  manifests list them in, after those with one.
+
+An invalid `group` or `order` is logged in the console and treated as absent; the report still
+shows. Where a report is listed never changes its URL.
+
+A bad or duplicate name is logged in the console and skipped; a `reports` value that isn't an
+array is ignored. A group shows only the reports the user may open, and doesn't show at all
+when there are none.
+
+### Serve the route
+
+The host opens your app at `{appUrl}/reports/{reportName}?appID=…`, filling the right side of
+the Reports section, under a heading and a breadcrumb (Reports › the report's group › the report; with no `group`,
+Reports › your app › the report). The
+report's own Manager App URL is `/instance/{guid}/{locale}/reports/apps/{appName}/{reportName}`.
+
+### What arrives
+
+```ts
+const { report, user } = useAgilityAppSDK()
+// report: { name: "usage-by-day", appName: "secure-files" }
+```
+
+`appName` is your manifest's `name`, lowercased, with each run of other characters turned into
+one hyphen (`"Secure Files"` → `secure-files`). It's the same on every instance, so a report link
+copied from staging works in production.
+
+[`setTitle`](api-reference.md#settitle) replaces the heading (and the report's breadcrumb when
+something is open on top of it).
+
+### Open a report, or an item from it
+
+```ts
+navigate({ target: { type: "appReport", name: "usage-by-day" } })
+```
+
+opens one of your own reports from any surface. A report is a screen of its own, so
+`openInStack` doesn't apply. From a report, `appItem` opens your stack item **on top of the
+report**, with the report as the first breadcrumb:
+
+```ts
+navigate({ target: { type: "appItem", name: "libraryfile", id: "6f1c-ab12" } })
+```
+
+The item's `parent` is then `{ name: "appreport", id: "usage-by-day" }`. `getNavigationUrl`
+resolves the same targets to a link.
+
+> ⚠️ On a Manager App without the reports surface, the reports never show and `appReport`
+> resolves to the host's "unsupported" error string. Check `result?.url`.
 
 ## The `user` context
 

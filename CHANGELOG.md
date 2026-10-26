@@ -6,6 +6,69 @@ This project follows [semantic versioning](https://semver.org/). Because the SDK
 are a public contract shared with the Agility Manager App, changes are additive — fields
 are added, never renamed or removed.
 
+## 2.5.0-beta.3
+
+Pre-release, on the `beta` dist-tag.
+
+### Fixed
+
+- **`useAgilityPreInstall` now sets `instance` and `locale`.** Both were declared on the hook's
+  return but never set, so they stayed `null` and an install screen had to read the host's raw
+  `context` reply to learn the instance. They now come from the host's reply to `preInstall`,
+  with `appInstallContext` and `user`. (Meant for 2.5.0-beta.2, which was already published.)
+
+## 2.5.0-beta.2
+
+Pre-release, on the `beta` dist-tag. Additive.
+
+### Added
+
+- **`group` and `order` on a report** (`IAppReportCapability`). `group` is the heading of the
+  Reports left-panel group the report is listed under, so an app can put each report where it
+  wants:
+  - a built-in group's key or English label, in any case (`agility-reports` / "Agility
+    Reports", `custom-reports` / "Custom Reports"), joins that group after its own entries;
+  - anything else makes a group with that heading, shared by every app that names it
+    (ignoring case);
+  - absent, the app's install name, as in 2.5.0-beta.1.
+
+  Built-in groups come first, then app groups alphabetically by heading. `order` sorts reports
+  within a group, ascending; reports without it come last. `group` is trimmed and must be 1–60
+  characters of plain text; an invalid `group` or `order` is logged and ignored. The report's
+  breadcrumb reads Reports › {group} › {report}. Report URLs don't change.
+
+## 2.5.0-beta.1
+
+Pre-release, on the `beta` dist-tag. Additive.
+
+### Added
+
+- **Section navigation panels.** A section can declare `"panel": true`. The Manager App then
+  loads `{appUrl}/sections/{sectionName}/panel` in the section's resizable left column and
+  keeps it there while the right side shows the section's home or any open item, the way
+  Assets keeps its folder tree. `section.panel` is `true` in the panel's context.
+- **The `reports` surface.** `capabilities.reports[]` (`{ name, label, description?, permissions? }`,
+  typed as `IAppReportCapability`) puts an app's reports in the Manager App's Reports section:
+  one left-panel group per app, headed by the app's name and listed after the built-in groups,
+  with one entry per report the user may open (`permissions` as a section's: absent or empty
+  means Read). A report opens full-pane at `{appUrl}/reports/{reportName}`, and the hook returns
+  `report: { name, appName }` (`IReportContext`). Report names follow the section rule
+  (`^[a-z][a-z0-9-]{1,39}$`) and need only be unique within the app. `appName` is the manifest
+  name slugified, the same on every instance. `setTitle` sets the report's heading.
+- **The `appReport` navigation target**: `{ type: "appReport", name }`, resolved only to the
+  calling app's own reports. From a report, `appItem` opens on top of it, with
+  `parent: { name: "appreport", id: reportName }`.
+- **`iconUrl` on a section**: the app's own SVG nav icon, on the app's origin and resolved
+  against its URL, drawn like the Manager App's own icons (20x20 viewBox, `fill="none"`,
+  `stroke="currentColor"`, no stroke width). The host inlines a sanitized copy, so the nav's
+  colours apply, and shows the named `icon` while it loads and whenever it's off-origin, fails
+  to load or uses anything outside the allowed shapes.
+- **Manifest types**: `IAppSectionCapability`, `IAppItemCapability` and `IAppReportCapability`,
+  for apps that build their manifest in TypeScript.
+- **`contextUpdated`.** On a section panel the hook's `item` and `parent` follow the item open
+  on the right (`null` at the section's home): the host posts each change and the hook
+  re-renders. Only messages from the parent window for the app's own `appID` are read.
+
 ## 2.5.0-beta.0
 
 Pre-release, on the `beta` dist-tag. Two new surfaces, so an app can have screens of its

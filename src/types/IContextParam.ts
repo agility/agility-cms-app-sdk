@@ -5,7 +5,7 @@ import { IEmbedContext } from "./IEmbedContext"
 import { IField } from "./IFieldParam"
 import { IInstance } from "./IInstance"
 import { IPageItem } from "./IPageItem"
-import { ISectionContext, IStackItemContext } from "./IAppSurfaceContext"
+import { IReportContext, ISectionContext, IStackItemContext } from "./IAppSurfaceContext"
 import { IUser } from "./IUser"
 
 export interface IContextParam {
@@ -25,6 +25,8 @@ export interface IContextParam {
 	item?: IStackItemContext
 	/** The stack item the app's item was opened on top of, or `null` at the bottom of the stack.  `items` surface only.  New in 2.5.0. */
 	parent?: IStackItemContext | null
+	/** The app report the app was opened in.  `reports` surface only.  New in 2.5.0-beta.1. */
+	report?: IReportContext
 	/** The signed-in user.  Every surface, on a Manager App that sends it.  For the UI only.  New in 2.5.0. */
 	user?: IUser
 }

@@ -71,6 +71,15 @@ describe("navigate", () => {
 		})
 	})
 
+	it("sends an appReport target", () => {
+		void navigate({ target: { type: "appReport", name: "usage-by-day" } })
+		expect(lastMessage()).toMatchObject({
+			appID: "app-1",
+			operationType: "navigate",
+			arg: { target: { type: "appReport", name: "usage-by-day" } }
+		})
+	})
+
 	it("resolves with the host's reply to its operation", async () => {
 		const pending = navigate({ target: { type: "appItem", name: "libraryfile", id: "12" } })
 		const { operationID } = lastMessage()
@@ -91,6 +100,14 @@ describe("getNavigationUrl", () => {
 		expect(lastMessage()).toMatchObject({
 			operationType: "getNavigationUrl",
 			arg: { target: { type: "appItem", name: "libraryfile", id: "12" } }
+		})
+	})
+
+	it("sends an appReport target", () => {
+		void getNavigationUrl({ target: { type: "appReport", name: "usage-by-day" } })
+		expect(lastMessage()).toMatchObject({
+			operationType: "getNavigationUrl",
+			arg: { target: { type: "appReport", name: "usage-by-day" } }
 		})
 	})
 })
