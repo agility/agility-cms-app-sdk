@@ -96,7 +96,8 @@ A bug in this SDK. The host does send `pageItem` in the page-sidebar context and
 
 **Workaround:** call `pageMethods.getPageItem()` explicitly.
 
-`useAgilityPreInstall` has the same defect for `instance` and `locale`.
+`useAgilityPreInstall` had the same defect for `instance` and `locale` before 2.5.0-beta.3. On older
+SDKs, read the instance from the host's `context` reply yourself; from 2.5.0-beta.3 the hook returns it.
 
 ## `closeModal()` or `resolveEmbed()` does nothing
 

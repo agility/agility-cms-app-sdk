@@ -102,8 +102,9 @@ const { initializing, appInstallContext, instance, locale, user } = useAgilityPr
 `user.teamIDs` are empty; `user.isOrgAdmin` is set from the organization's admin list. See
 [Surfaces § The `user` context](surfaces.md#the-user-context).
 
-> ⚠️ **`instance` and `locale` are always `null`** — declared and returned, never set. Same
-> class of bug as `pageItem` above. Only `initializing` and `appInstallContext` are usable.
+`instance` and `locale` come from the host's reply to `preInstall` (from **2.5.0-beta.3**).
+> ⚠️ Before 2.5.0-beta.3 they were always `null`: declared and returned, never set (the same class of bug as
+> `pageItem` above).
 
 Pair it with [`setExtraConfigValues`](#setextraconfigvalues) to finish the install.
 

@@ -6,6 +6,17 @@ This project follows [semantic versioning](https://semver.org/). Because the SDK
 are a public contract shared with the Agility Manager App, changes are additive — fields
 are added, never renamed or removed.
 
+## 2.5.0-beta.3
+
+Pre-release, on the `beta` dist-tag.
+
+### Fixed
+
+- **`useAgilityPreInstall` now sets `instance` and `locale`.** Both were declared on the hook's
+  return but never set, so they stayed `null` and an install screen had to read the host's raw
+  `context` reply to learn the instance. They now come from the host's reply to `preInstall`,
+  with `appInstallContext` and `user`. (Meant for 2.5.0-beta.2, which was already published.)
+
 ## 2.5.0-beta.2
 
 Pre-release, on the `beta` dist-tag. Additive.

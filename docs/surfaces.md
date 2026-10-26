@@ -122,11 +122,11 @@ Beyond that, only some fields populate:
 | `sections` | `section` (from 2.5.0) |
 | `items` | `item`, `parent` (from 2.5.0) |
 | `reports` | `report` (from 2.5.0-beta.1) |
-| install screen | `appInstallContext` (and `user`, from 2.5.0) only; `instance` and `locale` stay `null`. Opened from the organization's Apps page, `user` has empty `permissions` and `teamIDs`; `isOrgAdmin` comes from the organization's admin list ([why](#the-user-context)) |
+| install screen | `appInstallContext`, `user` (from 2.5.0), and `instance` and `locale` (from 2.5.0-beta.3; `null` before). Opened from the organization's Apps page, `user` has empty `permissions` and `teamIDs`; `isOrgAdmin` comes from the organization's admin list ([why](#the-user-context)) |
 
 > **`pageItem` before 2.4.0:** the SDK dropped it from the page-sidebar context, so `useAgilityAppSDK()` returned
 > `null`. Fixed in 2.4.0. On older SDKs, call [`getPageItem()`](api-reference.md#getpageitem) instead (it still works).
-> ⚠️ `useAgilityPreInstall` still has a similar defect: `instance` and `locale` stay `null` there.
+> `useAgilityPreInstall` had a similar defect (`instance` and `locale` stayed `null`) until 2.5.0-beta.3.
 
 `modalProps` is the general-purpose channel for host→app payload. New host→app data
 should be added as a field on `IContextParam` rather than as a second host→app operation.
