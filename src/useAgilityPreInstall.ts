@@ -6,6 +6,7 @@ import { addOperation } from './lib/operationAccess';
 import { operationDispatcher } from './lib/operationDispatcher';
 import { invokeAppMethod } from './lib/invokeAppMethod';
 import { getAppID } from './lib/getAppID';
+import { readPreInstallContext } from './lib/preInstallContext';
 interface AgilityPreInstallReturn {
 	initializing: boolean,
 	appInstallContext: IAppInstallContext | null,
@@ -43,8 +44,11 @@ export const useAgilityPreInstall = (): AgilityPreInstallReturn => {
 		operation.subscribe((context) => {
 
 			if (context) {
-				setAppInstallContext(context.app)
-				setUser(context.user || null)
+				const read = readPreInstallContext(context)
+				setAppInstallContext(read.appInstallContext)
+				setInstance(read.instance)
+				setLocale(read.locale)
+				setUser(read.user)
 				setInitializing(false)
 				operation.unsubscribe()
 			}

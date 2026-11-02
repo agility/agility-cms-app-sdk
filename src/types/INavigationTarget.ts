@@ -116,6 +116,22 @@ export type INavigationTarget =
 			 */
 			replace?: boolean
 	  }
+	| {
+			/**
+			 * One of **your own app's** reports, in the Reports section.  New in 2.5.0-beta.1.
+			 *
+			 * A report is a screen of its own, never stacked: `openInStack` is ignored.  The
+			 * host knows the calling app from its `appID`, so the app never names itself and
+			 * cannot open another app's report.
+			 */
+			type: "appReport"
+			/**
+			 * The `name` of the entry in your manifest's `capabilities.reports`.
+			 *
+			 * @type {string}
+			 */
+			name: string
+	  }
 
 export interface INavigateParam {
 	/**

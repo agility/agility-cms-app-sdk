@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Subject } from 'rxjs';
-import { IAppInstallContext, IInstance, IContextParam, IField, IContentItem, IContentModel, IPageItem, IEmbedContext, ISectionContext, IStackItemContext, IUser } from './types';
+import { IAppInstallContext, IInstance, IContextParam, IField, IContentItem, IContentModel, IPageItem, IEmbedContext, IReportContext, ISectionContext, IStackItemContext, IUser } from './types';
 import { getOperationID } from './lib/getOperationID';
 import { addOperation } from './lib/operationAccess';
 import { operationDispatcher } from './lib/operationDispatcher';
 import { invokeAppMethod } from './lib/invokeAppMethod';
 import { getAppID } from './lib/getAppID';
+import { readContextUpdate } from "./lib/contextUpdate"
 import { addFieldListener } from './methods/contentItem';
 
 
@@ -109,8 +110,19 @@ export interface AgilityAddSKReturn {
 	section: ISectionContext | null
 
 	/**
-	 * The app's own stack item, from the `{name}-{id}` segment of the URL.  Only available
-	 * on the items surface.  New in 2.5.0.
+	 * The app report the app was opened in: `{ name, appName }`.  Only available on the
+	 * reports surface.  New in 2.5.0-beta.1.
+	 *
+	 * @type {(IReportContext | null)}
+	 * @memberof AgilityAddSKReturn
+	 */
+	report: IReportContext | null
+
+	/**
+	 * The app's own stack item, from the `{name}-{id}` segment of the URL.  Available on the
+	 * items surface, and on a section panel, where it's the item open on the right (the top of
+	 * the section's stack; `null` at the section's home) and **updates as the user navigates**
+	 * (2.5.0-beta.1).  New in 2.5.0.
 	 *
 	 * @type {(IStackItemContext | null)}
 	 * @memberof AgilityAddSKReturn
@@ -119,7 +131,8 @@ export interface AgilityAddSKReturn {
 
 	/**
 	 * The stack item the app's item was opened on top of, such as `{ name: "listitem", id: "1001" }`.
-	 * `null` when the item is the first on the stack, and on every other surface.  New in 2.5.0.
+	 * `null` when the item is the first on the stack, and on every other surface.  On a section
+	 * panel it's the entry under the open item, and updates with it.  New in 2.5.0.
 	 *
 	 * @type {(IStackItemContext | null)}
 	 * @memberof AgilityAddSKReturn
@@ -159,6 +172,7 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 	const [modalProps, setModalProps] = useState<any>(null)
 	const [embed, setEmbed] = useState<IEmbedContext | null>(null)
 	const [section, setSection] = useState<ISectionContext | null>(null)
+	const [report, setReport] = useState<IReportContext | null>(null)
 	const [item, setItem] = useState<IStackItemContext | null>(null)
 	const [parent, setParent] = useState<IStackItemContext | null>(null)
 	const [user, setUser] = useState<IUser | null>(null)
@@ -185,6 +199,7 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 				setModalProps(context.modalProps || null)
 				setEmbed(context.embed || null)
 				setSection(context.section || null)
+				setReport(context.report || null)
 				setItem(context.item || null)
 				setParent(context.parent || null)
 				setUser(context.user || null)
@@ -213,6 +228,16 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 		//set up the listener for the app events
 		window.addEventListener("message", operationDispatcher, false);
 
+		// A section panel stays mounted while the user navigates beside it; the host posts the open
+		// item as `contextUpdated` instead of reloading it.
+		const onContextUpdated = (event: MessageEvent) => {
+			const update = readContextUpdate(event, appID, window.parent)
+			if (!update) return
+			if ("item" in update) setItem(update.item ?? null)
+			if ("parent" in update) setParent(update.parent ?? null)
+		}
+		window.addEventListener("message", onContextUpdated, false);
+
 		//send the init method call to the parent window
 		invokeAppMethod<{ updateContextID: string }>({
 			appID,
@@ -223,6 +248,7 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 		return () => {
 			//clean up the listener...
 			removeEventListener("message", operationDispatcher, false);
+			removeEventListener("message", onContextUpdated, false);
 		}
 	}, [])
 
@@ -239,6 +265,7 @@ export const useAgilityAppSDK = (): AgilityAddSKReturn => {
 		embed,
 		fieldValue,
 		section,
+		report,
 		item,
 		parent,
 		user
