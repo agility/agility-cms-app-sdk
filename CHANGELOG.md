@@ -6,6 +6,27 @@ This project follows [semantic versioning](https://semver.org/). Because the SDK
 are a public contract shared with the Agility Manager App, changes are additive — fields
 are added, never renamed or removed.
 
+## 2.5.0
+
+Stable release, on the `latest` dist-tag. The same code as 2.5.0-beta.3; only the version
+changes. It collects the four 2.5.0 betas below:
+
+- **Sections**: an app's own entry in the main navigation and a full-pane screen, with an
+  optional navigation panel (`panel: true`) and its own SVG icon (`iconUrl`).
+- **Stack items**: app screens on the Manager App's item stack, with their own URL segment,
+  breadcrumb and back button, opened with the `appItem` navigation target.
+- **Reports**: an app's reports in the Manager App's Reports section, with `group` and `order`,
+  opened with the `appReport` navigation target.
+- **`user` on every surface**, plus `Permission` and `hasPermission`.
+- **`rteToolbar` link buttons** (`insert: "link"`).
+- **`setTitle`** and **`contextUpdated`**, and `useAgilityPreInstall` now sets `instance` and
+  `locale`.
+
+Everything is additive: every 2.4 app keeps working unchanged. The Manager App in production
+supports all of it from 2026-11-02. Against an older host the new surfaces never mount, `user`
+is `null`, and the new navigation targets resolve to the host's "unsupported" error string.
+See each beta's section for the details.
+
 ## 2.5.0-beta.3
 
 Pre-release, on the `beta` dist-tag.
