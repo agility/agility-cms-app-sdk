@@ -111,7 +111,14 @@ Three consequences worth knowing up front:
 ### 1. Declare what your app provides
 
 Serve a manifest at **`{yourAppUrl}/.well-known/agility-app.json`**. Include only the
-surfaces you implement, and make sure CORS allows Agility to fetch it.
+surfaces you implement, and make sure CORS allows Agility to fetch it: send
+`Access-Control-Allow-Origin` (`*`, or the Manager App's origin, `https://app.agilitycms.com`).
+
+Your app can be private. The Manager App loads the manifest and every surface in the
+editor's browser, so the app only has to be reachable from there: behind an IP allowlist,
+a VPN, or on `localhost` while you develop. If the browser can't load the manifest (no
+CORS header, for example), Agility's servers try instead, which works only when the app is
+publicly reachable over https.
 
 ```jsonc
 {
